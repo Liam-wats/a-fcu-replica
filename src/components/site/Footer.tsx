@@ -1,68 +1,96 @@
-import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Youtube, Linkedin, Search } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Apple, Smartphone } from "lucide-react";
 import { Logo } from "./Logo";
+
+const PRIMARY_LINKS = [
+  "Fee Schedule",
+  "Careers",
+  "Blog",
+  "Recognition",
+  "Site Map",
+  "Accessibility Statement",
+  "Privacy Policy",
+];
 
 export function Footer() {
   return (
-    <footer className="bg-brand-green text-white">
-      <div className="container-x py-14 grid gap-10 lg:grid-cols-[1fr_1fr] items-start">
-        <div>
-          <div className="bg-white inline-block p-4">
-            <Logo />
+    <footer className="bg-white">
+      {/* Green banner */}
+      <div className="bg-secondary pt-12">
+        <div className="container-x">
+          <div className="bg-brand-green text-white inline-block px-8 py-7 max-w-xl">
+            <p className="font-serif text-2xl md:text-3xl leading-snug">
+              Banking on each other.
+              <br />
+              Building stronger communities.<sup className="text-sm">®</sup>
+            </p>
           </div>
-          <p className="font-serif text-2xl mt-6 leading-snug">
-            Banking on each other.
-            <br />
-            Building stronger communities.<sup className="text-sm">®</sup>
-          </p>
-          <div className="flex gap-3 mt-6">
-            {[Facebook, Instagram, Youtube, Linkedin].map((Icon, i) => (
-              <a key={i} href="#" aria-label="Social" className="w-9 h-9 rounded-full border border-white/40 inline-flex items-center justify-center hover:bg-white hover:text-brand-green transition-colors">
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-serif text-2xl text-white mb-4">I'm looking for…</h3>
-          <form className="flex" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="search"
-              placeholder="Search for…"
-              className="flex-1 bg-white text-ink px-4 py-3 outline-none"
-              aria-label="Search"
-            />
-            <button type="submit" className="bg-white text-brand-green px-5 border-l border-border" aria-label="Submit search">
-              <Search className="w-5 h-5" />
-            </button>
-          </form>
-          <h4 className="font-sans uppercase text-sm font-bold tracking-wide mt-6 mb-3">Popular Searches:</h4>
-          <ul className="space-y-2 text-[15px]">
-            <li>Routing #314977104</li>
-            <li><a href="#" className="underline underline-offset-4 hover:no-underline">Rates</a></li>
-            <li><a href="#" className="underline underline-offset-4 hover:no-underline">Debit Cards</a></li>
-            <li><a href="#" className="underline underline-offset-4 hover:no-underline">A+ Mobile App</a></li>
-          </ul>
         </div>
       </div>
 
-      <div className="border-t border-white/20">
-        <div className="container-x py-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-xs text-white/85">
-          <div className="flex items-center gap-4">
-            <span className="inline-flex items-center justify-center w-12 h-12 border border-white/40 text-[10px] text-center leading-tight">NCUA</span>
-            <span className="inline-flex items-center justify-center w-12 h-12 border border-white/40 text-[10px] text-center leading-tight">Equal<br/>Housing</span>
-            <p className="max-w-md">
-              Your savings federally insured to at least $250,000 by the National Credit Union Administration, a U.S. Government Agency.
+      <div className="bg-secondary pt-10 pb-12">
+        <div className="container-x grid lg:grid-cols-[1.4fr_1fr] gap-10">
+          <div>
+            <div className="flex items-start gap-8 flex-wrap">
+              <Logo />
+              <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+                {PRIMARY_LINKS.map((l) => (
+                  <li key={l}>
+                    <a href="#" className="text-brand-green underline underline-offset-4 hover:no-underline font-semibold text-[15px]">
+                      {l}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-xs text-ink/70 mt-8 max-w-lg italic leading-relaxed">
+              If you're using a screen reader and are having problems using this website, please call{" "}
+              <a href="tel:5123026800" className="underline">512.302.6800</a> for assistance.
+            </p>
+            <p className="text-xs text-ink/70 mt-3 max-w-lg italic leading-relaxed">
+              Since changes may be made to the info on our website without advance notice, for the most up-to-date information, please call{" "}
+              <a href="tel:5123026800" className="underline">512.302.6800</a>.
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            <a href="#" className="hover:underline">Privacy</a>
-            <a href="#" className="hover:underline">Disclosures</a>
-            <a href="#" className="hover:underline">Accessibility</a>
-            <a href="#" className="hover:underline">Site Map</a>
-            <span>© {new Date().getFullYear()} A+ Federal Credit Union</span>
+
+          <div>
+            <h4 className="font-bold text-ink mb-3">Download The A+ Mobile App</h4>
+            <div className="flex gap-3">
+              <a href="#" aria-label="Apple App Store" className="w-10 h-10 border border-ink/30 inline-flex items-center justify-center hover:bg-white">
+                <Apple className="w-5 h-5 text-ink" />
+              </a>
+              <a href="#" aria-label="Google Play" className="w-10 h-10 border border-ink/30 inline-flex items-center justify-center hover:bg-white">
+                <Smartphone className="w-5 h-5 text-ink" />
+              </a>
+            </div>
+            <h4 className="font-bold text-ink mt-7 mb-3">Connect With Us</h4>
+            <div className="flex gap-3">
+              {[Facebook, Instagram, Linkedin].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  aria-label="Social"
+                  className="w-10 h-10 border border-ink/30 inline-flex items-center justify-center hover:bg-white"
+                >
+                  <Icon className="w-5 h-5 text-ink" />
+                </a>
+              ))}
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-secondary border-t border-border">
+        <div className="container-x py-6 flex flex-col md:flex-row gap-4 items-center justify-center text-xs text-ink/70">
+          <span>Routing #314977104</span>
+          <span className="hidden md:inline">|</span>
+          <span className="font-semibold">Equal Housing LENDER</span>
+          <span className="hidden md:inline">|</span>
+          <span>NMLS #405608</span>
+          <span className="hidden md:inline">|</span>
+          <a href="#" className="text-brand-green underline underline-offset-4 hover:no-underline">Insured by NCUA</a>
+        </div>
+        <div className="container-x pb-6 text-center text-xs text-ink/60">
+          © {new Date().getFullYear()} A+ Federal Credit Union
         </div>
       </div>
     </footer>
