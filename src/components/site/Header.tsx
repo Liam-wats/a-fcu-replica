@@ -39,13 +39,17 @@ export function Header() {
                       <div key={col.title}>
                         <h4 className="text-sm font-bold text-brand-green mb-2 font-sans">{col.title}</h4>
                         <ul className="space-y-1.5">
-                          {col.links.map((l) => (
-                            <li key={l}>
-                              <Link to={item.href} className="text-sm text-ink hover:text-brand-green hover:underline">
-                                {l}
-                              </Link>
-                            </li>
-                          ))}
+                          {col.links.map((l) => {
+                            const label = typeof l === "string" ? l : l.label;
+                            const href = typeof l === "string" ? item.href : l.href;
+                            return (
+                              <li key={label}>
+                                <Link to={href} className="text-sm text-ink hover:text-brand-green hover:underline">
+                                  {label}
+                                </Link>
+                              </li>
+                            );
+                          })}
                         </ul>
                       </div>
                     ))}
@@ -88,9 +92,13 @@ export function Header() {
                     <div key={col.title}>
                       <h5 className="text-sm font-bold text-brand-green mb-1">{col.title}</h5>
                       <ul className="space-y-1">
-                        {col.links.map((l) => (
-                          <li key={l}><Link to={item.href} onClick={() => setMobile(false)} className="text-sm">{l}</Link></li>
-                        ))}
+                        {col.links.map((l) => {
+                          const label = typeof l === "string" ? l : l.label;
+                          const href = typeof l === "string" ? item.href : l.href;
+                          return (
+                            <li key={label}><Link to={href} onClick={() => setMobile(false)} className="text-sm">{label}</Link></li>
+                          );
+                        })}
                       </ul>
                     </div>
                   ))}

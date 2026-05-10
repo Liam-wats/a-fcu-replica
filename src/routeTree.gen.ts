@@ -11,6 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
+import { Route as AccountsYouthRouteImport } from './routes/accounts/youth'
+import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
+import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
+import { Route as AccountsCertificatesRouteImport } from './routes/accounts/certificates'
 
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
@@ -22,31 +27,98 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsIndexRoute = AccountsIndexRouteImport.update({
+  id: '/accounts/',
+  path: '/accounts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsYouthRoute = AccountsYouthRouteImport.update({
+  id: '/accounts/youth',
+  path: '/accounts/youth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsSavingsRoute = AccountsSavingsRouteImport.update({
+  id: '/accounts/savings',
+  path: '/accounts/savings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsCheckingRoute = AccountsCheckingRouteImport.update({
+  id: '/accounts/checking',
+  path: '/accounts/checking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsCertificatesRoute = AccountsCertificatesRouteImport.update({
+  id: '/accounts/certificates',
+  path: '/accounts/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/accounts/certificates': typeof AccountsCertificatesRoute
+  '/accounts/checking': typeof AccountsCheckingRoute
+  '/accounts/savings': typeof AccountsSavingsRoute
+  '/accounts/youth': typeof AccountsYouthRoute
+  '/accounts/': typeof AccountsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/accounts/certificates': typeof AccountsCertificatesRoute
+  '/accounts/checking': typeof AccountsCheckingRoute
+  '/accounts/savings': typeof AccountsSavingsRoute
+  '/accounts/youth': typeof AccountsYouthRoute
+  '/accounts': typeof AccountsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/accounts/certificates': typeof AccountsCertificatesRoute
+  '/accounts/checking': typeof AccountsCheckingRoute
+  '/accounts/savings': typeof AccountsSavingsRoute
+  '/accounts/youth': typeof AccountsYouthRoute
+  '/accounts/': typeof AccountsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/join'
+  fullPaths:
+    | '/'
+    | '/join'
+    | '/accounts/certificates'
+    | '/accounts/checking'
+    | '/accounts/savings'
+    | '/accounts/youth'
+    | '/accounts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/join'
-  id: '__root__' | '/' | '/join'
+  to:
+    | '/'
+    | '/join'
+    | '/accounts/certificates'
+    | '/accounts/checking'
+    | '/accounts/savings'
+    | '/accounts/youth'
+    | '/accounts'
+  id:
+    | '__root__'
+    | '/'
+    | '/join'
+    | '/accounts/certificates'
+    | '/accounts/checking'
+    | '/accounts/savings'
+    | '/accounts/youth'
+    | '/accounts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JoinRoute: typeof JoinRoute
+  AccountsCertificatesRoute: typeof AccountsCertificatesRoute
+  AccountsCheckingRoute: typeof AccountsCheckingRoute
+  AccountsSavingsRoute: typeof AccountsSavingsRoute
+  AccountsYouthRoute: typeof AccountsYouthRoute
+  AccountsIndexRoute: typeof AccountsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +137,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts/': {
+      id: '/accounts/'
+      path: '/accounts'
+      fullPath: '/accounts/'
+      preLoaderRoute: typeof AccountsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/youth': {
+      id: '/accounts/youth'
+      path: '/accounts/youth'
+      fullPath: '/accounts/youth'
+      preLoaderRoute: typeof AccountsYouthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/savings': {
+      id: '/accounts/savings'
+      path: '/accounts/savings'
+      fullPath: '/accounts/savings'
+      preLoaderRoute: typeof AccountsSavingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/checking': {
+      id: '/accounts/checking'
+      path: '/accounts/checking'
+      fullPath: '/accounts/checking'
+      preLoaderRoute: typeof AccountsCheckingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/certificates': {
+      id: '/accounts/certificates'
+      path: '/accounts/certificates'
+      fullPath: '/accounts/certificates'
+      preLoaderRoute: typeof AccountsCertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JoinRoute: JoinRoute,
+  AccountsCertificatesRoute: AccountsCertificatesRoute,
+  AccountsCheckingRoute: AccountsCheckingRoute,
+  AccountsSavingsRoute: AccountsSavingsRoute,
+  AccountsYouthRoute: AccountsYouthRoute,
+  AccountsIndexRoute: AccountsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

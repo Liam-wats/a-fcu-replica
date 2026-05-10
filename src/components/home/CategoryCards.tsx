@@ -5,9 +5,9 @@ const CARDS = [
     href: "/accounts",
     body: "Discover a range of account options designed to meet your everyday banking needs and maximize your savings.",
     links: [
-      { label: "Checking", href: "/accounts" },
-      { label: "Savings", href: "/accounts" },
-      { label: "Certificates", href: "/accounts" },
+      { label: "Checking", href: "/accounts/checking" },
+      { label: "Savings", href: "/accounts/savings" },
+      { label: "Certificates", href: "/accounts/certificates" },
     ],
   },
   {

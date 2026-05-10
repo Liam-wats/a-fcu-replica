@@ -3,10 +3,26 @@ export const NAV = [
     label: "Accounts",
     href: "/accounts",
     columns: [
-      { title: "Checking", links: ["Cash-Back Checking", "Free Checking", "Compare Checking"] },
-      { title: "Savings", links: ["Regular Savings", "Money Market", "Holiday & Vacation"] },
-      { title: "Certificates", links: ["Share Certificates", "IRA Certificates", "Compare Certificates"] },
-      { title: "Youth", links: ["Kids Accounts", "Teen Accounts", "Student Accounts"] },
+      { title: "Checking", href: "/accounts/checking", links: [
+        { label: "Cash-Back Checking", href: "/accounts/checking" },
+        { label: "Free Checking", href: "/accounts/checking" },
+        { label: "Compare Checking", href: "/accounts/checking#compare" },
+      ]},
+      { title: "Savings", href: "/accounts/savings", links: [
+        { label: "Regular Savings", href: "/accounts/savings" },
+        { label: "Money Market", href: "/accounts/savings" },
+        { label: "Holiday & Vacation Club", href: "/accounts/savings" },
+      ]},
+      { title: "Certificates", href: "/accounts/certificates", links: [
+        { label: "Share Certificates", href: "/accounts/certificates" },
+        { label: "IRA Certificates", href: "/accounts/certificates" },
+        { label: "Compare Certificates", href: "/accounts/certificates#compare" },
+      ]},
+      { title: "Youth", href: "/accounts/youth", links: [
+        { label: "Kids Accounts (0–12)", href: "/accounts/youth" },
+        { label: "Teen Accounts (13–17)", href: "/accounts/youth" },
+        { label: "Student Accounts", href: "/accounts/youth" },
+      ]},
     ],
   },
   {
