@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Search, User, ChevronDown } from "lucide-react";
 
 const utilLinks = [
-  { label: "Join", href: "/accounts" },
+  { label: "Join", href: "/join" },
   { label: "Rates", href: "/guidance" },
   { label: "Locations", href: "/locations" },
 ];
