@@ -29,10 +29,27 @@ export const NAV = [
     label: "Loans",
     href: "/loans",
     columns: [
-      { title: "Home Loans", links: ["Mortgage Purchase", "Mortgage Refinance", "Home Equity", "HELOC"] },
-      { title: "Vehicle Loans", links: ["Auto Purchase", "Auto Refinance", "RV & Boat", "Motorcycle"] },
-      { title: "Personal Credit", links: ["Personal Loans", "Credit Cards", "Lines of Credit"] },
-      { title: "Student Loans", links: ["Private Student Loans", "Refinance Student Loans"] },
+      { title: "Home Loans", href: "/loans/home-loans", links: [
+        { label: "Mortgage Purchase", href: "/loans/home-loans" },
+        { label: "Mortgage Refinance", href: "/loans/home-loans" },
+        { label: "Home Equity", href: "/loans/home-loans" },
+        { label: "HELOC", href: "/loans/home-loans" },
+      ]},
+      { title: "Vehicle Loans", href: "/loans/vehicle-loans", links: [
+        { label: "Auto Purchase", href: "/loans/vehicle-loans" },
+        { label: "Auto Refinance", href: "/loans/vehicle-loans" },
+        { label: "RV & Boat", href: "/loans/vehicle-loans" },
+        { label: "Motorcycle", href: "/loans/vehicle-loans" },
+      ]},
+      { title: "Personal Credit", href: "/loans/personal-credit", links: [
+        { label: "Personal Loans", href: "/loans/personal-credit" },
+        { label: "Credit Cards", href: "/loans/personal-credit" },
+        { label: "Lines of Credit", href: "/loans/personal-credit" },
+      ]},
+      { title: "Student Loans", href: "/loans/student-loans", links: [
+        { label: "Private Student Loans", href: "/loans/student-loans" },
+        { label: "Refinance Student Loans", href: "/loans/student-loans" },
+      ]},
     ],
   },
   {
