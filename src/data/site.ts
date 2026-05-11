@@ -56,10 +56,27 @@ export const NAV = [
     label: "Services",
     href: "/services",
     columns: [
-      { title: "Online Banking", links: ["A+ Online Banking", "Bill Pay", "Card Management", "Credit Score"] },
-      { title: "Mobile Banking", links: ["A+ Mobile App", "Mobile Deposit", "Digital Wallets"] },
-      { title: "Member Services", links: ["Direct Deposit", "Wire Transfers", "Notary"] },
-      { title: "Insurance & Investments", links: ["Insurance", "Investments", "Retirement"] },
+      { title: "Online Banking", href: "/services/online-banking", links: [
+        { label: "A+ Online Banking", href: "/services/online-banking" },
+        { label: "Bill Pay", href: "/services/online-banking" },
+        { label: "Card Management", href: "/services/online-banking" },
+        { label: "Credit Score", href: "/services/online-banking" },
+      ]},
+      { title: "Mobile Banking", href: "/services/mobile-banking", links: [
+        { label: "A+ Mobile App", href: "/services/mobile-banking" },
+        { label: "Mobile Deposit", href: "/services/mobile-banking" },
+        { label: "Digital Wallets", href: "/services/mobile-banking" },
+      ]},
+      { title: "Member Services", href: "/services/member-services", links: [
+        { label: "Direct Deposit", href: "/services/member-services" },
+        { label: "Wire Transfers", href: "/services/member-services" },
+        { label: "Notary", href: "/services/member-services" },
+      ]},
+      { title: "Insurance & Investments", href: "/services/insurance-investments", links: [
+        { label: "Insurance", href: "/services/insurance-investments" },
+        { label: "Investments", href: "/services/insurance-investments" },
+        { label: "Retirement", href: "/services/insurance-investments" },
+      ]},
     ],
   },
   {

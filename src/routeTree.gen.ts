@@ -11,8 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
+import { Route as ServicesOnlineBankingRouteImport } from './routes/services/online-banking'
+import { Route as ServicesMobileBankingRouteImport } from './routes/services/mobile-banking'
+import { Route as ServicesMemberServicesRouteImport } from './routes/services/member-services'
+import { Route as ServicesInsuranceInvestmentsRouteImport } from './routes/services/insurance-investments'
 import { Route as LoansVehicleLoansRouteImport } from './routes/loans/vehicle-loans'
 import { Route as LoansStudentLoansRouteImport } from './routes/loans/student-loans'
 import { Route as LoansPersonalCreditRouteImport } from './routes/loans/personal-credit'
@@ -32,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesIndexRoute = ServicesIndexRouteImport.update({
+  id: '/services/',
+  path: '/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoansIndexRoute = LoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
@@ -42,6 +52,27 @@ const AccountsIndexRoute = AccountsIndexRouteImport.update({
   path: '/accounts/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesOnlineBankingRoute = ServicesOnlineBankingRouteImport.update({
+  id: '/services/online-banking',
+  path: '/services/online-banking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesMobileBankingRoute = ServicesMobileBankingRouteImport.update({
+  id: '/services/mobile-banking',
+  path: '/services/mobile-banking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesMemberServicesRoute = ServicesMemberServicesRouteImport.update({
+  id: '/services/member-services',
+  path: '/services/member-services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesInsuranceInvestmentsRoute =
+  ServicesInsuranceInvestmentsRouteImport.update({
+    id: '/services/insurance-investments',
+    path: '/services/insurance-investments',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LoansVehicleLoansRoute = LoansVehicleLoansRouteImport.update({
   id: '/loans/vehicle-loans',
   path: '/loans/vehicle-loans',
@@ -94,8 +125,13 @@ export interface FileRoutesByFullPath {
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
   '/loans/vehicle-loans': typeof LoansVehicleLoansRoute
+  '/services/insurance-investments': typeof ServicesInsuranceInvestmentsRoute
+  '/services/member-services': typeof ServicesMemberServicesRoute
+  '/services/mobile-banking': typeof ServicesMobileBankingRoute
+  '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts/': typeof AccountsIndexRoute
   '/loans/': typeof LoansIndexRoute
+  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -108,8 +144,13 @@ export interface FileRoutesByTo {
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
   '/loans/vehicle-loans': typeof LoansVehicleLoansRoute
+  '/services/insurance-investments': typeof ServicesInsuranceInvestmentsRoute
+  '/services/member-services': typeof ServicesMemberServicesRoute
+  '/services/mobile-banking': typeof ServicesMobileBankingRoute
+  '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts': typeof AccountsIndexRoute
   '/loans': typeof LoansIndexRoute
+  '/services': typeof ServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,8 +164,13 @@ export interface FileRoutesById {
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
   '/loans/vehicle-loans': typeof LoansVehicleLoansRoute
+  '/services/insurance-investments': typeof ServicesInsuranceInvestmentsRoute
+  '/services/member-services': typeof ServicesMemberServicesRoute
+  '/services/mobile-banking': typeof ServicesMobileBankingRoute
+  '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts/': typeof AccountsIndexRoute
   '/loans/': typeof LoansIndexRoute
+  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,8 +185,13 @@ export interface FileRouteTypes {
     | '/loans/personal-credit'
     | '/loans/student-loans'
     | '/loans/vehicle-loans'
+    | '/services/insurance-investments'
+    | '/services/member-services'
+    | '/services/mobile-banking'
+    | '/services/online-banking'
     | '/accounts/'
     | '/loans/'
+    | '/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,8 +204,13 @@ export interface FileRouteTypes {
     | '/loans/personal-credit'
     | '/loans/student-loans'
     | '/loans/vehicle-loans'
+    | '/services/insurance-investments'
+    | '/services/member-services'
+    | '/services/mobile-banking'
+    | '/services/online-banking'
     | '/accounts'
     | '/loans'
+    | '/services'
   id:
     | '__root__'
     | '/'
@@ -167,8 +223,13 @@ export interface FileRouteTypes {
     | '/loans/personal-credit'
     | '/loans/student-loans'
     | '/loans/vehicle-loans'
+    | '/services/insurance-investments'
+    | '/services/member-services'
+    | '/services/mobile-banking'
+    | '/services/online-banking'
     | '/accounts/'
     | '/loans/'
+    | '/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,8 +243,13 @@ export interface RootRouteChildren {
   LoansPersonalCreditRoute: typeof LoansPersonalCreditRoute
   LoansStudentLoansRoute: typeof LoansStudentLoansRoute
   LoansVehicleLoansRoute: typeof LoansVehicleLoansRoute
+  ServicesInsuranceInvestmentsRoute: typeof ServicesInsuranceInvestmentsRoute
+  ServicesMemberServicesRoute: typeof ServicesMemberServicesRoute
+  ServicesMobileBankingRoute: typeof ServicesMobileBankingRoute
+  ServicesOnlineBankingRoute: typeof ServicesOnlineBankingRoute
   AccountsIndexRoute: typeof AccountsIndexRoute
   LoansIndexRoute: typeof LoansIndexRoute
+  ServicesIndexRoute: typeof ServicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/services/': {
+      id: '/services/'
+      path: '/services'
+      fullPath: '/services/'
+      preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/loans/': {
       id: '/loans/'
       path: '/loans'
@@ -214,6 +287,34 @@ declare module '@tanstack/react-router' {
       path: '/accounts'
       fullPath: '/accounts/'
       preLoaderRoute: typeof AccountsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/online-banking': {
+      id: '/services/online-banking'
+      path: '/services/online-banking'
+      fullPath: '/services/online-banking'
+      preLoaderRoute: typeof ServicesOnlineBankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/mobile-banking': {
+      id: '/services/mobile-banking'
+      path: '/services/mobile-banking'
+      fullPath: '/services/mobile-banking'
+      preLoaderRoute: typeof ServicesMobileBankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/member-services': {
+      id: '/services/member-services'
+      path: '/services/member-services'
+      fullPath: '/services/member-services'
+      preLoaderRoute: typeof ServicesMemberServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/insurance-investments': {
+      id: '/services/insurance-investments'
+      path: '/services/insurance-investments'
+      fullPath: '/services/insurance-investments'
+      preLoaderRoute: typeof ServicesInsuranceInvestmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/loans/vehicle-loans': {
@@ -286,8 +387,13 @@ const rootRouteChildren: RootRouteChildren = {
   LoansPersonalCreditRoute: LoansPersonalCreditRoute,
   LoansStudentLoansRoute: LoansStudentLoansRoute,
   LoansVehicleLoansRoute: LoansVehicleLoansRoute,
+  ServicesInsuranceInvestmentsRoute: ServicesInsuranceInvestmentsRoute,
+  ServicesMemberServicesRoute: ServicesMemberServicesRoute,
+  ServicesMobileBankingRoute: ServicesMobileBankingRoute,
+  ServicesOnlineBankingRoute: ServicesOnlineBankingRoute,
   AccountsIndexRoute: AccountsIndexRoute,
   LoansIndexRoute: LoansIndexRoute,
+  ServicesIndexRoute: ServicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
