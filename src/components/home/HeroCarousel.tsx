@@ -32,56 +32,56 @@ export function HeroCarousel() {
           {HERO_SLIDES.map((slide, i) => (
             <div
               key={i}
-              className={`relative shrink-0 grow-0 basis-full ${
-                slide.bg === "yellow" ? "bg-brand-yellow" : "bg-white"
-              }`}
+              className="relative shrink-0 grow-0 basis-full bg-white"
             >
-              <div className="container-x grid lg:grid-cols-2 items-center gap-8 py-14 lg:py-24 min-h-[520px] lg:min-h-[600px]">
-                <div className="relative z-10 max-w-xl">
-                  <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.05] text-ink">
-                    {slide.title}
-                  </h1>
-                  <p className="mt-5 text-lg text-ink/80 max-w-md">{slide.body}</p>
-                  <a
-                    href={slide.ctaHref}
-                    className="mt-8 inline-flex items-center gap-3 bg-brand-green hover:bg-brand-green-dark text-white px-7 py-3.5 font-semibold transition-colors"
-                  >
-                    {slide.ctaLabel}
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+              <div className="grid lg:grid-cols-2 items-stretch min-h-[460px] lg:min-h-[560px]">
+                <div className="relative z-10 flex items-center px-6 lg:px-10 py-12 lg:py-20">
+                  <div className="max-w-xl">
+                    <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.05] text-ink">
+                      {slide.title}
+                    </h1>
+                    <p className="mt-5 text-lg text-ink/80 max-w-md italic">{slide.body}</p>
+                    <a
+                      href={slide.ctaHref}
+                      className="mt-8 inline-flex items-center gap-3 bg-brand-green hover:bg-brand-green-dark text-white px-7 py-3.5 font-semibold transition-colors"
+                    >
+                      {slide.ctaLabel}
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
-                <div className="relative">
+                <div className="relative bg-brand-yellow">
+                  <img
+                    src={ANGLE_OVERLAY}
+                    alt=""
+                    aria-hidden="true"
+                    className="hidden lg:block absolute inset-y-0 -left-px h-full pointer-events-none"
+                  />
                   <img
                     src={slide.image}
                     alt={slide.alt}
-                    className="w-full h-[280px] md:h-[380px] lg:h-[500px] object-cover"
+                    className="relative w-full h-[280px] md:h-[380px] lg:h-full object-contain"
                     loading={i === 0 ? "eager" : "lazy"}
                   />
                 </div>
               </div>
-              {slide.bg === "yellow" && (
-                <img
-                  src={ANGLE_OVERLAY}
-                  alt=""
-                  aria-hidden="true"
-                  className="hidden lg:block absolute inset-y-0 left-1/2 h-full pointer-events-none -translate-x-[55%]"
-                />
-              )}
             </div>
           ))}
         </div>
       </div>
 
       {/* Controls */}
-      <div className="absolute right-4 bottom-4 lg:right-10 lg:bottom-10 z-20 flex items-center gap-2 bg-white/95 border border-border">
-        <button onClick={() => emblaApi?.scrollPrev()} aria-label="Previous slide" className="p-3 hover:bg-secondary">
+      <div className="absolute right-4 bottom-4 lg:right-10 lg:bottom-10 z-20 flex items-center gap-2">
+        <button onClick={() => emblaApi?.scrollPrev()} aria-label="Previous slide" className="bg-white border-2 border-brand-green p-2.5 hover:bg-brand-green/5 transition-colors">
           <ChevronLeft className="w-4 h-4 text-brand-green" />
         </button>
-        <span className="text-sm tabular-nums text-ink/70 px-1">{selected + 1}/{HERO_SLIDES.length}</span>
-        <button onClick={togglePlay} aria-label={playing ? "Pause" : "Play"} className="p-3 hover:bg-secondary">
+        <div className="bg-white border-2 border-brand-green w-11 h-11 flex items-center justify-center text-sm tabular-nums text-ink font-semibold">
+          {selected + 1}/{HERO_SLIDES.length}
+        </div>
+        <button onClick={togglePlay} aria-label={playing ? "Pause" : "Play"} className="bg-white border-2 border-brand-green p-2.5 hover:bg-brand-green/5 transition-colors">
           {playing ? <Pause className="w-4 h-4 text-brand-green" /> : <Play className="w-4 h-4 text-brand-green" />}
         </button>
-        <button onClick={() => emblaApi?.scrollNext()} aria-label="Next slide" className="p-3 hover:bg-secondary">
+        <button onClick={() => emblaApi?.scrollNext()} aria-label="Next slide" className="bg-white border-2 border-brand-green p-2.5 hover:bg-brand-green/5 transition-colors">
           <ChevronRight className="w-4 h-4 text-brand-green" />
         </button>
       </div>
