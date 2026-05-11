@@ -83,9 +83,21 @@ export const NAV = [
     label: "Business",
     href: "/business",
     columns: [
-      { title: "Business Accounts", links: ["Checking", "Savings", "Certificates"] },
-      { title: "Business Lending", links: ["Loans", "Lines of Credit", "Commercial Real Estate"] },
-      { title: "Business Services", links: ["Online Banking", "Merchant Services", "Payroll"] },
+      { title: "Business Accounts", href: "/business/accounts", links: [
+        { label: "Business Checking", href: "/business/accounts" },
+        { label: "Business Savings", href: "/business/accounts" },
+        { label: "Business Certificates", href: "/business/accounts" },
+      ]},
+      { title: "Business Lending", href: "/business/lending", links: [
+        { label: "Business Loans", href: "/business/lending" },
+        { label: "Lines of Credit", href: "/business/lending" },
+        { label: "Commercial Real Estate", href: "/business/lending" },
+      ]},
+      { title: "Business Services", href: "/business/services", links: [
+        { label: "Online Banking", href: "/business/services" },
+        { label: "Merchant Services", href: "/business/services" },
+        { label: "Payroll", href: "/business/services" },
+      ]},
     ],
   },
   {

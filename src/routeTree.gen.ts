@@ -13,6 +13,7 @@ import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
+import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
 import { Route as ServicesOnlineBankingRouteImport } from './routes/services/online-banking'
 import { Route as ServicesMobileBankingRouteImport } from './routes/services/mobile-banking'
@@ -22,6 +23,9 @@ import { Route as LoansVehicleLoansRouteImport } from './routes/loans/vehicle-lo
 import { Route as LoansStudentLoansRouteImport } from './routes/loans/student-loans'
 import { Route as LoansPersonalCreditRouteImport } from './routes/loans/personal-credit'
 import { Route as LoansHomeLoansRouteImport } from './routes/loans/home-loans'
+import { Route as BusinessServicesRouteImport } from './routes/business/services'
+import { Route as BusinessLendingRouteImport } from './routes/business/lending'
+import { Route as BusinessAccountsRouteImport } from './routes/business/accounts'
 import { Route as AccountsYouthRouteImport } from './routes/accounts/youth'
 import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
 import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
@@ -45,6 +49,11 @@ const ServicesIndexRoute = ServicesIndexRouteImport.update({
 const LoansIndexRoute = LoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessIndexRoute = BusinessIndexRouteImport.update({
+  id: '/business/',
+  path: '/business/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsIndexRoute = AccountsIndexRouteImport.update({
@@ -93,6 +102,21 @@ const LoansHomeLoansRoute = LoansHomeLoansRouteImport.update({
   path: '/loans/home-loans',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BusinessServicesRoute = BusinessServicesRouteImport.update({
+  id: '/business/services',
+  path: '/business/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessLendingRoute = BusinessLendingRouteImport.update({
+  id: '/business/lending',
+  path: '/business/lending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessAccountsRoute = BusinessAccountsRouteImport.update({
+  id: '/business/accounts',
+  path: '/business/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountsYouthRoute = AccountsYouthRouteImport.update({
   id: '/accounts/youth',
   path: '/accounts/youth',
@@ -121,6 +145,9 @@ export interface FileRoutesByFullPath {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/business/accounts': typeof BusinessAccountsRoute
+  '/business/lending': typeof BusinessLendingRoute
+  '/business/services': typeof BusinessServicesRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -130,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts/': typeof AccountsIndexRoute
+  '/business/': typeof BusinessIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
 }
@@ -140,6 +168,9 @@ export interface FileRoutesByTo {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/business/accounts': typeof BusinessAccountsRoute
+  '/business/lending': typeof BusinessLendingRoute
+  '/business/services': typeof BusinessServicesRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -149,6 +180,7 @@ export interface FileRoutesByTo {
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts': typeof AccountsIndexRoute
+  '/business': typeof BusinessIndexRoute
   '/loans': typeof LoansIndexRoute
   '/services': typeof ServicesIndexRoute
 }
@@ -160,6 +192,9 @@ export interface FileRoutesById {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/business/accounts': typeof BusinessAccountsRoute
+  '/business/lending': typeof BusinessLendingRoute
+  '/business/services': typeof BusinessServicesRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -169,6 +204,7 @@ export interface FileRoutesById {
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
   '/accounts/': typeof AccountsIndexRoute
+  '/business/': typeof BusinessIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
 }
@@ -181,6 +217,9 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/business/accounts'
+    | '/business/lending'
+    | '/business/services'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -190,6 +229,7 @@ export interface FileRouteTypes {
     | '/services/mobile-banking'
     | '/services/online-banking'
     | '/accounts/'
+    | '/business/'
     | '/loans/'
     | '/services/'
   fileRoutesByTo: FileRoutesByTo
@@ -200,6 +240,9 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/business/accounts'
+    | '/business/lending'
+    | '/business/services'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -209,6 +252,7 @@ export interface FileRouteTypes {
     | '/services/mobile-banking'
     | '/services/online-banking'
     | '/accounts'
+    | '/business'
     | '/loans'
     | '/services'
   id:
@@ -219,6 +263,9 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/business/accounts'
+    | '/business/lending'
+    | '/business/services'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -228,6 +275,7 @@ export interface FileRouteTypes {
     | '/services/mobile-banking'
     | '/services/online-banking'
     | '/accounts/'
+    | '/business/'
     | '/loans/'
     | '/services/'
   fileRoutesById: FileRoutesById
@@ -239,6 +287,9 @@ export interface RootRouteChildren {
   AccountsCheckingRoute: typeof AccountsCheckingRoute
   AccountsSavingsRoute: typeof AccountsSavingsRoute
   AccountsYouthRoute: typeof AccountsYouthRoute
+  BusinessAccountsRoute: typeof BusinessAccountsRoute
+  BusinessLendingRoute: typeof BusinessLendingRoute
+  BusinessServicesRoute: typeof BusinessServicesRoute
   LoansHomeLoansRoute: typeof LoansHomeLoansRoute
   LoansPersonalCreditRoute: typeof LoansPersonalCreditRoute
   LoansStudentLoansRoute: typeof LoansStudentLoansRoute
@@ -248,6 +299,7 @@ export interface RootRouteChildren {
   ServicesMobileBankingRoute: typeof ServicesMobileBankingRoute
   ServicesOnlineBankingRoute: typeof ServicesOnlineBankingRoute
   AccountsIndexRoute: typeof AccountsIndexRoute
+  BusinessIndexRoute: typeof BusinessIndexRoute
   LoansIndexRoute: typeof LoansIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
 }
@@ -280,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/loans'
       fullPath: '/loans/'
       preLoaderRoute: typeof LoansIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business/': {
+      id: '/business/'
+      path: '/business'
+      fullPath: '/business/'
+      preLoaderRoute: typeof BusinessIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts/': {
@@ -345,6 +404,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoansHomeLoansRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/business/services': {
+      id: '/business/services'
+      path: '/business/services'
+      fullPath: '/business/services'
+      preLoaderRoute: typeof BusinessServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business/lending': {
+      id: '/business/lending'
+      path: '/business/lending'
+      fullPath: '/business/lending'
+      preLoaderRoute: typeof BusinessLendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business/accounts': {
+      id: '/business/accounts'
+      path: '/business/accounts'
+      fullPath: '/business/accounts'
+      preLoaderRoute: typeof BusinessAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/accounts/youth': {
       id: '/accounts/youth'
       path: '/accounts/youth'
@@ -383,6 +463,9 @@ const rootRouteChildren: RootRouteChildren = {
   AccountsCheckingRoute: AccountsCheckingRoute,
   AccountsSavingsRoute: AccountsSavingsRoute,
   AccountsYouthRoute: AccountsYouthRoute,
+  BusinessAccountsRoute: BusinessAccountsRoute,
+  BusinessLendingRoute: BusinessLendingRoute,
+  BusinessServicesRoute: BusinessServicesRoute,
   LoansHomeLoansRoute: LoansHomeLoansRoute,
   LoansPersonalCreditRoute: LoansPersonalCreditRoute,
   LoansStudentLoansRoute: LoansStudentLoansRoute,
@@ -392,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesMobileBankingRoute: ServicesMobileBankingRoute,
   ServicesOnlineBankingRoute: ServicesOnlineBankingRoute,
   AccountsIndexRoute: AccountsIndexRoute,
+  BusinessIndexRoute: BusinessIndexRoute,
   LoansIndexRoute: LoansIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
 }
