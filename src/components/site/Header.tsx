@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Menu, X, Search, User } from "lucide-react";
 import { Logo } from "./Logo";
 import { UtilityBar } from "./UtilityBar";
@@ -8,6 +8,7 @@ import { NAV } from "@/data/site";
 export function Header() {
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgba(0,0,0,0.06)]">
@@ -61,7 +62,7 @@ export function Header() {
         </nav>
 
         <div className="lg:hidden flex items-center gap-3">
-          <button aria-label="Search" className="p-2"><Search className="w-5 h-5" /></button>
+          <button aria-label="Search" className="p-2" onClick={() => navigate({ to: "/search", search: { q: "" } })}><Search className="w-5 h-5" /></button>
           <a href="#login" aria-label="Login" className="p-2 bg-brand-green text-white"><User className="w-5 h-5" /></a>
           <button aria-label="Menu" className="p-2" onClick={() => setMobile(true)}>
             <Menu className="w-6 h-6" />
