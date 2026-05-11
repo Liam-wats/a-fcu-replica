@@ -126,9 +126,21 @@ export const NAV = [
     label: "Guidance",
     href: "/guidance",
     columns: [
-      { title: "Financial Education", links: ["Workshops", "Calculators", "Articles"] },
-      { title: "Rates", links: ["All Rates", "Loan Rates", "Deposit Rates"] },
-      { title: "Tools", links: ["Make a Payment", "Switch Kit", "FAQ"] },
+      { title: "Financial Education", href: "/guidance/financial-education", links: [
+        { label: "Workshops", href: "/guidance/financial-education" },
+        { label: "Calculators", href: "/guidance/financial-education" },
+        { label: "Articles", href: "/guidance/financial-education" },
+      ]},
+      { title: "Rates", href: "/guidance/rates", links: [
+        { label: "All Rates", href: "/guidance/rates" },
+        { label: "Loan Rates", href: "/guidance/rates" },
+        { label: "Deposit Rates", href: "/guidance/rates" },
+      ]},
+      { title: "Tools", href: "/guidance/tools", links: [
+        { label: "Make a Payment", href: "/guidance/tools" },
+        { label: "Switch Kit", href: "/guidance/tools" },
+        { label: "FAQ", href: "/guidance/tools" },
+      ]},
     ],
   },
 ] as const;

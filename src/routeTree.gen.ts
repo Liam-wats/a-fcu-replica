@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
+import { Route as GuidanceIndexRouteImport } from './routes/guidance/index'
 import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
 import { Route as WhoWeAreMembershipRouteImport } from './routes/who-we-are/membership'
@@ -27,6 +28,9 @@ import { Route as LoansVehicleLoansRouteImport } from './routes/loans/vehicle-lo
 import { Route as LoansStudentLoansRouteImport } from './routes/loans/student-loans'
 import { Route as LoansPersonalCreditRouteImport } from './routes/loans/personal-credit'
 import { Route as LoansHomeLoansRouteImport } from './routes/loans/home-loans'
+import { Route as GuidanceToolsRouteImport } from './routes/guidance/tools'
+import { Route as GuidanceRatesRouteImport } from './routes/guidance/rates'
+import { Route as GuidanceFinancialEducationRouteImport } from './routes/guidance/financial-education'
 import { Route as BusinessServicesRouteImport } from './routes/business/services'
 import { Route as BusinessLendingRouteImport } from './routes/business/lending'
 import { Route as BusinessAccountsRouteImport } from './routes/business/accounts'
@@ -58,6 +62,11 @@ const ServicesIndexRoute = ServicesIndexRouteImport.update({
 const LoansIndexRoute = LoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidanceIndexRoute = GuidanceIndexRouteImport.update({
+  id: '/guidance/',
+  path: '/guidance/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessIndexRoute = BusinessIndexRouteImport.update({
@@ -126,6 +135,22 @@ const LoansHomeLoansRoute = LoansHomeLoansRouteImport.update({
   path: '/loans/home-loans',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidanceToolsRoute = GuidanceToolsRouteImport.update({
+  id: '/guidance/tools',
+  path: '/guidance/tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidanceRatesRoute = GuidanceRatesRouteImport.update({
+  id: '/guidance/rates',
+  path: '/guidance/rates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidanceFinancialEducationRoute =
+  GuidanceFinancialEducationRouteImport.update({
+    id: '/guidance/financial-education',
+    path: '/guidance/financial-education',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BusinessServicesRoute = BusinessServicesRouteImport.update({
   id: '/business/services',
   path: '/business/services',
@@ -172,6 +197,9 @@ export interface FileRoutesByFullPath {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
+  '/guidance/rates': typeof GuidanceRatesRoute
+  '/guidance/tools': typeof GuidanceToolsRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -185,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
+  '/guidance/': typeof GuidanceIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
@@ -199,6 +228,9 @@ export interface FileRoutesByTo {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
+  '/guidance/rates': typeof GuidanceRatesRoute
+  '/guidance/tools': typeof GuidanceToolsRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -212,6 +244,7 @@ export interface FileRoutesByTo {
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts': typeof AccountsIndexRoute
   '/business': typeof BusinessIndexRoute
+  '/guidance': typeof GuidanceIndexRoute
   '/loans': typeof LoansIndexRoute
   '/services': typeof ServicesIndexRoute
   '/who-we-are': typeof WhoWeAreIndexRoute
@@ -227,6 +260,9 @@ export interface FileRoutesById {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
+  '/guidance/rates': typeof GuidanceRatesRoute
+  '/guidance/tools': typeof GuidanceToolsRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -240,6 +276,7 @@ export interface FileRoutesById {
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
+  '/guidance/': typeof GuidanceIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
@@ -256,6 +293,9 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/guidance/financial-education'
+    | '/guidance/rates'
+    | '/guidance/tools'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -269,6 +309,7 @@ export interface FileRouteTypes {
     | '/who-we-are/membership'
     | '/accounts/'
     | '/business/'
+    | '/guidance/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
@@ -283,6 +324,9 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/guidance/financial-education'
+    | '/guidance/rates'
+    | '/guidance/tools'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -296,6 +340,7 @@ export interface FileRouteTypes {
     | '/who-we-are/membership'
     | '/accounts'
     | '/business'
+    | '/guidance'
     | '/loans'
     | '/services'
     | '/who-we-are'
@@ -310,6 +355,9 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/guidance/financial-education'
+    | '/guidance/rates'
+    | '/guidance/tools'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -323,6 +371,7 @@ export interface FileRouteTypes {
     | '/who-we-are/membership'
     | '/accounts/'
     | '/business/'
+    | '/guidance/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
@@ -338,6 +387,9 @@ export interface RootRouteChildren {
   BusinessAccountsRoute: typeof BusinessAccountsRoute
   BusinessLendingRoute: typeof BusinessLendingRoute
   BusinessServicesRoute: typeof BusinessServicesRoute
+  GuidanceFinancialEducationRoute: typeof GuidanceFinancialEducationRoute
+  GuidanceRatesRoute: typeof GuidanceRatesRoute
+  GuidanceToolsRoute: typeof GuidanceToolsRoute
   LoansHomeLoansRoute: typeof LoansHomeLoansRoute
   LoansPersonalCreditRoute: typeof LoansPersonalCreditRoute
   LoansStudentLoansRoute: typeof LoansStudentLoansRoute
@@ -351,6 +403,7 @@ export interface RootRouteChildren {
   WhoWeAreMembershipRoute: typeof WhoWeAreMembershipRoute
   AccountsIndexRoute: typeof AccountsIndexRoute
   BusinessIndexRoute: typeof BusinessIndexRoute
+  GuidanceIndexRoute: typeof GuidanceIndexRoute
   LoansIndexRoute: typeof LoansIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   WhoWeAreIndexRoute: typeof WhoWeAreIndexRoute
@@ -391,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/loans'
       fullPath: '/loans/'
       preLoaderRoute: typeof LoansIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidance/': {
+      id: '/guidance/'
+      path: '/guidance'
+      fullPath: '/guidance/'
+      preLoaderRoute: typeof GuidanceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/business/': {
@@ -484,6 +544,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoansHomeLoansRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guidance/tools': {
+      id: '/guidance/tools'
+      path: '/guidance/tools'
+      fullPath: '/guidance/tools'
+      preLoaderRoute: typeof GuidanceToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidance/rates': {
+      id: '/guidance/rates'
+      path: '/guidance/rates'
+      fullPath: '/guidance/rates'
+      preLoaderRoute: typeof GuidanceRatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidance/financial-education': {
+      id: '/guidance/financial-education'
+      path: '/guidance/financial-education'
+      fullPath: '/guidance/financial-education'
+      preLoaderRoute: typeof GuidanceFinancialEducationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/business/services': {
       id: '/business/services'
       path: '/business/services'
@@ -546,6 +627,9 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessAccountsRoute: BusinessAccountsRoute,
   BusinessLendingRoute: BusinessLendingRoute,
   BusinessServicesRoute: BusinessServicesRoute,
+  GuidanceFinancialEducationRoute: GuidanceFinancialEducationRoute,
+  GuidanceRatesRoute: GuidanceRatesRoute,
+  GuidanceToolsRoute: GuidanceToolsRoute,
   LoansHomeLoansRoute: LoansHomeLoansRoute,
   LoansPersonalCreditRoute: LoansPersonalCreditRoute,
   LoansStudentLoansRoute: LoansStudentLoansRoute,
@@ -559,6 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   WhoWeAreMembershipRoute: WhoWeAreMembershipRoute,
   AccountsIndexRoute: AccountsIndexRoute,
   BusinessIndexRoute: BusinessIndexRoute,
+  GuidanceIndexRoute: GuidanceIndexRoute,
   LoansIndexRoute: LoansIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   WhoWeAreIndexRoute: WhoWeAreIndexRoute,
