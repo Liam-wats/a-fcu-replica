@@ -104,9 +104,22 @@ export const NAV = [
     label: "Who We Are",
     href: "/who-we-are",
     columns: [
-      { title: "About", links: ["Our Story", "Leadership", "Careers", "Newsroom"] },
-      { title: "Community", links: ["A+ Gives", "Sponsorships", "Volunteering"] },
-      { title: "Membership", links: ["Join A+FCU", "Member Benefits", "Refer a Friend"] },
+      { title: "About", href: "/who-we-are/about", links: [
+        { label: "Our Story", href: "/who-we-are/about" },
+        { label: "Leadership", href: "/who-we-are/about" },
+        { label: "Careers", href: "/who-we-are/about" },
+        { label: "Newsroom", href: "/who-we-are/about" },
+      ]},
+      { title: "Community", href: "/who-we-are/community", links: [
+        { label: "A+ Gives", href: "/who-we-are/community" },
+        { label: "Sponsorships", href: "/who-we-are/community" },
+        { label: "Volunteering", href: "/who-we-are/community" },
+      ]},
+      { title: "Membership", href: "/who-we-are/membership", links: [
+        { label: "Join A+FCU", href: "/join" },
+        { label: "Member Benefits", href: "/who-we-are/membership" },
+        { label: "Refer a Friend", href: "/who-we-are/membership" },
+      ]},
     ],
   },
   {

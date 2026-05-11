@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
 import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
+import { Route as WhoWeAreMembershipRouteImport } from './routes/who-we-are/membership'
+import { Route as WhoWeAreCommunityRouteImport } from './routes/who-we-are/community'
+import { Route as WhoWeAreAboutRouteImport } from './routes/who-we-are/about'
 import { Route as ServicesOnlineBankingRouteImport } from './routes/services/online-banking'
 import { Route as ServicesMobileBankingRouteImport } from './routes/services/mobile-banking'
 import { Route as ServicesMemberServicesRouteImport } from './routes/services/member-services'
@@ -41,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WhoWeAreIndexRoute = WhoWeAreIndexRouteImport.update({
+  id: '/who-we-are/',
+  path: '/who-we-are/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
@@ -59,6 +68,21 @@ const BusinessIndexRoute = BusinessIndexRouteImport.update({
 const AccountsIndexRoute = AccountsIndexRouteImport.update({
   id: '/accounts/',
   path: '/accounts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhoWeAreMembershipRoute = WhoWeAreMembershipRouteImport.update({
+  id: '/who-we-are/membership',
+  path: '/who-we-are/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhoWeAreCommunityRoute = WhoWeAreCommunityRouteImport.update({
+  id: '/who-we-are/community',
+  path: '/who-we-are/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhoWeAreAboutRoute = WhoWeAreAboutRouteImport.update({
+  id: '/who-we-are/about',
+  path: '/who-we-are/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesOnlineBankingRoute = ServicesOnlineBankingRouteImport.update({
@@ -156,10 +180,14 @@ export interface FileRoutesByFullPath {
   '/services/member-services': typeof ServicesMemberServicesRoute
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
+  '/who-we-are/about': typeof WhoWeAreAboutRoute
+  '/who-we-are/community': typeof WhoWeAreCommunityRoute
+  '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/who-we-are/': typeof WhoWeAreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,10 +207,14 @@ export interface FileRoutesByTo {
   '/services/member-services': typeof ServicesMemberServicesRoute
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
+  '/who-we-are/about': typeof WhoWeAreAboutRoute
+  '/who-we-are/community': typeof WhoWeAreCommunityRoute
+  '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts': typeof AccountsIndexRoute
   '/business': typeof BusinessIndexRoute
   '/loans': typeof LoansIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/who-we-are': typeof WhoWeAreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,10 +235,14 @@ export interface FileRoutesById {
   '/services/member-services': typeof ServicesMemberServicesRoute
   '/services/mobile-banking': typeof ServicesMobileBankingRoute
   '/services/online-banking': typeof ServicesOnlineBankingRoute
+  '/who-we-are/about': typeof WhoWeAreAboutRoute
+  '/who-we-are/community': typeof WhoWeAreCommunityRoute
+  '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/who-we-are/': typeof WhoWeAreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -228,10 +264,14 @@ export interface FileRouteTypes {
     | '/services/member-services'
     | '/services/mobile-banking'
     | '/services/online-banking'
+    | '/who-we-are/about'
+    | '/who-we-are/community'
+    | '/who-we-are/membership'
     | '/accounts/'
     | '/business/'
     | '/loans/'
     | '/services/'
+    | '/who-we-are/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -251,10 +291,14 @@ export interface FileRouteTypes {
     | '/services/member-services'
     | '/services/mobile-banking'
     | '/services/online-banking'
+    | '/who-we-are/about'
+    | '/who-we-are/community'
+    | '/who-we-are/membership'
     | '/accounts'
     | '/business'
     | '/loans'
     | '/services'
+    | '/who-we-are'
   id:
     | '__root__'
     | '/'
@@ -274,10 +318,14 @@ export interface FileRouteTypes {
     | '/services/member-services'
     | '/services/mobile-banking'
     | '/services/online-banking'
+    | '/who-we-are/about'
+    | '/who-we-are/community'
+    | '/who-we-are/membership'
     | '/accounts/'
     | '/business/'
     | '/loans/'
     | '/services/'
+    | '/who-we-are/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -298,10 +346,14 @@ export interface RootRouteChildren {
   ServicesMemberServicesRoute: typeof ServicesMemberServicesRoute
   ServicesMobileBankingRoute: typeof ServicesMobileBankingRoute
   ServicesOnlineBankingRoute: typeof ServicesOnlineBankingRoute
+  WhoWeAreAboutRoute: typeof WhoWeAreAboutRoute
+  WhoWeAreCommunityRoute: typeof WhoWeAreCommunityRoute
+  WhoWeAreMembershipRoute: typeof WhoWeAreMembershipRoute
   AccountsIndexRoute: typeof AccountsIndexRoute
   BusinessIndexRoute: typeof BusinessIndexRoute
   LoansIndexRoute: typeof LoansIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
+  WhoWeAreIndexRoute: typeof WhoWeAreIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -318,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/who-we-are/': {
+      id: '/who-we-are/'
+      path: '/who-we-are'
+      fullPath: '/who-we-are/'
+      preLoaderRoute: typeof WhoWeAreIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/': {
@@ -346,6 +405,27 @@ declare module '@tanstack/react-router' {
       path: '/accounts'
       fullPath: '/accounts/'
       preLoaderRoute: typeof AccountsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/who-we-are/membership': {
+      id: '/who-we-are/membership'
+      path: '/who-we-are/membership'
+      fullPath: '/who-we-are/membership'
+      preLoaderRoute: typeof WhoWeAreMembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/who-we-are/community': {
+      id: '/who-we-are/community'
+      path: '/who-we-are/community'
+      fullPath: '/who-we-are/community'
+      preLoaderRoute: typeof WhoWeAreCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/who-we-are/about': {
+      id: '/who-we-are/about'
+      path: '/who-we-are/about'
+      fullPath: '/who-we-are/about'
+      preLoaderRoute: typeof WhoWeAreAboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/online-banking': {
@@ -474,10 +554,14 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesMemberServicesRoute: ServicesMemberServicesRoute,
   ServicesMobileBankingRoute: ServicesMobileBankingRoute,
   ServicesOnlineBankingRoute: ServicesOnlineBankingRoute,
+  WhoWeAreAboutRoute: WhoWeAreAboutRoute,
+  WhoWeAreCommunityRoute: WhoWeAreCommunityRoute,
+  WhoWeAreMembershipRoute: WhoWeAreMembershipRoute,
   AccountsIndexRoute: AccountsIndexRoute,
   BusinessIndexRoute: BusinessIndexRoute,
   LoansIndexRoute: LoansIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
+  WhoWeAreIndexRoute: WhoWeAreIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
