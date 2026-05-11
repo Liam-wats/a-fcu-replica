@@ -45,12 +45,12 @@ export function FeaturedRates() {
                   {r.primaryLabel && (
                     <p className="text-sm italic text-ink/70">{r.primaryLabel}</p>
                   )}
-                  <div className="mt-1 flex items-baseline gap-3">
-                    <span className="font-serif text-3xl text-ink">{r.primary}</span>
+                  <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                    <span className="font-serif text-2xl md:text-[28px] text-ink leading-none">{r.primary}</span>
                     {showSplit && (
                       <>
-                        <span className="text-ink/30 text-2xl font-light">|</span>
-                        <span className="font-serif text-3xl text-ink">{secondaryNumber}</span>
+                        <span className="text-ink/30 text-xl font-light">|</span>
+                        <span className="font-serif text-2xl md:text-[28px] text-ink leading-none">{secondaryNumber}</span>
                       </>
                     )}
                   </div>
