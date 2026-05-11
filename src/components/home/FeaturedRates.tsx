@@ -31,10 +31,7 @@ export function FeaturedRates() {
               secondaryNumber = match ? match[1] : r.secondary;
             }
             return (
-              <div
-                key={r.name}
-                className="bg-white p-6 border border-border hover:shadow-md transition-shadow flex flex-col"
-              >
+              <div key={r.name} className="bg-white p-6 border border-border hover:shadow-md transition-shadow flex flex-col px-[24px]">
                 <img src={r.icon} alt="" className="w-12 h-12 mb-4" />
                 <a
                   href="#"
