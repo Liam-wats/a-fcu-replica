@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Heart } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { AGIVES_PROGRAMS, SPONSORSHIPS } from "@/data/who-we-are";
 
 const VOLUNTEER_WAYS = [
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/who-we-are/community")({
 function CommunityPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Community"
         title="Rooted in Austin. Invested in People."
         body="As a not-for-profit credit union, A+FCU returns value to the communities we serve — through grants, scholarships, sponsorships, and thousands of volunteer hours each year."

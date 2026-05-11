@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Building2, CreditCard, Landmark } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LoanBenefits } from "@/components/loans/LoanBenefits";
 import { BUSINESS_LOAN_PRODUCTS } from "@/data/business";
 
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/business/lending")({
 function BusinessLendingPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Business Lending"
         title="Capital to Grow Your Business, Your Way."
         body="From short-term lines of credit to long-term commercial real estate financing — A+FCU business loans are made by local lenders who understand the Austin market."

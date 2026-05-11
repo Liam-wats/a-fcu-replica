@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Gift, Users } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { MEMBER_BENEFITS, ELIGIBILITY_GROUPS } from "@/data/who-we-are";
 
 const HOW_TO_JOIN = [
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/who-we-are/membership")({
 function MembershipPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Membership"
         title="Better Banking Starts With Membership."
         body="As an A+FCU member, you're not a customer — you're an owner. That means every service we offer, every rate we set, and every decision we make is in your best interest."

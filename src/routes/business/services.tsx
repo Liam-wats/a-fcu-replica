@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Users, BarChart3, ShieldCheck, Clock } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { BUSINESS_SERVICES_FEATURES, PAYROLL_FEATURES } from "@/data/business";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/business/services")({
 function BusinessServicesPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Business Services"
         title="Tools to Run Your Business Smarter."
         body="Business Online Banking, merchant payment processing, and full-service payroll — everything you need to operate efficiently, all in one place."

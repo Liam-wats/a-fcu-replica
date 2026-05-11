@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { CERTIFICATE_PRODUCTS, CERTIFICATE_RATES } from "@/data/accounts";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/accounts/certificates")({
 function CertificatesPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Certificates"
         title="Lock In a Guaranteed Rate. Watch Your Money Grow."
         body="A+FCU Share Certificates offer competitive, fixed rates for terms from 3 to 60 months — with no market risk and NCUA-insured protection."

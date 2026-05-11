@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LoanCard } from "@/components/loans/LoanCard";
 import { LoanBenefits } from "@/components/loans/LoanBenefits";
 import { PERSONAL_CREDIT_PRODUCTS } from "@/data/loans";
@@ -27,7 +27,7 @@ const USE_CASES = [
 function PersonalCreditPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Personal Credit"
         title="Get the Funds You Need. Fast."
         body="Personal loans, credit cards, and lines of credit with no collateral required — apply today, get funds as fast as tomorrow.†"

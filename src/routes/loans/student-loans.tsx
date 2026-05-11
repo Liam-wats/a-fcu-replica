@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LoanCard } from "@/components/loans/LoanCard";
 import { LoanBenefits } from "@/components/loans/LoanBenefits";
 import { STUDENT_LOAN_PRODUCTS } from "@/data/loans";
@@ -33,7 +33,7 @@ const TIMELINE = [
 function StudentLoansPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Student Loans"
         title="Invest in Your Education Without the Stress."
         body="Private student loans and refinancing from A+FCU — competitive rates, no origination fees, and flexible repayment options."

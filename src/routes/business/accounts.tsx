@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { BUSINESS_CHECKING_PRODUCTS, BUSINESS_SAVINGS_PRODUCTS, BUSINESS_WHY } from "@/data/business";
 
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/business/accounts")({
 function BusinessAccountsPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Business Accounts"
         title="Accounts That Work as Hard as You Do."
         body="No hidden fees, no minimum balance surprises, and real dividends on your balance. A+FCU business accounts are built to support your bottom line."

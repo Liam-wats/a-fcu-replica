@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, MapPin, Clock } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { WORKSHOPS, ARTICLES, CALCULATORS } from "@/data/guidance";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/guidance/financial-education")({
 function FinancialEducationPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Financial Education"
         title="Free Knowledge for Every Stage of Your Financial Life."
         body="From first-time homebuyers to seasoned investors — A+FCU's free workshops, calculators, and articles give you the tools to make smarter financial decisions."

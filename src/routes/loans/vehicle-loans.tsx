@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LoanCard } from "@/components/loans/LoanCard";
 import { LoanBenefits } from "@/components/loans/LoanBenefits";
 import { VEHICLE_LOAN_PRODUCTS, VEHICLE_LOAN_RATES } from "@/data/loans";
@@ -24,7 +24,7 @@ const TIPS = [
 function VehicleLoansPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Vehicle Loans"
         title="Hit the Road with a Rate You'll Love."
         body="Whether you're buying new, used, or refinancing your current auto loan — A+FCU offers competitive rates and fast, local decisions."

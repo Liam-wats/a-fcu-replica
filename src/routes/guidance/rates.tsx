@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LOAN_RATES, DEPOSIT_RATES } from "@/data/guidance";
 
 export const Route = createFileRoute("/guidance/rates")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/guidance/rates")({
 function RatesPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Rates"
         title="Competitive Rates, Updated Daily."
         body="A+FCU offers some of the best rates in Central Texas on loans and deposits. As a not-for-profit credit union, we pass our earnings back to you."

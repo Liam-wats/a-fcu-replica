@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LoanCard } from "@/components/loans/LoanCard";
 import { LoanBenefits } from "@/components/loans/LoanBenefits";
 import { HOME_LOAN_PRODUCTS, HOME_LOAN_RATES } from "@/data/loans";
@@ -27,7 +27,7 @@ const MORTGAGE_CHECKLIST = [
 function HomeLoansPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Home Loans"
         title="Your Dream Home Starts with the Right Mortgage."
         body="A+FCU offers competitive home loan rates, local underwriting, and dedicated mortgage advisors — from your first home to your forever home."

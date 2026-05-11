@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, GraduationCap, Smartphone, TrendingUp } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { YOUTH_PRODUCTS } from "@/data/accounts";
@@ -43,7 +43,7 @@ const RESOURCES = [
 function YouthPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Youth Accounts"
         title="Build Smart Money Habits That Last a Lifetime."
         body="From a first piggy bank to a student checking account — A+FCU has an account for every stage of the journey."
