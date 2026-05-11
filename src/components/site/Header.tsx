@@ -106,8 +106,8 @@ export function Header() {
               </details>
             ))}
             <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
-              <Link to="/accounts" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Join</Link>
-              <Link to="/guidance" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Rates</Link>
+              <Link to="/join" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Join</Link>
+              <Link to="/guidance/rates" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Rates</Link>
               <Link to="/locations" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Locations</Link>
               <Link to="/contact-us" onClick={() => setMobile(false)} className="border border-border py-3 text-center">Contact</Link>
             </div>

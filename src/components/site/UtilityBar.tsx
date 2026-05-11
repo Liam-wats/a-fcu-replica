@@ -3,7 +3,7 @@ import { Search, User, ChevronDown } from "lucide-react";
 
 const utilLinks = [
   { label: "Join", href: "/join" },
-  { label: "Rates", href: "/guidance" },
+  { label: "Rates", href: "/guidance/rates" },
   { label: "Locations", href: "/locations" },
 ];
 

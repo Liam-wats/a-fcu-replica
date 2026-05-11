@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RatesRouteImport } from './routes/rates'
+import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
@@ -39,6 +41,16 @@ import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
 import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
 import { Route as AccountsCertificatesRouteImport } from './routes/accounts/certificates'
 
+const RatesRoute = RatesRouteImport.update({
+  id: '/rates',
+  path: '/rates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
@@ -190,6 +202,8 @@ const AccountsCertificatesRoute = AccountsCertificatesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/locations': typeof LocationsRoute
+  '/rates': typeof RatesRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -221,6 +235,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/locations': typeof LocationsRoute
+  '/rates': typeof RatesRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -253,6 +269,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
+  '/locations': typeof LocationsRoute
+  '/rates': typeof RatesRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -286,6 +304,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/join'
+    | '/locations'
+    | '/rates'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -317,6 +337,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/join'
+    | '/locations'
+    | '/rates'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -348,6 +370,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/join'
+    | '/locations'
+    | '/rates'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -380,6 +404,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JoinRoute: typeof JoinRoute
+  LocationsRoute: typeof LocationsRoute
+  RatesRoute: typeof RatesRoute
   AccountsCertificatesRoute: typeof AccountsCertificatesRoute
   AccountsCheckingRoute: typeof AccountsCheckingRoute
   AccountsSavingsRoute: typeof AccountsSavingsRoute
@@ -411,6 +437,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rates': {
+      id: '/rates'
+      path: '/rates'
+      fullPath: '/rates'
+      preLoaderRoute: typeof RatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/join': {
       id: '/join'
       path: '/join'
@@ -620,6 +660,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JoinRoute: JoinRoute,
+  LocationsRoute: LocationsRoute,
+  RatesRoute: RatesRoute,
   AccountsCertificatesRoute: AccountsCertificatesRoute,
   AccountsCheckingRoute: AccountsCheckingRoute,
   AccountsSavingsRoute: AccountsSavingsRoute,
