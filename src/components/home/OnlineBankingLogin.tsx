@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 export function OnlineBankingLogin() {
   return (
-    <section id="login" className="relative -mt-10 lg:-mt-16 z-30">
+    <section id="login" className="relative -mt-10 lg:-mt-16 z-30 mx-0 px-10">
       <div className="container-x">
         <div className="bg-white shadow-2xl border border-border p-6 md:p-8 max-w-2xl">
           <div className="flex items-start justify-between gap-4 mb-4">
