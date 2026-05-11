@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RatesRouteImport } from './routes/rates'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
@@ -54,6 +55,11 @@ const LocationsRoute = LocationsRouteImport.update({
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactUsRoute = ContactUsRouteImport.update({
+  id: '/contact-us',
+  path: '/contact-us',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -201,6 +207,7 @@ const AccountsCertificatesRoute = AccountsCertificatesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
   '/rates': typeof RatesRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
   '/rates': typeof RatesRoute
@@ -268,6 +276,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
   '/rates': typeof RatesRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/contact-us'
     | '/join'
     | '/locations'
     | '/rates'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contact-us'
     | '/join'
     | '/locations'
     | '/rates'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/contact-us'
     | '/join'
     | '/locations'
     | '/rates'
@@ -403,6 +415,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactUsRoute: typeof ContactUsRoute
   JoinRoute: typeof JoinRoute
   LocationsRoute: typeof LocationsRoute
   RatesRoute: typeof RatesRoute
@@ -456,6 +469,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact-us': {
+      id: '/contact-us'
+      path: '/contact-us'
+      fullPath: '/contact-us'
+      preLoaderRoute: typeof ContactUsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -659,6 +679,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactUsRoute: ContactUsRoute,
   JoinRoute: JoinRoute,
   LocationsRoute: LocationsRoute,
   RatesRoute: RatesRoute,
