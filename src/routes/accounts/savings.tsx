@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { SAVINGS_PRODUCTS } from "@/data/accounts";
@@ -36,7 +36,7 @@ const SAVINGS_TIPS = [
 function SavingsPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Savings Accounts"
         title="Save Smarter, Earn More, Stress Less."
         body="Whether you're building an emergency fund, growing your nest egg, or saving for the holidays, A+FCU has a savings account designed for your goal."

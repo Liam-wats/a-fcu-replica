@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { CHECKING_PRODUCTS } from "@/data/accounts";
@@ -31,7 +31,7 @@ const COMPARE_ROWS = [
 function CheckingPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Checking Accounts"
         title="Your Money Should Work as Hard as You Do."
         body="Earn cash back on everyday purchases, get paid up to two days early, and pay zero monthly fees — ever."

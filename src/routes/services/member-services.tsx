@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, FileText, Zap } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { MEMBER_SERVICES_LIST, NOTARY_INFO } from "@/data/services";
@@ -27,7 +27,7 @@ const WIRE_DETAILS = [
 function MemberServicesPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Member Services"
         title="Practical Services That Make Life Easier."
         body="Direct deposit, wire transfers, and free notary services — the everyday tools A+FCU members rely on."

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { LEADERSHIP_TEAM, TIMELINE, OPEN_POSITIONS, EMPLOYEE_BENEFITS, NEWSROOM_ITEMS } from "@/data/who-we-are";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/who-we-are/about")({
 function AboutPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="About A+FCU"
         title="75 Years of Putting Members First."
         body="A+FCU was founded in 1949 by Austin educators who believed every person deserved access to fair, member-owned financial services. Today, we serve over 100,000 members across Central Texas."

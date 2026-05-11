@@ -1,149 +1,277 @@
-export const NAV = [
+import navAccounts from "@/assets/nav/accounts.webp";
+import navLoans from "@/assets/nav/loans.webp";
+import navServices from "@/assets/nav/services.webp";
+import navBusiness from "@/assets/nav/business.webp";
+import navWho from "@/assets/nav/who.webp";
+import navGuidance from "@/assets/nav/guidance.webp";
+
+export type NavLink = { label: string; href: string };
+export type NavColumn = { title: string; href: string; links: NavLink[] };
+export type NavFeatured = { image: string; title: string; body: string; href: string };
+export type NavItem = {
+  label: string;
+  href: string;
+  /** Layout: columns are placed left-to-right; if rows present, each row is a strip of columns. */
+  rows: NavColumn[][];
+  featured: NavFeatured;
+};
+
+export const NAV: NavItem[] = [
   {
     label: "Accounts",
     href: "/accounts",
-    columns: [
-      { title: "Checking", href: "/accounts/checking", links: [
-        { label: "Cash-Back Checking", href: "/accounts/checking" },
-        { label: "Free Checking", href: "/accounts/checking" },
-        { label: "Compare Checking", href: "/accounts/checking#compare" },
-      ]},
-      { title: "Savings", href: "/accounts/savings", links: [
-        { label: "Regular Savings", href: "/accounts/savings" },
-        { label: "Money Market", href: "/accounts/savings" },
-        { label: "Holiday & Vacation Club", href: "/accounts/savings" },
-      ]},
-      { title: "Certificates", href: "/accounts/certificates", links: [
-        { label: "Share Certificates", href: "/accounts/certificates" },
-        { label: "IRA Certificates", href: "/accounts/certificates" },
-        { label: "Compare Certificates", href: "/accounts/certificates#compare" },
-      ]},
-      { title: "Youth", href: "/accounts/youth", links: [
-        { label: "Kids Accounts (0–12)", href: "/accounts/youth" },
-        { label: "Teen Accounts (13–17)", href: "/accounts/youth" },
-        { label: "Student Accounts", href: "/accounts/youth" },
-      ]},
+    rows: [
+      [
+        { title: "Checking Accounts", href: "/accounts/checking", links: [
+          { label: "Cash-Back Checking", href: "/accounts/checking" },
+          { label: "A+ Checking", href: "/accounts/checking" },
+          { label: "Value Checking", href: "/accounts/checking" },
+        ]},
+        { title: "Savings Accounts", href: "/accounts/savings", links: [
+          { label: "Membership Savings", href: "/accounts/savings" },
+          { label: "Tiered Money Market", href: "/accounts/savings" },
+        ]},
+        { title: "Certificates", href: "/accounts/certificates", links: [
+          { label: "StartUP Certificate", href: "/accounts/certificates" },
+          { label: "Share Certificates", href: "/accounts/certificates" },
+          { label: "New Money Advantage Certificates", href: "/accounts/certificates" },
+        ]},
+      ],
+      [
+        { title: "", href: "", links: [] },
+        { title: "Investments", href: "/services/insurance-investments", links: [
+          { label: "A+ Wealth Management", href: "/services/insurance-investments" },
+          { label: "IRAs", href: "/services/insurance-investments" },
+          { label: "HSAs", href: "/services/insurance-investments" },
+        ]},
+        { title: "", href: "", links: [] },
+      ],
     ],
+    featured: {
+      image: navAccounts,
+      title: "Don't Miss An Early Payday!",
+      body: "Set up direct deposit with our FREE online tool to get paid up to 2 days early.*",
+      href: "/services/member-services",
+    },
   },
   {
     label: "Loans",
     href: "/loans",
-    columns: [
-      { title: "Home Loans", href: "/loans/home-loans", links: [
-        { label: "Mortgage Purchase", href: "/loans/home-loans" },
-        { label: "Mortgage Refinance", href: "/loans/home-loans" },
-        { label: "Home Equity", href: "/loans/home-loans" },
-        { label: "HELOC", href: "/loans/home-loans" },
-      ]},
-      { title: "Vehicle Loans", href: "/loans/vehicle-loans", links: [
-        { label: "Auto Purchase", href: "/loans/vehicle-loans" },
-        { label: "Auto Refinance", href: "/loans/vehicle-loans" },
-        { label: "RV & Boat", href: "/loans/vehicle-loans" },
-        { label: "Motorcycle", href: "/loans/vehicle-loans" },
-      ]},
-      { title: "Personal Credit", href: "/loans/personal-credit", links: [
-        { label: "Personal Loans", href: "/loans/personal-credit" },
-        { label: "Credit Cards", href: "/loans/personal-credit" },
-        { label: "Lines of Credit", href: "/loans/personal-credit" },
-      ]},
-      { title: "Student Loans", href: "/loans/student-loans", links: [
-        { label: "Private Student Loans", href: "/loans/student-loans" },
-        { label: "Refinance Student Loans", href: "/loans/student-loans" },
-      ]},
+    rows: [
+      [
+        { title: "Home Loans", href: "/loans/home-loans", links: [
+          { label: "Purchases", href: "/loans/home-loans" },
+          { label: "Refinance", href: "/loans/home-loans" },
+          { label: "Home Equity", href: "/loans/home-loans" },
+        ]},
+        { title: "Vehicle Loans", href: "/loans/vehicle-loans", links: [
+          { label: "Car & Truck Loans", href: "/loans/vehicle-loans" },
+          { label: "RVs, Motorcycles, & More", href: "/loans/vehicle-loans" },
+          { label: "Partner Dealerships", href: "/loans/vehicle-loans" },
+        ]},
+        { title: "Personal Credit", href: "/loans/personal-credit", links: [
+          { label: "A+ Personal Loan", href: "/loans/personal-credit" },
+          { label: "A+ Preferred Line of Credit", href: "/loans/personal-credit" },
+          { label: "Credit Cards", href: "/loans/personal-credit" },
+          { label: "A+ Holiday Loan", href: "/loans/personal-credit" },
+        ]},
+      ],
+      [
+        { title: "", href: "", links: [] },
+        { title: "Make A Payment", href: "/guidance/tools", links: [
+          { label: "Make A Payment", href: "/guidance/tools" },
+        ]},
+        { title: "", href: "", links: [] },
+      ],
     ],
+    featured: {
+      image: navLoans,
+      title: "Refi Your Auto Loan To Save Big",
+      body: "For a limited time, beat your current auto loan rate by 1% APR!*†",
+      href: "/loans/vehicle-loans",
+    },
   },
   {
     label: "Services",
     href: "/services",
-    columns: [
-      { title: "Online Banking", href: "/services/online-banking", links: [
-        { label: "A+ Online Banking", href: "/services/online-banking" },
-        { label: "Bill Pay", href: "/services/online-banking" },
-        { label: "Card Management", href: "/services/online-banking" },
-        { label: "Credit Score", href: "/services/online-banking" },
-      ]},
-      { title: "Mobile Banking", href: "/services/mobile-banking", links: [
-        { label: "A+ Mobile App", href: "/services/mobile-banking" },
-        { label: "Mobile Deposit", href: "/services/mobile-banking" },
-        { label: "Digital Wallets", href: "/services/mobile-banking" },
-      ]},
-      { title: "Member Services", href: "/services/member-services", links: [
-        { label: "Direct Deposit", href: "/services/member-services" },
-        { label: "Wire Transfers", href: "/services/member-services" },
-        { label: "Notary", href: "/services/member-services" },
-      ]},
-      { title: "Insurance & Investments", href: "/services/insurance-investments", links: [
-        { label: "Insurance", href: "/services/insurance-investments" },
-        { label: "Investments", href: "/services/insurance-investments" },
-        { label: "Retirement", href: "/services/insurance-investments" },
-      ]},
+    rows: [
+      [
+        { title: "Online Banking", href: "/services/online-banking", links: [
+          { label: "A+ Online Banking", href: "/services/online-banking" },
+          { label: "Bill Pay", href: "/services/online-banking" },
+          { label: "Financial Tools", href: "/services/online-banking" },
+          { label: "Credit Score", href: "/services/online-banking" },
+          { label: "Card Management", href: "/services/online-banking" },
+          { label: "Resources", href: "/services/online-banking" },
+        ]},
+        { title: "Mobile Banking", href: "/services/mobile-banking", links: [
+          { label: "A+ Mobile App", href: "/services/mobile-banking" },
+          { label: "Mobile Deposit", href: "/services/mobile-banking" },
+          { label: "Zelle®", href: "/services/mobile-banking" },
+          { label: "Mobile Wallet", href: "/services/mobile-banking" },
+          { label: "Resources", href: "/services/mobile-banking" },
+        ]},
+        { title: "Member Services", href: "/services/member-services", links: [
+          { label: "Debit Cards", href: "/services/member-services" },
+          { label: "Direct Deposit & Payroll Deduction", href: "/services/member-services" },
+          { label: "Overdraft Protections", href: "/services/member-services" },
+          { label: "Wire Transfers", href: "/services/member-services" },
+          { label: "Insurance & Protection", href: "/services/insurance-investments" },
+          { label: "Order Checks", href: "/services/member-services" },
+        ]},
+      ],
     ],
+    featured: {
+      image: navServices,
+      title: "Are You On Fraud Alert?",
+      body: "Use our free resources to help protect your finances.",
+      href: "/guidance/financial-education",
+    },
   },
   {
     label: "Business",
     href: "/business",
-    columns: [
-      { title: "Business Accounts", href: "/business/accounts", links: [
-        { label: "Business Checking", href: "/business/accounts" },
-        { label: "Business Savings", href: "/business/accounts" },
-        { label: "Business Certificates", href: "/business/accounts" },
-      ]},
-      { title: "Business Lending", href: "/business/lending", links: [
-        { label: "Business Loans", href: "/business/lending" },
-        { label: "Lines of Credit", href: "/business/lending" },
-        { label: "Commercial Real Estate", href: "/business/lending" },
-      ]},
-      { title: "Business Services", href: "/business/services", links: [
-        { label: "Online Banking", href: "/business/services" },
-        { label: "Merchant Services", href: "/business/services" },
-        { label: "Payroll", href: "/business/services" },
-      ]},
+    rows: [
+      [
+        { title: "Business Accounts", href: "/business/accounts", links: [
+          { label: "Checking Accounts", href: "/business/accounts" },
+          { label: "Membership Savings", href: "/business/accounts" },
+        ]},
+        { title: "Business Loans", href: "/business/lending", links: [
+          { label: "Real Estate Loans", href: "/business/lending" },
+          { label: "Secured & Unsecured Loans", href: "/business/lending" },
+          { label: "Business Line of Credit", href: "/business/lending" },
+          { label: "Business Credit Cards", href: "/business/lending" },
+        ]},
+        { title: "Business Services", href: "/business/services", links: [
+          { label: "Business Bill Pay", href: "/business/services" },
+          { label: "Cash Management", href: "/business/services" },
+          { label: "Merchant Services", href: "/business/services" },
+          { label: "HSAs", href: "/business/services" },
+          { label: "Contact Us", href: "/contact-us" },
+        ]},
+      ],
     ],
+    featured: {
+      image: navBusiness,
+      title: "Online Banking For Businesses",
+      body: "Log in to manage your business accounts 24/7.",
+      href: "/business/services",
+    },
   },
   {
     label: "Who We Are",
     href: "/who-we-are",
-    columns: [
-      { title: "About", href: "/who-we-are/about", links: [
-        { label: "Our Story", href: "/who-we-are/about" },
-        { label: "Leadership", href: "/who-we-are/about" },
-        { label: "Careers", href: "/who-we-are/about" },
-        { label: "Newsroom", href: "/who-we-are/about" },
-      ]},
-      { title: "Community", href: "/who-we-are/community", links: [
-        { label: "A+ Gives", href: "/who-we-are/community" },
-        { label: "Sponsorships", href: "/who-we-are/community" },
-        { label: "Volunteering", href: "/who-we-are/community" },
-      ]},
-      { title: "Membership", href: "/who-we-are/membership", links: [
-        { label: "Join A+FCU", href: "/join" },
-        { label: "Member Benefits", href: "/who-we-are/membership" },
-        { label: "Refer a Friend", href: "/who-we-are/membership" },
-      ]},
+    rows: [
+      [
+        { title: "Community Support", href: "/who-we-are/community", links: [
+          { label: "A+ Gives", href: "/who-we-are/community" },
+          { label: "Member Giveback", href: "/who-we-are/community" },
+          { label: "Member Support", href: "/who-we-are/community" },
+          { label: "Scholarships", href: "/who-we-are/community" },
+        ]},
+        { title: "Youth Programs", href: "/who-we-are/community", links: [
+          { label: "Scouting America", href: "/who-we-are/community" },
+          { label: "Girl Scouts", href: "/who-we-are/community" },
+          { label: "Youth Month", href: "/who-we-are/community" },
+          { label: "Youth Financial Camp", href: "/who-we-are/community" },
+          { label: "Financial Boot Camp", href: "/who-we-are/community" },
+          { label: "Summer Saving Program", href: "/who-we-are/community" },
+        ]},
+        { title: "Educators", href: "/who-we-are/community", links: [
+          { label: "Educator Loans", href: "/who-we-are/community" },
+          { label: "Educator Resources", href: "/who-we-are/community" },
+          { label: "A+ Education Foundation", href: "/who-we-are/community" },
+        ]},
+        { title: "Member Benefits", href: "/who-we-are/membership", links: [
+          { label: "Refer & Earn", href: "/who-we-are/membership" },
+          { label: "PlusPoints", href: "/who-we-are/membership" },
+          { label: "Member Discounts", href: "/who-we-are/membership" },
+          { label: "Golden Apple Club", href: "/who-we-are/membership" },
+          { label: "Select Employee Groups", href: "/who-we-are/membership" },
+        ]},
+      ],
+      [
+        { title: "Contact Us", href: "/contact-us", links: [
+          { label: "Contact", href: "/contact-us" },
+          { label: "Request An Appointment", href: "/contact-us" },
+        ]},
+        { title: "Careers", href: "/who-we-are/about", links: [
+          { label: "Careers", href: "/who-we-are/about" },
+          { label: "Current Openings", href: "/who-we-are/about" },
+        ]},
+        { title: "Recognition & Awards", href: "/who-we-are/about", links: [
+          { label: "Recognition & Awards", href: "/who-we-are/about" },
+        ]},
+        { title: "News & Publications", href: "/who-we-are/about", links: [
+          { label: "News & Publications", href: "/who-we-are/about" },
+        ]},
+      ],
     ],
+    featured: {
+      image: navWho,
+      title: "Join A+FCU!",
+      body: "Open your account online within 5 minutes.",
+      href: "/join",
+    },
   },
   {
     label: "Guidance",
     href: "/guidance",
-    columns: [
-      { title: "Financial Education", href: "/guidance/financial-education", links: [
-        { label: "Workshops", href: "/guidance/financial-education" },
-        { label: "Calculators", href: "/guidance/financial-education" },
-        { label: "Articles", href: "/guidance/financial-education" },
-      ]},
-      { title: "Rates", href: "/guidance/rates", links: [
-        { label: "All Rates", href: "/guidance/rates" },
-        { label: "Loan Rates", href: "/guidance/rates" },
-        { label: "Deposit Rates", href: "/guidance/rates" },
-      ]},
-      { title: "Tools", href: "/guidance/tools", links: [
-        { label: "Make a Payment", href: "/guidance/tools" },
-        { label: "Switch Kit", href: "/guidance/tools" },
-        { label: "FAQ", href: "/guidance/tools" },
-      ]},
+    rows: [
+      [
+        { title: "Life Guidance", href: "/guidance/financial-education", links: [
+          { label: "Business Finances", href: "/guidance/financial-education" },
+          { label: "Buying A Home", href: "/guidance/financial-education" },
+          { label: "Buying A Vehicle", href: "/guidance/financial-education" },
+          { label: "Family & Finances", href: "/guidance/financial-education" },
+          { label: "Paying For College", href: "/guidance/financial-education" },
+          { label: "Personal Finances", href: "/guidance/financial-education" },
+          { label: "Retirement", href: "/guidance/financial-education" },
+          { label: "Safety & Security", href: "/guidance/financial-education" },
+        ]},
+        { title: "Blog", href: "/guidance/financial-education", links: [
+          { label: "A+ News", href: "/guidance/financial-education" },
+          { label: "Business Finances", href: "/guidance/financial-education" },
+          { label: "Buying A Home", href: "/guidance/financial-education" },
+          { label: "Buying A Vehicle", href: "/guidance/financial-education" },
+          { label: "Credit & Debt", href: "/guidance/financial-education" },
+          { label: "View All Categories", href: "/guidance/financial-education" },
+        ]},
+        { title: "Calculators", href: "/guidance/tools", links: [
+          { label: "Savings", href: "/guidance/tools" },
+          { label: "Home Loans", href: "/guidance/tools" },
+          { label: "Investments", href: "/guidance/tools" },
+          { label: "Credit & Debt", href: "/guidance/tools" },
+          { label: "Vehicle Loans", href: "/guidance/tools" },
+        ]},
+        { title: "BALANCE", href: "/guidance/financial-education", links: [
+          { label: "Financial Counseling", href: "/guidance/financial-education" },
+          { label: "BalanceTrack", href: "/guidance/financial-education" },
+          { label: "Contests", href: "/guidance/financial-education" },
+        ]},
+      ],
+      [
+        { title: "", href: "", links: [] },
+        { title: "Webinars & Events", href: "/guidance/financial-education", links: [
+          { label: "Webinars & Events", href: "/guidance/financial-education" },
+        ]},
+        { title: "Rates", href: "/guidance/rates", links: [
+          { label: "Savings Rates", href: "/guidance/rates" },
+          { label: "Certificate Rates", href: "/guidance/rates" },
+          { label: "Vehicle Loan Rates", href: "/guidance/rates" },
+        ]},
+        { title: "", href: "", links: [] },
+      ],
     ],
+    featured: {
+      image: navGuidance,
+      title: "Help Detect Fraud",
+      body: "Monitor your credit with FREE monthly credit score updates – enroll today!*",
+      href: "/services/online-banking",
+    },
   },
-] as const;
+];
 
 type HeroBg = "yellow" | "white";
 export const HERO_SLIDES: Array<{

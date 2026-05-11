@@ -18,7 +18,7 @@ export function HeroCarousel() {
   }, [emblaApi]);
 
   const togglePlay = useCallback(() => {
-    const ap = emblaApi?.plugins()?.autoplay;
+    const ap = emblaApi?.plugins()?.autoplay as ReturnType<typeof Autoplay> | undefined;
     if (!ap) return;
     if (playing) ap.stop();
     else ap.play();

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Smartphone, Camera, Wallet } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { MOBILE_FEATURES, DIGITAL_WALLETS } from "@/data/services";
@@ -30,7 +30,7 @@ const APP_AWARDS = [
 function MobileBankingPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Mobile Banking"
         title="Award-Winning Banking in Your Pocket."
         body="The A+ Mobile App was recognized as the Best Mobile Banking App in North America. Free for every A+FCU member on iOS and Android."

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, ShieldCheck, TrendingUp, PiggyBank } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { INSURANCE_PRODUCTS } from "@/data/services";
@@ -45,7 +45,7 @@ const RETIREMENT_OPTIONS = [
 function InsuranceInvestmentsPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Insurance & Investments"
         title="Protect Today. Build for Tomorrow."
         body="From insurance that covers what matters most to investment and retirement planning guided by licensed professionals — A+FCU has the tools to help you achieve financial security."

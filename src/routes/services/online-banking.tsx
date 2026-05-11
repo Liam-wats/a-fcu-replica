@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, CreditCard, BarChart3, Receipt, Lock } from "lucide-react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { ProductCard } from "@/components/accounts/ProductCard";
 import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 import { ONLINE_BANKING_FEATURES, CARD_MANAGEMENT_FEATURES } from "@/data/services";
@@ -35,7 +35,7 @@ const TOOLS = [
 function OnlineBankingPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Online Banking"
         title="Your Full Financial Picture, Anytime You Need It."
         body="A+ Online Banking gives you instant, secure access to all your accounts from any browser — pay bills, manage cards, check your credit, and more."

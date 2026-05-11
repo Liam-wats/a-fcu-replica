@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown, ChevronUp, CreditCard, Repeat, HelpCircle } from "lucide-react";
 import { useState } from "react";
-import { PageHero } from "@/components/site/PageHero";
+import { SplitHero } from "@/components/site/SplitHero";
 import { FAQ_ITEMS, SWITCH_KIT_STEPS } from "@/data/guidance";
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/guidance/tools")({
 function ToolsPage() {
   return (
     <>
-      <PageHero
+      <SplitHero
         eyebrow="Tools & Support"
         title="Everything You Need to Bank With Ease."
         body="Make a payment, switch your banking to A+FCU, or get answers to your questions — we make it simple."
