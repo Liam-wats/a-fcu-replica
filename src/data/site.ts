@@ -100,6 +100,7 @@ export const HERO_SLIDES = [
     ctaHref: "/loans",
     image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-mortgage-purchase_may26_homepage-hero.webp",
     alt: "Family of four in the backyard while the dad helps the younger son ride a bike. Mom and sister clap in the back.",
+    bg: "yellow" as const,
   },
   {
     eyebrow: null,
@@ -109,6 +110,7 @@ export const HERO_SLIDES = [
     ctaHref: "/loans",
     image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
     alt: "Man and woman sit at kitchen table with laptop and mobile phone.",
+    bg: "white" as const,
   },
   {
     eyebrow: null,
@@ -118,6 +120,7 @@ export const HERO_SLIDES = [
     ctaHref: "/accounts",
     image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
     alt: "Image of mobile phone with the A+ Mobile App showing cash back earned. A+ debit card is in front of the phone.",
+    bg: "white" as const,
   },
 ];
 
