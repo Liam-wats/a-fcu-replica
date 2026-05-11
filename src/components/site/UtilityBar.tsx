@@ -10,7 +10,7 @@ const utilLinks = [
 export function UtilityBar() {
   return (
     <div className="hidden lg:block border-b border-border bg-white">
-      <div className="container-x flex items-center justify-end gap-6 h-10 text-sm">
+      <div className="w-full px-6 lg:px-10 flex items-center justify-end gap-6 h-10 text-sm">
         {utilLinks.map((l) => (
           <Link key={l.label} to={l.href} className="text-ink hover:text-brand-green transition-colors">
             {l.label}

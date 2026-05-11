@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgba(0,0,0,0.06)]">
       <UtilityBar />
-      <div className="container-x flex items-center justify-between h-20 lg:h-24">
+      <div className="w-full px-6 lg:px-10 flex items-center justify-between h-20 lg:h-24">
         <Logo />
 
         <nav

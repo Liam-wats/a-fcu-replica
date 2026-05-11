@@ -100,7 +100,7 @@ export const HERO_SLIDES = [
     ctaHref: "/loans",
     image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-mortgage-purchase_may26_homepage-hero.webp",
     alt: "Family of four in the backyard while the dad helps the younger son ride a bike. Mom and sister clap in the back.",
-    bg: "yellow" as const,
+    bg: "white" as const,
   },
   {
     eyebrow: null,
