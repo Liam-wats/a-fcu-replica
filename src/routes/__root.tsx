@@ -51,13 +51,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isAdmin = useRouterState({
-    select: (s) => s.location.pathname.startsWith("/admin"),
+  const isShell = useRouterState({
+    select: (s) => {
+      const p = s.location.pathname;
+      return p.startsWith("/admin") || p === "/login" || p === "/dashboard";
+    },
   });
 
   return (
     <QueryClientProvider client={queryClient}>
-      {isAdmin ? (
+      {isShell ? (
         <Outlet />
       ) : (
         <div className="flex min-h-screen flex-col">

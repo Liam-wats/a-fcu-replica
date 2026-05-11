@@ -63,7 +63,7 @@ export function Header() {
 
         <div className="lg:hidden flex items-center gap-3">
           <button aria-label="Search" className="p-2" onClick={() => navigate({ to: "/search", search: { q: "" } })}><Search className="w-5 h-5" /></button>
-          <a href="#login" aria-label="Login" className="p-2 bg-brand-green text-white"><User className="w-5 h-5" /></a>
+          <Link to="/login" aria-label="Login" className="p-2 bg-brand-green text-white"><User className="w-5 h-5" /></Link>
           <button aria-label="Menu" className="p-2" onClick={() => setMobile(true)}>
             <Menu className="w-6 h-6" />
           </button>

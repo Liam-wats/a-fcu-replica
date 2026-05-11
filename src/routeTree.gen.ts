@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RatesRouteImport } from './routes/rates'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -56,6 +58,11 @@ const RatesRoute = RatesRouteImport.update({
   path: '/rates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationsRoute = LocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -64,6 +71,11 @@ const LocationsRoute = LocationsRouteImport.update({
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactUsRoute = ContactUsRouteImport.update({
@@ -233,8 +245,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/rates': typeof RatesRoute
   '/search': typeof SearchRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
@@ -270,8 +284,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/rates': typeof RatesRoute
   '/search': typeof SearchRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
@@ -309,8 +325,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/rates': typeof RatesRoute
   '/search': typeof SearchRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
@@ -349,8 +367,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/contact-us'
+    | '/dashboard'
     | '/join'
     | '/locations'
+    | '/login'
     | '/rates'
     | '/search'
     | '/accounts/certificates'
@@ -386,8 +406,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contact-us'
+    | '/dashboard'
     | '/join'
     | '/locations'
+    | '/login'
     | '/rates'
     | '/search'
     | '/accounts/certificates'
@@ -424,8 +446,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/contact-us'
+    | '/dashboard'
     | '/join'
     | '/locations'
+    | '/login'
     | '/rates'
     | '/search'
     | '/accounts/certificates'
@@ -463,8 +487,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactUsRoute: typeof ContactUsRoute
+  DashboardRoute: typeof DashboardRoute
   JoinRoute: typeof JoinRoute
   LocationsRoute: typeof LocationsRoute
+  LoginRoute: typeof LoginRoute
   RatesRoute: typeof RatesRoute
   SearchRoute: typeof SearchRoute
   AccountsCertificatesRoute: typeof AccountsCertificatesRoute
@@ -512,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations': {
       id: '/locations'
       path: '/locations'
@@ -524,6 +557,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact-us': {
@@ -769,8 +809,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactUsRoute: ContactUsRoute,
+  DashboardRoute: DashboardRoute,
   JoinRoute: JoinRoute,
   LocationsRoute: LocationsRoute,
+  LoginRoute: LoginRoute,
   RatesRoute: RatesRoute,
   SearchRoute: SearchRoute,
   AccountsCertificatesRoute: AccountsCertificatesRoute,

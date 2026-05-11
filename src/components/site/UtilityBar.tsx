@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, User, ChevronDown, X } from "lucide-react";
+import { Search, User, ChevronDown, X, LayoutDashboard } from "lucide-react";
+import { getMemberSession } from "@/lib/session";
 
 const utilLinks = [
   { label: "Join", href: "/join" },
@@ -12,6 +13,7 @@ export function UtilityBar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const isLoggedIn = !!getMemberSession();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,12 +45,21 @@ export function UtilityBar() {
         >
           Search <Search className="w-3.5 h-3.5" />
         </button>
-        <a
-          href="#login"
-          className="bg-brand-green hover:bg-brand-green-dark text-white inline-flex items-center gap-2 px-5 py-2.5 -my-px text-sm font-medium transition-colors"
-        >
-          <User className="w-4 h-4" /> Login
-        </a>
+        {isLoggedIn ? (
+          <Link
+            to="/dashboard"
+            className="bg-brand-green hover:bg-brand-green-dark text-white inline-flex items-center gap-2 px-5 py-2.5 -my-px text-sm font-medium transition-colors"
+          >
+            <LayoutDashboard className="w-4 h-4" /> My Dashboard
+          </Link>
+        ) : (
+          <Link
+            to="/login"
+            className="bg-brand-green hover:bg-brand-green-dark text-white inline-flex items-center gap-2 px-5 py-2.5 -my-px text-sm font-medium transition-colors"
+          >
+            <User className="w-4 h-4" /> Login
+          </Link>
+        )}
       </div>
 
       {searchOpen && (
