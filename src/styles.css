@@ -1,6 +1,6 @@
 @import "tailwindcss" source(none);
-@source "../src";
 @import "tw-animate-css";
+@source "../src";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -40,10 +40,10 @@
 :root {
   --radius: 0.25rem;
 
-  --brand-green: oklch(0.46 0.12 150);          /* ~#1f7a3a */
+  --brand-green: oklch(0.46 0.12 150);
   --brand-green-dark: oklch(0.40 0.11 150);
   --brand-green-darker: oklch(0.30 0.08 150);
-  --brand-yellow: oklch(0.86 0.17 95);            /* ~#f5c11f */
+  --brand-yellow: oklch(0.86 0.17 95);
   --brand-cream: oklch(0.975 0.005 90);
   --ink: oklch(0.20 0.01 250);
 
