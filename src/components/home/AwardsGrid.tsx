@@ -33,7 +33,7 @@ export function AwardsGrid() {
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
             aria-label="Previous awards"
-            className="w-10 h-10 inline-flex items-center justify-center bg-brand-green text-white disabled:opacity-40 hover:bg-brand-green-dark transition-colors"
+            className="w-11 h-11 inline-flex items-center justify-center border border-brand-green text-brand-green disabled:opacity-40 hover:bg-brand-green hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -41,7 +41,7 @@ export function AwardsGrid() {
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
             aria-label="Next awards"
-            className="w-10 h-10 inline-flex items-center justify-center border border-border text-ink/70 disabled:opacity-40 hover:bg-secondary transition-colors"
+            className="w-11 h-11 inline-flex items-center justify-center border border-brand-green text-brand-green disabled:opacity-40 hover:bg-brand-green hover:text-white transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
           </button>
