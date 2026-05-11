@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { OnlineBankingLogin } from "@/components/home/OnlineBankingLogin";
-import { MobileAppCTA } from "@/components/home/MobileAppCTA";
 import { FeaturedRates } from "@/components/home/FeaturedRates";
 import { ContentBlock } from "@/components/home/ContentBlock";
 import { PillLinks } from "@/components/home/PillLinks";
@@ -26,7 +25,6 @@ function Index() {
     <>
       <HeroCarousel />
       <OnlineBankingLogin />
-      <MobileAppCTA />
       <FeaturedRates />
       <ContentBlock
         image="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp"
