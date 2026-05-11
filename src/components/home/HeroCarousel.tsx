@@ -26,11 +26,16 @@ export function HeroCarousel() {
   }, [emblaApi, playing]);
 
   return (
-    <section className="relative bg-brand-yellow overflow-hidden">
+    <section className="relative bg-white overflow-hidden">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {HERO_SLIDES.map((slide, i) => (
-            <div key={i} className="relative shrink-0 grow-0 basis-full">
+            <div
+              key={i}
+              className={`relative shrink-0 grow-0 basis-full ${
+                slide.bg === "yellow" ? "bg-brand-yellow" : "bg-white"
+              }`}
+            >
               <div className="container-x grid lg:grid-cols-2 items-center gap-8 py-14 lg:py-24 min-h-[520px] lg:min-h-[600px]">
                 <div className="relative z-10 max-w-xl">
                   <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.05] text-ink">
@@ -54,12 +59,14 @@ export function HeroCarousel() {
                   />
                 </div>
               </div>
-              <img
-                src={ANGLE_OVERLAY}
-                alt=""
-                aria-hidden="true"
-                className="hidden lg:block absolute inset-y-0 left-1/2 h-full pointer-events-none -translate-x-[55%]"
-              />
+              {slide.bg === "yellow" && (
+                <img
+                  src={ANGLE_OVERLAY}
+                  alt=""
+                  aria-hidden="true"
+                  className="hidden lg:block absolute inset-y-0 left-1/2 h-full pointer-events-none -translate-x-[55%]"
+                />
+              )}
             </div>
           ))}
         </div>
