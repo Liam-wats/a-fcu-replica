@@ -2,9 +2,8 @@ import { ArrowRight } from "lucide-react";
 
 export function OnlineBankingLogin() {
   return (
-    <section id="login" className="relative -mt-10 lg:-mt-16 z-30 mx-0 px-10">
-      <div className="container-x">
-        <div className="bg-white shadow-2xl border border-border p-6 md:p-8 max-w-2xl">
+    <section id="login" className="relative -mt-10 lg:-mt-16 z-30 mx-0 px-6 lg:px-10">
+      <div className="bg-white shadow-2xl border border-border p-6 md:p-8 max-w-2xl">
           <div className="flex items-start justify-between gap-4 mb-4">
             <h2 className="font-serif text-2xl md:text-3xl">A+ Online Banking</h2>
             <a href="/join" className="text-brand-green underline underline-offset-4 font-semibold text-sm hover:no-underline whitespace-nowrap">
@@ -32,7 +31,6 @@ export function OnlineBankingLogin() {
               <a key={l} href="#" className="text-brand-green underline underline-offset-4 hover:no-underline">{l}</a>
             ))}
           </div>
-        </div>
       </div>
     </section>
   );
