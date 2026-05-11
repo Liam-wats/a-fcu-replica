@@ -14,12 +14,14 @@ import { Route as RatesRouteImport } from './routes/rates'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ContactUsRouteImport } from './routes/contact-us'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
 import { Route as GuidanceIndexRouteImport } from './routes/guidance/index'
 import { Route as BusinessIndexRouteImport } from './routes/business/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
 import { Route as WhoWeAreMembershipRouteImport } from './routes/who-we-are/membership'
 import { Route as WhoWeAreCommunityRouteImport } from './routes/who-we-are/community'
@@ -42,6 +44,7 @@ import { Route as AccountsYouthRouteImport } from './routes/accounts/youth'
 import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
 import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
 import { Route as AccountsCertificatesRouteImport } from './routes/accounts/certificates'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -66,6 +69,11 @@ const JoinRoute = JoinRouteImport.update({
 const ContactUsRoute = ContactUsRouteImport.update({
   id: '/contact-us',
   path: '/contact-us',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,6 +105,11 @@ const BusinessIndexRoute = BusinessIndexRouteImport.update({
   id: '/business/',
   path: '/business/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AccountsIndexRoute = AccountsIndexRouteImport.update({
   id: '/accounts/',
@@ -210,9 +223,15 @@ const AccountsCertificatesRoute = AccountsCertificatesRouteImport.update({
   path: '/accounts/certificates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/users/$userId',
+  path: '/users/$userId',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
@@ -240,11 +259,13 @@ export interface FileRoutesByFullPath {
   '/who-we-are/community': typeof WhoWeAreCommunityRoute
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,15 +296,18 @@ export interface FileRoutesByTo {
   '/who-we-are/community': typeof WhoWeAreCommunityRoute
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts': typeof AccountsIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/business': typeof BusinessIndexRoute
   '/guidance': typeof GuidanceIndexRoute
   '/loans': typeof LoansIndexRoute
   '/services': typeof ServicesIndexRoute
   '/who-we-are': typeof WhoWeAreIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
@@ -311,16 +335,19 @@ export interface FileRoutesById {
   '/who-we-are/community': typeof WhoWeAreCommunityRoute
   '/who-we-are/membership': typeof WhoWeAreMembershipRoute
   '/accounts/': typeof AccountsIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/contact-us'
     | '/join'
     | '/locations'
@@ -348,11 +375,13 @@ export interface FileRouteTypes {
     | '/who-we-are/community'
     | '/who-we-are/membership'
     | '/accounts/'
+    | '/admin/'
     | '/business/'
     | '/guidance/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
+    | '/admin/users/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -383,14 +412,17 @@ export interface FileRouteTypes {
     | '/who-we-are/community'
     | '/who-we-are/membership'
     | '/accounts'
+    | '/admin'
     | '/business'
     | '/guidance'
     | '/loans'
     | '/services'
     | '/who-we-are'
+    | '/admin/users/$userId'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/contact-us'
     | '/join'
     | '/locations'
@@ -418,15 +450,18 @@ export interface FileRouteTypes {
     | '/who-we-are/community'
     | '/who-we-are/membership'
     | '/accounts/'
+    | '/admin/'
     | '/business/'
     | '/guidance/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
+    | '/admin/users/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ContactUsRoute: typeof ContactUsRoute
   JoinRoute: typeof JoinRoute
   LocationsRoute: typeof LocationsRoute
@@ -498,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactUsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -539,6 +581,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/business/'
       preLoaderRoute: typeof BusinessIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/accounts/': {
       id: '/accounts/'
@@ -694,11 +743,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsCertificatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/users/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ContactUsRoute: ContactUsRoute,
   JoinRoute: JoinRoute,
   LocationsRoute: LocationsRoute,
