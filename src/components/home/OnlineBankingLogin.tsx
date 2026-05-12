@@ -30,6 +30,7 @@ export function OnlineBankingLogin() {
           ...data.member,
           loginId: data.member.loginId ?? loginId.trim(),
         }));
+        sessionStorage.setItem("apfcu_token", data.token);
         navigate({ to: "/dashboard" });
       } else {
         setError(data.error || "Login failed. Please try again.");
