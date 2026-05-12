@@ -239,6 +239,22 @@ app.get("/api/applications/:ref", async (req, res) => {
   }
 });
 
+// POST /api/admin/login — verify admin password
+app.post("/api/admin/login", (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: "Password required." });
+  }
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return res.status(503).json({ error: "Admin access not configured." });
+  }
+  if (password !== adminPassword) {
+    return res.status(401).json({ error: "Incorrect password. Please try again." });
+  }
+  return res.json({ success: true });
+});
+
 const PORT = process.env.API_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server running on port ${PORT}`);
