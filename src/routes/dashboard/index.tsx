@@ -4,7 +4,7 @@ import {
   ArrowLeftRight, CreditCard, Smartphone, FileText, BookCheck,
   Eye, EyeOff, TrendingUp, ShieldCheck, HelpCircle,
   MapPin, Phone, ExternalLink, ChevronRight, AlertCircle,
-  CheckCircle2, Loader2,
+  CheckCircle2, Loader2, RefreshCw,
 } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
@@ -47,6 +47,8 @@ function DashboardOverview() {
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
   const [greeting, setGreeting] = useState("Good morning");
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   useEffect(() => {
     const h = new Date().getHours();
@@ -82,9 +84,22 @@ function DashboardOverview() {
       const res = await fetch(`/api/member/${loginId}/account`);
       const json = await res.json();
       setData(json);
+      setLastRefreshed(new Date());
     } catch { /* silent */ }
     finally { setLoading(false); }
   }, []);
+
+  const handleRefresh = useCallback(async () => {
+    if (!session?.loginId || refreshing) return;
+    setRefreshing(true);
+    try {
+      const res = await fetch(`/api/member/${session.loginId}/account`);
+      const json = await res.json();
+      setData(json);
+      setLastRefreshed(new Date());
+    } catch { /* silent */ }
+    finally { setRefreshing(false); }
+  }, [session, refreshing]);
 
   useEffect(() => {
     if (session?.loginId) fetchData(session.loginId);
@@ -131,9 +146,23 @@ function DashboardOverview() {
               <p className="text-[11px] font-bold uppercase tracking-widest text-ink/35">Primary Account</p>
               <h2 className="font-serif text-xl text-ink mt-0.5">{accountLabel}</h2>
             </div>
-            <span className="text-[11px] font-semibold bg-brand-green/10 text-brand-green px-2.5 py-1 border border-brand-green/20">
-              {isChecking ? "Checking" : "Savings"}
-            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing || loading}
+                title="Refresh balance"
+                className="flex items-center gap-1.5 text-[12px] font-semibold text-ink/45 hover:text-brand-green disabled:opacity-40 transition-colors group"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 transition-transform ${refreshing ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`} />
+                {lastRefreshed
+                  ? <span className="hidden sm:inline">Updated {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  : <span className="hidden sm:inline">Refresh</span>
+                }
+              </button>
+              <span className="text-[11px] font-semibold bg-brand-green/10 text-brand-green px-2.5 py-1 border border-brand-green/20">
+                {isChecking ? "Checking" : "Savings"}
+              </span>
+            </div>
           </div>
 
           {loading ? (
