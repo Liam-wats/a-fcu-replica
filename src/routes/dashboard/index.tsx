@@ -49,11 +49,31 @@ function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("apfcu_session");
-    if (raw) setSession(JSON.parse(raw));
     const h = new Date().getHours();
     if (h >= 12 && h < 17) setGreeting("Good afternoon");
     else if (h >= 17) setGreeting("Good evening");
+
+    const raw = sessionStorage.getItem("apfcu_session");
+    if (!raw) return;
+    const parsed: Session = JSON.parse(raw);
+
+    // Session is missing loginId (logged in before server update) — repair it silently
+    if (!parsed.loginId && parsed.referenceNumber) {
+      fetch(`/api/session/repair?ref=${encodeURIComponent(parsed.referenceNumber)}`)
+        .then(r => r.json())
+        .then(fresh => {
+          if (fresh.loginId) {
+            const repaired = { ...parsed, loginId: fresh.loginId };
+            sessionStorage.setItem("apfcu_session", JSON.stringify(repaired));
+            setSession(repaired);
+          } else {
+            setSession(parsed);
+          }
+        })
+        .catch(() => setSession(parsed));
+    } else {
+      setSession(parsed);
+    }
   }, []);
 
   const fetchData = useCallback(async (loginId: string) => {

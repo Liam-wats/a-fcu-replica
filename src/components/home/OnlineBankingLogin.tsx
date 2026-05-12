@@ -26,7 +26,10 @@ export function OnlineBankingLogin() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        sessionStorage.setItem("apfcu_session", JSON.stringify(data.member));
+        sessionStorage.setItem("apfcu_session", JSON.stringify({
+          ...data.member,
+          loginId: data.member.loginId ?? loginId.trim(),
+        }));
         navigate({ to: "/dashboard" });
       } else {
         setError(data.error || "Login failed. Please try again.");

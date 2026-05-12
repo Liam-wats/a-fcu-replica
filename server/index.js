@@ -274,6 +274,30 @@ app.get("/api/applications/:ref", async (req, res) => {
   }
 });
 
+// GET /api/session/repair?ref=xxx — re-hydrate session with loginId
+app.get("/api/session/repair", async (req, res) => {
+  const { ref } = req.query;
+  if (!ref) return res.status(400).json({ error: "ref required" });
+  try {
+    const result = await pool.query(
+      "SELECT login_id, first_name, last_name, email, account_type, reference_number FROM membership_applications WHERE reference_number = $1",
+      [ref]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: "Not found" });
+    const m = result.rows[0];
+    return res.json({
+      loginId: m.login_id,
+      firstName: m.first_name,
+      lastName: m.last_name,
+      email: m.email,
+      accountType: m.account_type,
+      referenceNumber: m.reference_number,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Repair failed" });
+  }
+});
+
 // GET /api/member/:loginId/account — fetch balance, transactions, alerts
 app.get("/api/member/:loginId/account", async (req, res) => {
   const { loginId } = req.params;
