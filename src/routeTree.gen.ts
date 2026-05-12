@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactUsRouteImport } from './routes/contact-us'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -65,6 +66,11 @@ const LocationsRoute = LocationsRouteImport.update({
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactUsRoute = ContactUsRouteImport.update({
@@ -269,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
@@ -356,6 +364,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
+  '/dashboard': typeof DashboardRoute
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/contact-us'
+    | '/dashboard'
     | '/join'
     | '/locations'
     | '/login'
@@ -445,6 +455,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contact-us'
+    | '/dashboard'
     | '/locations'
     | '/login'
     | '/accounts/certificates'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/contact-us'
+    | '/dashboard'
     | '/join'
     | '/locations'
     | '/login'
@@ -533,6 +545,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactUsRoute: typeof ContactUsRoute
+  DashboardRoute: typeof DashboardRoute
   JoinRoute: typeof JoinRouteWithChildren
   LocationsRoute: typeof LocationsRoute
   LoginRoute: typeof LoginRoute
@@ -586,6 +599,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact-us': {
@@ -902,6 +922,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactUsRoute: ContactUsRoute,
+  DashboardRoute: DashboardRoute,
   JoinRoute: JoinRouteWithChildren,
   LocationsRoute: LocationsRoute,
   LoginRoute: LoginRoute,

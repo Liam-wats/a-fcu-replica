@@ -54,7 +54,7 @@ function LoginPage() {
       if (res.ok && data.success) {
         // Store session info and redirect to a dashboard or home
         sessionStorage.setItem("apfcu_session", JSON.stringify(data.member));
-        navigate({ to: "/" });
+        navigate({ to: "/dashboard" });
       } else {
         setError(data.error || "Login failed. Please try again.");
       }
