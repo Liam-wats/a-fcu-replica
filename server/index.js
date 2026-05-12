@@ -45,6 +45,40 @@ async function migrate() {
 
 migrate().catch(console.error);
 
+async function migrateAccountData() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS member_balances (
+      login_id TEXT PRIMARY KEY,
+      available_balance NUMERIC DEFAULT 0,
+      current_balance NUMERIC DEFAULT 0,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS member_transactions (
+      id SERIAL PRIMARY KEY,
+      login_id TEXT NOT NULL,
+      txn_date TEXT NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT DEFAULT 'Other',
+      amount NUMERIC NOT NULL,
+      txn_type TEXT DEFAULT 'debit',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS member_alerts (
+      id SERIAL PRIMARY KEY,
+      login_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      alert_type TEXT DEFAULT 'info',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+}
+migrateAccountData().catch(console.error);
+
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password + "apfcu_salt").digest("hex");
 }
@@ -140,6 +174,7 @@ app.post("/api/login", async (req, res) => {
     return res.json({
       success: true,
       member: {
+        loginId: member.login_id,
         firstName: member.first_name,
         lastName: member.last_name,
         email: member.email,
@@ -236,6 +271,109 @@ app.get("/api/applications/:ref", async (req, res) => {
   } catch (err) {
     console.error("Error fetching application:", err);
     return res.status(500).json({ error: "Failed to fetch application" });
+  }
+});
+
+// GET /api/member/:loginId/account — fetch balance, transactions, alerts
+app.get("/api/member/:loginId/account", async (req, res) => {
+  const { loginId } = req.params;
+  try {
+    let balRes = await pool.query("SELECT * FROM member_balances WHERE login_id = $1", [loginId]);
+    let balance = balRes.rows[0];
+    if (!balance) {
+      const ins = await pool.query(
+        "INSERT INTO member_balances (login_id) VALUES ($1) RETURNING *", [loginId]
+      );
+      balance = ins.rows[0];
+    }
+    const txRes = await pool.query(
+      "SELECT * FROM member_transactions WHERE login_id = $1 ORDER BY created_at DESC LIMIT 50", [loginId]
+    );
+    const alertRes = await pool.query(
+      "SELECT * FROM member_alerts WHERE login_id = $1 ORDER BY created_at DESC", [loginId]
+    );
+    return res.json({
+      balance: { available: parseFloat(balance.available_balance), current: parseFloat(balance.current_balance) },
+      transactions: txRes.rows,
+      alerts: alertRes.rows,
+    });
+  } catch (err) {
+    console.error("Error fetching account data:", err);
+    return res.status(500).json({ error: "Failed to fetch account data" });
+  }
+});
+
+// PUT /api/member/:loginId/balance
+app.put("/api/member/:loginId/balance", async (req, res) => {
+  const { loginId } = req.params;
+  const { available, current } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO member_balances (login_id, available_balance, current_balance, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (login_id) DO UPDATE SET
+         available_balance = $2, current_balance = $3, updated_at = NOW()
+       RETURNING *`,
+      [loginId, available, current]
+    );
+    return res.json({ success: true, balance: result.rows[0] });
+  } catch (err) {
+    console.error("Error updating balance:", err);
+    return res.status(500).json({ error: "Failed to update balance" });
+  }
+});
+
+// POST /api/member/:loginId/transactions
+app.post("/api/member/:loginId/transactions", async (req, res) => {
+  const { loginId } = req.params;
+  const { txn_date, description, category, amount, txn_type } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO member_transactions (login_id, txn_date, description, category, amount, txn_type)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [loginId, txn_date, description, category || "Other", amount, txn_type || "debit"]
+    );
+    return res.status(201).json({ success: true, transaction: result.rows[0] });
+  } catch (err) {
+    console.error("Error adding transaction:", err);
+    return res.status(500).json({ error: "Failed to add transaction" });
+  }
+});
+
+// DELETE /api/member/:loginId/transactions/:id
+app.delete("/api/member/:loginId/transactions/:id", async (req, res) => {
+  const { loginId, id } = req.params;
+  try {
+    await pool.query("DELETE FROM member_transactions WHERE id = $1 AND login_id = $2", [id, loginId]);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete transaction" });
+  }
+});
+
+// POST /api/member/:loginId/alerts
+app.post("/api/member/:loginId/alerts", async (req, res) => {
+  const { loginId } = req.params;
+  const { title, message, alert_type } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO member_alerts (login_id, title, message, alert_type) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [loginId, title, message, alert_type || "info"]
+    );
+    return res.status(201).json({ success: true, alert: result.rows[0] });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to add alert" });
+  }
+});
+
+// DELETE /api/member/:loginId/alerts/:id
+app.delete("/api/member/:loginId/alerts/:id", async (req, res) => {
+  const { loginId, id } = req.params;
+  try {
+    await pool.query("DELETE FROM member_alerts WHERE id = $1 AND login_id = $2", [id, loginId]);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete alert" });
   }
 });
 

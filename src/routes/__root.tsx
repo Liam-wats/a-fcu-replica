@@ -51,11 +51,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = { pathname: typeof window !== "undefined" ? window.location.pathname : "" };
-  const isAdmin = location.pathname.startsWith("/admin");
+  const isBareLayout =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/dashboard");
 
   return (
     <QueryClientProvider client={queryClient}>
-      {isAdmin ? (
+      {isBareLayout ? (
         <Outlet />
       ) : (
         <div className="flex min-h-screen flex-col">

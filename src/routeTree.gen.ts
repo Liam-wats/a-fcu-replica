@@ -21,6 +21,7 @@ import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
 import { Route as JoinIndexRouteImport } from './routes/join/index'
 import { Route as GuidanceIndexRouteImport } from './routes/guidance/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
@@ -45,6 +46,11 @@ import { Route as JoinAccountRouteImport } from './routes/join/account'
 import { Route as GuidanceToolsRouteImport } from './routes/guidance/tools'
 import { Route as GuidanceRatesRouteImport } from './routes/guidance/rates'
 import { Route as GuidanceFinancialEducationRouteImport } from './routes/guidance/financial-education'
+import { Route as DashboardTransferRouteImport } from './routes/dashboard/transfer'
+import { Route as DashboardStatementsRouteImport } from './routes/dashboard/statements'
+import { Route as DashboardDepositRouteImport } from './routes/dashboard/deposit'
+import { Route as DashboardChecksRouteImport } from './routes/dashboard/checks'
+import { Route as DashboardBillsRouteImport } from './routes/dashboard/bills'
 import { Route as BusinessServicesRouteImport } from './routes/business/services'
 import { Route as BusinessLendingRouteImport } from './routes/business/lending'
 import { Route as BusinessAccountsRouteImport } from './routes/business/accounts'
@@ -112,6 +118,11 @@ const GuidanceIndexRoute = GuidanceIndexRouteImport.update({
   id: '/guidance/',
   path: '/guidance/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const BusinessIndexRoute = BusinessIndexRouteImport.update({
   id: '/business/',
@@ -235,6 +246,31 @@ const GuidanceFinancialEducationRoute =
     path: '/guidance/financial-education',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardTransferRoute = DashboardTransferRouteImport.update({
+  id: '/transfer',
+  path: '/transfer',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStatementsRoute = DashboardStatementsRouteImport.update({
+  id: '/statements',
+  path: '/statements',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDepositRoute = DashboardDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardChecksRoute = DashboardChecksRouteImport.update({
+  id: '/checks',
+  path: '/checks',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBillsRoute = DashboardBillsRouteImport.update({
+  id: '/bills',
+  path: '/bills',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const BusinessServicesRoute = BusinessServicesRouteImport.update({
   id: '/business/services',
   path: '/business/services',
@@ -275,7 +311,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
@@ -286,6 +322,11 @@ export interface FileRoutesByFullPath {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/dashboard/bills': typeof DashboardBillsRoute
+  '/dashboard/checks': typeof DashboardChecksRoute
+  '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/statements': typeof DashboardStatementsRoute
+  '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
@@ -310,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/accounts/': typeof AccountsIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/business/': typeof BusinessIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
   '/join/': typeof JoinIndexRoute
   '/loans/': typeof LoansIndexRoute
@@ -319,7 +361,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
-  '/dashboard': typeof DashboardRoute
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
@@ -329,6 +370,11 @@ export interface FileRoutesByTo {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/dashboard/bills': typeof DashboardBillsRoute
+  '/dashboard/checks': typeof DashboardChecksRoute
+  '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/statements': typeof DashboardStatementsRoute
+  '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
@@ -353,6 +399,7 @@ export interface FileRoutesByTo {
   '/accounts': typeof AccountsIndexRoute
   '/admin': typeof AdminIndexRoute
   '/business': typeof BusinessIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/guidance': typeof GuidanceIndexRoute
   '/join': typeof JoinIndexRoute
   '/loans': typeof LoansIndexRoute
@@ -364,7 +411,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact-us': typeof ContactUsRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/login': typeof LoginRoute
@@ -375,6 +422,11 @@ export interface FileRoutesById {
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
+  '/dashboard/bills': typeof DashboardBillsRoute
+  '/dashboard/checks': typeof DashboardChecksRoute
+  '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/statements': typeof DashboardStatementsRoute
+  '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
@@ -399,6 +451,7 @@ export interface FileRoutesById {
   '/accounts/': typeof AccountsIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/business/': typeof BusinessIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
   '/join/': typeof JoinIndexRoute
   '/loans/': typeof LoansIndexRoute
@@ -422,6 +475,11 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/dashboard/bills'
+    | '/dashboard/checks'
+    | '/dashboard/deposit'
+    | '/dashboard/statements'
+    | '/dashboard/transfer'
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
@@ -446,6 +504,7 @@ export interface FileRouteTypes {
     | '/accounts/'
     | '/admin/'
     | '/business/'
+    | '/dashboard/'
     | '/guidance/'
     | '/join/'
     | '/loans/'
@@ -455,7 +514,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contact-us'
-    | '/dashboard'
     | '/locations'
     | '/login'
     | '/accounts/certificates'
@@ -465,6 +523,11 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/dashboard/bills'
+    | '/dashboard/checks'
+    | '/dashboard/deposit'
+    | '/dashboard/statements'
+    | '/dashboard/transfer'
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
@@ -489,6 +552,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/admin'
     | '/business'
+    | '/dashboard'
     | '/guidance'
     | '/join'
     | '/loans'
@@ -510,6 +574,11 @@ export interface FileRouteTypes {
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
+    | '/dashboard/bills'
+    | '/dashboard/checks'
+    | '/dashboard/deposit'
+    | '/dashboard/statements'
+    | '/dashboard/transfer'
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
@@ -534,6 +603,7 @@ export interface FileRouteTypes {
     | '/accounts/'
     | '/admin/'
     | '/business/'
+    | '/dashboard/'
     | '/guidance/'
     | '/join/'
     | '/loans/'
@@ -545,7 +615,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactUsRoute: typeof ContactUsRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   JoinRoute: typeof JoinRouteWithChildren
   LocationsRoute: typeof LocationsRoute
   LoginRoute: typeof LoginRoute
@@ -663,6 +733,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/guidance/'
       preLoaderRoute: typeof GuidanceIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/business/': {
       id: '/business/'
@@ -832,6 +909,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidanceFinancialEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/transfer': {
+      id: '/dashboard/transfer'
+      path: '/transfer'
+      fullPath: '/dashboard/transfer'
+      preLoaderRoute: typeof DashboardTransferRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/statements': {
+      id: '/dashboard/statements'
+      path: '/statements'
+      fullPath: '/dashboard/statements'
+      preLoaderRoute: typeof DashboardStatementsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/deposit': {
+      id: '/dashboard/deposit'
+      path: '/deposit'
+      fullPath: '/dashboard/deposit'
+      preLoaderRoute: typeof DashboardDepositRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/checks': {
+      id: '/dashboard/checks'
+      path: '/checks'
+      fullPath: '/dashboard/checks'
+      preLoaderRoute: typeof DashboardChecksRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/bills': {
+      id: '/dashboard/bills'
+      path: '/bills'
+      fullPath: '/dashboard/bills'
+      preLoaderRoute: typeof DashboardBillsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/business/services': {
       id: '/business/services'
       path: '/business/services'
@@ -894,6 +1006,28 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardBillsRoute: typeof DashboardBillsRoute
+  DashboardChecksRoute: typeof DashboardChecksRoute
+  DashboardDepositRoute: typeof DashboardDepositRoute
+  DashboardStatementsRoute: typeof DashboardStatementsRoute
+  DashboardTransferRoute: typeof DashboardTransferRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardBillsRoute: DashboardBillsRoute,
+  DashboardChecksRoute: DashboardChecksRoute,
+  DashboardDepositRoute: DashboardDepositRoute,
+  DashboardStatementsRoute: DashboardStatementsRoute,
+  DashboardTransferRoute: DashboardTransferRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 interface JoinRouteChildren {
   JoinAccountRoute: typeof JoinAccountRoute
   JoinAddressRoute: typeof JoinAddressRoute
@@ -922,7 +1056,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactUsRoute: ContactUsRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   JoinRoute: JoinRouteWithChildren,
   LocationsRoute: LocationsRoute,
   LoginRoute: LoginRoute,

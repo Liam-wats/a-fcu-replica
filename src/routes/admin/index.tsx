@@ -4,8 +4,18 @@ import {
   Search, X, ChevronUp, ChevronDown, CheckCircle2,
   Clock, XCircle, AlertCircle, RefreshCw, Save,
   Loader2, MoreHorizontal, Users, FileText, Check,
+  DollarSign, Trash2, Plus, Wallet, Bell, User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+interface AccountData {
+  balance: { available: number; current: number };
+  transactions: { id: number; txn_date: string; description: string; category: string; amount: number; txn_type: string }[];
+  alerts: { id: number; title: string; message: string; alert_type: string }[];
+}
+
+const TX_CATEGORIES = ["Groceries","Dining","Utilities","Transportation","Healthcare","Entertainment","Shopping","Transfer","Bills","Deposit","Other"];
+const ALERT_TYPES = [{ id: "info", label: "Info" }, { id: "warning", label: "Warning" }, { id: "success", label: "Success" }];
 
 export const Route = createFileRoute("/admin/")({
   component: AdminApplicationsPage,
@@ -94,6 +104,10 @@ function Field({
   );
 }
 
+function fmt(n: number) {
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
 function EditDrawer({
   app,
   onClose,
@@ -103,10 +117,46 @@ function EditDrawer({
   onClose: () => void;
   onSaved: (updated: Application) => void;
 }) {
-  const [form, setForm] = useState<Application>({ ...app });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [form, setForm]       = useState<Application>({ ...app });
+  const [saving, setSaving]   = useState(false);
+  const [error, setError]     = useState("");
+  const [saved, setSaved]     = useState(false);
+  const [tab, setTab]         = useState<"profile" | "account">("profile");
+
+  // Account data state
+  const [acct, setAcct]               = useState<AccountData | null>(null);
+  const [acctLoading, setAcctLoading] = useState(false);
+  const [balAvail, setBalAvail]       = useState("");
+  const [balCurrent, setBalCurrent]   = useState("");
+  const [savingBal, setSavingBal]     = useState(false);
+  const [balSaved, setBalSaved]       = useState(false);
+
+  // New transaction form
+  const [txForm, setTxForm] = useState({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
+  const [addingTx, setAddingTx]   = useState(false);
+  const [showTxForm, setShowTxForm] = useState(false);
+
+  // New alert form
+  const [alertForm, setAlertForm] = useState({ title: "", message: "", alert_type: "info" });
+  const [addingAlert, setAddingAlert]   = useState(false);
+  const [showAlertForm, setShowAlertForm] = useState(false);
+
+  const loginId = form.login_id;
+
+  const loadAccountData = useCallback(async () => {
+    if (!loginId) return;
+    setAcctLoading(true);
+    try {
+      const res = await fetch(`/api/member/${loginId}/account`);
+      const data: AccountData = await res.json();
+      setAcct(data);
+      setBalAvail(data.balance.available.toFixed(2));
+      setBalCurrent(data.balance.current.toFixed(2));
+    } catch { /* silent */ }
+    finally { setAcctLoading(false); }
+  }, [loginId]);
+
+  useEffect(() => { if (tab === "account") loadAccountData(); }, [tab, loadAccountData]);
 
   const dirty = JSON.stringify(form) !== JSON.stringify(app);
 
@@ -116,27 +166,19 @@ function EditDrawer({
   };
 
   const handleSave = async () => {
-    setSaving(true);
-    setError("");
+    setSaving(true); setError("");
     try {
       const res = await fetch(`/api/applications/${app.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName:   form.first_name,
-          lastName:    form.last_name,
-          email:       form.email,
-          phone:       form.phone,
-          dob:         form.date_of_birth,
-          ssnLast4:    form.ssn_last4,
-          street:      form.street,
-          apt:         form.apt ?? "",
-          city:        form.city,
-          state:       form.state,
-          zip:         form.zip,
-          accountType: form.account_type,
-          loginId:     form.login_id ?? "",
-          status:      form.status,
+          firstName: form.first_name, lastName: form.last_name,
+          email: form.email, phone: form.phone,
+          dob: form.date_of_birth, ssnLast4: form.ssn_last4,
+          street: form.street, apt: form.apt ?? "",
+          city: form.city, state: form.state, zip: form.zip,
+          accountType: form.account_type, loginId: form.login_id ?? "",
+          status: form.status,
         }),
       });
       const data = await res.json();
@@ -144,173 +186,533 @@ function EditDrawer({
       setSaved(true);
       onSaved(data.application as Application);
       setTimeout(() => setSaved(false), 2000);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
+    } catch (e: any) { setError(e.message); }
+    finally { setSaving(false); }
   };
+
+  const saveBalance = async () => {
+    if (!loginId) return;
+    setSavingBal(true);
+    try {
+      await fetch(`/api/member/${loginId}/balance`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available: parseFloat(balAvail), current: parseFloat(balCurrent) }),
+      });
+      setBalSaved(true);
+      setTimeout(() => setBalSaved(false), 2000);
+      if (acct) setAcct({ ...acct, balance: { available: parseFloat(balAvail), current: parseFloat(balCurrent) } });
+    } catch { /* silent */ }
+    finally { setSavingBal(false); }
+  };
+
+  const addTransaction = async () => {
+    if (!loginId || !txForm.description || !txForm.amount || !txForm.txn_date) return;
+    setAddingTx(true);
+    try {
+      const res = await fetch(`/api/member/${loginId}/transactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
+      });
+      const data = await res.json();
+      if (res.ok && acct) {
+        setAcct({ ...acct, transactions: [data.transaction, ...acct.transactions] });
+        setTxForm({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
+        setShowTxForm(false);
+      }
+    } catch { /* silent */ }
+    finally { setAddingTx(false); }
+  };
+
+  const deleteTransaction = async (id: number) => {
+    if (!loginId) return;
+    await fetch(`/api/member/${loginId}/transactions/${id}`, { method: "DELETE" });
+    if (acct) setAcct({ ...acct, transactions: acct.transactions.filter(t => t.id !== id) });
+  };
+
+  const addAlert = async () => {
+    if (!loginId || !alertForm.title || !alertForm.message) return;
+    setAddingAlert(true);
+    try {
+      const res = await fetch(`/api/member/${loginId}/alerts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(alertForm),
+      });
+      const data = await res.json();
+      if (res.ok && acct) {
+        setAcct({ ...acct, alerts: [data.alert, ...acct.alerts] });
+        setAlertForm({ title: "", message: "", alert_type: "info" });
+        setShowAlertForm(false);
+      }
+    } catch { /* silent */ }
+    finally { setAddingAlert(false); }
+  };
+
+  const deleteAlert = async (id: number) => {
+    if (!loginId) return;
+    await fetch(`/api/member/${loginId}/alerts/${id}`, { method: "DELETE" });
+    if (acct) setAcct({ ...acct, alerts: acct.alerts.filter(a => a.id !== id) });
+  };
+
+  const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/30 z-40 backdrop-blur-[1px]"
-        onClick={onClose}
-      />
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-[480px] max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-[1px]" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-[520px] max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div>
-            <p className="text-xs text-slate-400 font-mono">{app.reference_number}</p>
-            <h2 className="font-semibold text-slate-900 text-base mt-0.5">
-              {app.first_name} {app.last_name}
-            </h2>
+        <div className="px-6 py-4 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-400 font-mono">{app.reference_number}</p>
+              <h2 className="font-semibold text-slate-900 text-base mt-0.5">
+                {app.first_name} {app.last_name}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <StatusChip status={form.status} />
+              <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded transition-colors">
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <StatusChip status={form.status} />
-            <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded transition-colors">
-              <X className="w-4 h-4 text-slate-500" />
-            </button>
+          {/* Tabs */}
+          <div className="flex gap-0 mt-4 border-b border-slate-100 -mb-4">
+            {[
+              { id: "profile" as const,  label: "Profile",      icon: User },
+              { id: "account" as const,  label: "Account Data", icon: Wallet },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={cn(
+                  "flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-semibold border-b-2 transition-colors",
+                  tab === id ? "border-brand-green text-brand-green" : "border-transparent text-slate-400 hover:text-slate-700"
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" /> {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-7">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
 
-          {/* Status control */}
-          <FieldGroup label="Application Status">
-            <div className="flex gap-2 flex-wrap">
-              {ALL_STATUSES.map((s) => {
-                const cfg = STATUS_CONFIG[s];
-                const active = form.status === s;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => set("status", s)}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-full transition-all",
-                      active
-                        ? cn(cfg.chip, "ring-2 ring-offset-1", s === "approved" ? "ring-emerald-400" : s === "rejected" ? "ring-red-400" : s === "pending" ? "ring-amber-400" : "ring-blue-400")
-                        : "bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600"
-                    )}
-                  >
-                    {active && <Check className="w-3 h-3" />}
-                    {cfg.label}
-                  </button>
-                );
-              })}
-            </div>
-          </FieldGroup>
+          {/* ── PROFILE TAB ── */}
+          {tab === "profile" && (
+            <div className="px-6 py-5 space-y-7">
+              <FieldGroup label="Application Status">
+                <div className="flex gap-2 flex-wrap">
+                  {ALL_STATUSES.map((s) => {
+                    const cfg = STATUS_CONFIG[s];
+                    const active = form.status === s;
+                    return (
+                      <button key={s} type="button" onClick={() => set("status", s)}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-full transition-all",
+                          active
+                            ? cn(cfg.chip, "ring-2 ring-offset-1", s === "approved" ? "ring-emerald-400" : s === "rejected" ? "ring-red-400" : s === "pending" ? "ring-amber-400" : "ring-blue-400")
+                            : "bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600"
+                        )}
+                      >
+                        {active && <Check className="w-3 h-3" />}
+                        {cfg.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </FieldGroup>
 
-          {/* Personal */}
-          <FieldGroup label="Personal Information">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="First Name"  name="first_name"   value={form.first_name}   onChange={set} />
-              <Field label="Last Name"   name="last_name"    value={form.last_name}    onChange={set} />
-            </div>
-            <Field label="Email Address" name="email"        value={form.email}        onChange={set} type="email" />
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Phone"       name="phone"        value={form.phone}        onChange={set} />
-              <Field label="Date of Birth" name="date_of_birth" value={form.date_of_birth ?? ""} onChange={set} />
-            </div>
-            <Field label="SSN (last 4)"  name="ssn_last4"   value={form.ssn_last4 ?? ""} onChange={set} />
-          </FieldGroup>
+              <FieldGroup label="Personal Information">
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="First Name" name="first_name" value={form.first_name} onChange={set} />
+                  <Field label="Last Name"  name="last_name"  value={form.last_name}  onChange={set} />
+                </div>
+                <Field label="Email Address" name="email" value={form.email} onChange={set} type="email" />
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Phone" name="phone" value={form.phone} onChange={set} />
+                  <Field label="Date of Birth" name="date_of_birth" value={form.date_of_birth ?? ""} onChange={set} />
+                </div>
+                <Field label="SSN (last 4)" name="ssn_last4" value={form.ssn_last4 ?? ""} onChange={set} />
+              </FieldGroup>
 
-          {/* Address */}
-          <FieldGroup label="Home Address">
-            <Field label="Street"        name="street"      value={form.street}       onChange={set} />
-            <Field label="Apt / Suite"   name="apt"         value={form.apt ?? ""}    onChange={set} />
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-1">
-                <Field label="City"      name="city"        value={form.city}         onChange={set} />
-              </div>
-              <div>
-                <Field label="State"     name="state"       value={form.state}        onChange={set} />
-              </div>
-              <div>
-                <Field label="ZIP"       name="zip"         value={form.zip}          onChange={set} />
-              </div>
-            </div>
-          </FieldGroup>
+              <FieldGroup label="Home Address">
+                <Field label="Street" name="street" value={form.street} onChange={set} />
+                <Field label="Apt / Suite" name="apt" value={form.apt ?? ""} onChange={set} />
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-1"><Field label="City"  name="city"  value={form.city}  onChange={set} /></div>
+                  <div><Field label="State" name="state" value={form.state} onChange={set} /></div>
+                  <div><Field label="ZIP"   name="zip"   value={form.zip}   onChange={set} /></div>
+                </div>
+              </FieldGroup>
 
-          {/* Account */}
-          <FieldGroup label="Account Type">
-            <div className="flex flex-col gap-1.5">
-              {Object.entries(ACCOUNT_LABELS).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => set("account_type", id)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2 border rounded text-sm text-left transition-all",
-                    form.account_type === id
-                      ? "border-brand-green bg-brand-green/5 text-brand-green font-semibold"
-                      : "border-slate-200 text-slate-600 hover:border-slate-300"
-                  )}
-                >
-                  <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                    form.account_type === id ? "border-brand-green bg-brand-green" : "border-slate-300"
-                  )}>
-                    {form.account_type === id && <Check className="w-2.5 h-2.5 text-white" />}
+              <FieldGroup label="Account Type">
+                <div className="flex flex-col gap-1.5">
+                  {Object.entries(ACCOUNT_LABELS).map(([id, label]) => (
+                    <button key={id} type="button" onClick={() => set("account_type", id)}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 border rounded text-sm text-left transition-all",
+                        form.account_type === id
+                          ? "border-brand-green bg-brand-green/5 text-brand-green font-semibold"
+                          : "border-slate-200 text-slate-600 hover:border-slate-300"
+                      )}
+                    >
+                      <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                        form.account_type === id ? "border-brand-green bg-brand-green" : "border-slate-300"
+                      )}>
+                        {form.account_type === id && <Check className="w-2.5 h-2.5 text-white" />}
+                      </div>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </FieldGroup>
+
+              <FieldGroup label="Online Banking">
+                <Field label="Login ID" name="login_id" value={form.login_id ?? ""} onChange={set} />
+                <div className="text-[11px] text-slate-400 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  Password hash is stored separately and cannot be viewed.
+                </div>
+              </FieldGroup>
+
+              <FieldGroup label="Audit">
+                <Field label="Reference #" name="reference_number" value={form.reference_number} readOnly />
+                <Field label="Applied" name="submitted_at" value={new Date(form.submitted_at).toLocaleString()} readOnly />
+              </FieldGroup>
+            </div>
+          )}
+
+          {/* ── ACCOUNT DATA TAB ── */}
+          {tab === "account" && (
+            <div className="px-6 py-5 space-y-6">
+              {!loginId ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+                  <AlertCircle className="w-8 h-8 text-amber-400" />
+                  <p className="text-sm font-semibold text-slate-700">No Login ID set</p>
+                  <p className="text-[13px] text-slate-400">
+                    Assign a Login ID on the Profile tab first before managing account data.
+                  </p>
+                </div>
+              ) : acctLoading ? (
+                <div className="flex items-center justify-center py-12 gap-2 text-slate-400 text-sm">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Loading account data…
+                </div>
+              ) : (
+                <>
+                  {/* ── Balance ── */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <DollarSign className="w-4 h-4 text-brand-green" />
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Account Balance</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 mb-0.5">Available Balance</label>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                          <input
+                            type="number" step="0.01" min="0"
+                            className="w-full pl-6 pr-2.5 py-1.5 text-sm border border-slate-200 rounded outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                            value={balAvail}
+                            onChange={e => setBalAvail(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 mb-0.5">Current Balance</label>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                          <input
+                            type="number" step="0.01" min="0"
+                            className="w-full pl-6 pr-2.5 py-1.5 text-sm border border-slate-200 rounded outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                            value={balCurrent}
+                            onChange={e => setBalCurrent(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={saveBalance}
+                      disabled={savingBal}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 transition-colors"
+                    >
+                      {savingBal ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                      {balSaved ? "Saved!" : "Save Balance"}
+                    </button>
                   </div>
-                  {label}
-                </button>
-              ))}
+
+                  <div className="border-t border-slate-100" />
+
+                  {/* ── Transactions ── */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-brand-green" />
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                          Transactions ({acct?.transactions.length ?? 0})
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowTxForm(v => !v)}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-green hover:underline"
+                      >
+                        <Plus className="w-3 h-3" /> Add
+                      </button>
+                    </div>
+
+                    {showTxForm && (
+                      <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-3 space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Date</label>
+                            <input
+                              placeholder={todayStr}
+                              className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green"
+                              value={txForm.txn_date}
+                              onChange={e => setTxForm(f => ({ ...f, txn_date: e.target.value }))}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Category</label>
+                            <select
+                              className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green bg-white"
+                              value={txForm.category}
+                              onChange={e => setTxForm(f => ({ ...f, category: e.target.value }))}
+                            >
+                              {TX_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Description</label>
+                          <input
+                            placeholder="e.g. Walmart Grocery"
+                            className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green"
+                            value={txForm.description}
+                            onChange={e => setTxForm(f => ({ ...f, description: e.target.value }))}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Amount</label>
+                            <div className="relative">
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                              <input
+                                type="number" step="0.01" min="0" placeholder="0.00"
+                                className="w-full pl-5 pr-2 py-1.5 text-xs border border-slate-200 rounded outline-none focus:border-brand-green"
+                                value={txForm.amount}
+                                onChange={e => setTxForm(f => ({ ...f, amount: e.target.value }))}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Type</label>
+                            <div className="flex gap-1">
+                              {["debit", "credit"].map(t => (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  onClick={() => setTxForm(f => ({ ...f, txn_type: t }))}
+                                  className={cn(
+                                    "flex-1 text-[10px] font-semibold py-1.5 border rounded capitalize transition-all",
+                                    txForm.txn_type === t
+                                      ? t === "debit" ? "bg-red-50 border-red-300 text-red-600" : "bg-emerald-50 border-emerald-300 text-emerald-700"
+                                      : "border-slate-200 text-slate-400 hover:border-slate-300"
+                                  )}
+                                >
+                                  {t}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={addTransaction}
+                            disabled={addingTx}
+                            className="text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
+                          >
+                            {addingTx ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                            Add Transaction
+                          </button>
+                          <button onClick={() => setShowTxForm(false)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {(acct?.transactions ?? []).length === 0 ? (
+                      <p className="text-xs text-slate-400 italic py-2">No transactions yet.</p>
+                    ) : (
+                      <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
+                        {(acct?.transactions ?? []).map(tx => (
+                          <div key={tx.id} className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded px-3 py-2 group">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className={cn(
+                                "w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-full shrink-0",
+                                tx.txn_type === "debit" ? "bg-red-100 text-red-500" : "bg-emerald-100 text-emerald-600"
+                              )}>
+                                {tx.txn_type === "debit" ? "−" : "+"}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold text-slate-800 truncate">{tx.description}</p>
+                                <p className="text-[10px] text-slate-400">{tx.category} · {tx.txn_date}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={cn("text-xs font-bold tabular-nums",
+                                tx.txn_type === "debit" ? "text-slate-700" : "text-emerald-600"
+                              )}>
+                                {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(tx.amount))}
+                              </span>
+                              <button
+                                onClick={() => deleteTransaction(tx.id)}
+                                className="p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t border-slate-100" />
+
+                  {/* ── Alerts ── */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-4 h-4 text-brand-green" />
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                          Member Alerts ({acct?.alerts.length ?? 0})
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowAlertForm(v => !v)}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-green hover:underline"
+                      >
+                        <Plus className="w-3 h-3" /> Add
+                      </button>
+                    </div>
+
+                    {showAlertForm && (
+                      <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-3 space-y-2">
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Title</label>
+                          <input
+                            placeholder="e.g. Low balance notice"
+                            className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green"
+                            value={alertForm.title}
+                            onChange={e => setAlertForm(f => ({ ...f, title: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Message</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Alert message text…"
+                            className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green resize-none"
+                            value={alertForm.message}
+                            onChange={e => setAlertForm(f => ({ ...f, message: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">Type</label>
+                          <div className="flex gap-1.5">
+                            {ALERT_TYPES.map(({ id, label }) => (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={() => setAlertForm(f => ({ ...f, alert_type: id }))}
+                                className={cn(
+                                  "flex-1 text-[10px] font-semibold py-1.5 border rounded transition-all",
+                                  alertForm.alert_type === id
+                                    ? id === "warning" ? "bg-amber-50 border-amber-300 text-amber-700"
+                                      : id === "success" ? "bg-emerald-50 border-emerald-300 text-emerald-700"
+                                      : "bg-blue-50 border-blue-300 text-blue-700"
+                                    : "border-slate-200 text-slate-400 hover:border-slate-300"
+                                )}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={addAlert}
+                            disabled={addingAlert}
+                            className="text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
+                          >
+                            {addingAlert ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                            Add Alert
+                          </button>
+                          <button onClick={() => setShowAlertForm(false)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {(acct?.alerts ?? []).length === 0 ? (
+                      <p className="text-xs text-slate-400 italic py-2">No alerts for this member.</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {(acct?.alerts ?? []).map(alert => (
+                          <div key={alert.id} className={cn(
+                            "flex items-start justify-between rounded px-3 py-2 border group",
+                            alert.alert_type === "warning" ? "bg-amber-50 border-amber-100"
+                              : alert.alert_type === "success" ? "bg-emerald-50 border-emerald-100"
+                              : "bg-blue-50 border-blue-100"
+                          )}>
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-slate-800">{alert.title}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">{alert.message}</p>
+                            </div>
+                            <button
+                              onClick={() => deleteAlert(alert.id)}
+                              className="ml-2 p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
-          </FieldGroup>
-
-          {/* Online Banking */}
-          <FieldGroup label="Online Banking">
-            <Field label="Login ID" name="login_id" value={form.login_id ?? ""} onChange={set} />
-            <div className="text-[11px] text-slate-400 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" />
-              Password hash is stored separately and cannot be viewed.
-            </div>
-          </FieldGroup>
-
-          {/* Audit */}
-          <FieldGroup label="Audit">
-            <Field label="Reference #"   name="reference_number" value={form.reference_number} readOnly />
-            <Field label="Applied"       name="submitted_at"     value={new Date(form.submitted_at).toLocaleString()} readOnly />
-          </FieldGroup>
-
+          )}
         </div>
 
-        {/* Footer actions */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3">
-          {error && (
-            <p className="text-xs text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" /> {error}
-            </p>
-          )}
-          {!error && saved && (
-            <p className="text-xs text-emerald-600 flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Saved successfully
-            </p>
-          )}
-          {!error && !saved && <span />}
-          <div className="flex gap-2 ml-auto">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 rounded transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving || !dirty}
-              className="px-4 py-2 text-sm font-semibold bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 text-white rounded inline-flex items-center gap-1.5 transition-colors"
-            >
-              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              {saving ? "Saving…" : "Save Changes"}
-            </button>
+        {/* Footer — only show profile save on profile tab */}
+        {tab === "profile" && (
+          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3">
+            {error && <p className="text-xs text-red-600 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
+            {!error && saved && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Saved successfully</p>}
+            {!error && !saved && <span />}
+            <div className="flex gap-2 ml-auto">
+              <button
+                type="button" onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 rounded transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button" onClick={handleSave} disabled={saving || !dirty}
+                className="px-4 py-2 text-sm font-semibold bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 text-white rounded inline-flex items-center gap-1.5 transition-colors"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                {saving ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
