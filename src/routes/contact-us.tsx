@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { SplitHero } from "@/components/site/SplitHero";
+import { useState } from "react";
 
 export const Route = createFileRoute("/contact-us")({
   head: () => ({
@@ -21,7 +22,82 @@ const CHANNELS = [
   { icon: Clock, title: "Hours", lines: ["Mon–Fri 9am–6pm", "Sat 9am–1pm"] },
 ];
 
+interface FormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+interface FieldError {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  message?: string;
+}
+
+function validateForm(form: FormState): FieldError {
+  const errors: FieldError = {};
+  if (!form.firstName.trim()) errors.firstName = "First name is required.";
+  if (!form.lastName.trim()) errors.lastName = "Last name is required.";
+  if (!form.email.trim()) {
+    errors.email = "Email is required.";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.email = "Please enter a valid email address.";
+  }
+  if (!form.message.trim()) errors.message = "Message is required.";
+  else if (form.message.trim().length < 10) errors.message = "Message must be at least 10 characters.";
+  return errors;
+}
+
 function ContactUsPage() {
+  const [form, setForm] = useState<FormState>({
+    firstName: "", lastName: "", email: "", subject: "", message: "",
+  });
+  const [errors, setErrors] = useState<FieldError>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
+
+  const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+    if (errors[field as keyof FieldError]) {
+      setErrors((err) => ({ ...err, [field]: undefined }));
+    }
+    setServerError("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError("");
+    const fieldErrors = validateForm(form);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubmitted(true);
+        setForm({ firstName: "", lastName: "", email: "", subject: "", message: "" });
+      } else {
+        setServerError(data.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setServerError("Unable to send your message. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <SplitHero
@@ -50,18 +126,103 @@ function ContactUsPage() {
         <div className="container-x max-w-2xl">
           <h2 className="font-serif text-3xl mb-2">Send us a message</h2>
           <p className="text-muted-foreground mb-8">For account-specific questions, please log in and use secure messaging instead.</p>
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <input className="border border-border px-4 py-3" placeholder="First name" required />
-              <input className="border border-border px-4 py-3" placeholder="Last name" required />
+
+          {submitted ? (
+            <div className="bg-emerald-50 border border-emerald-200 px-6 py-8 flex flex-col items-center text-center gap-3">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+              <h3 className="font-serif text-xl text-emerald-900">Message Sent!</h3>
+              <p className="text-sm text-emerald-700 max-w-md leading-relaxed">
+                Thank you for reaching out. We've received your message and will get back to you within one business day.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="mt-2 text-sm font-semibold text-brand-green hover:underline underline-offset-4"
+              >
+                Send another message
+              </button>
             </div>
-            <input type="email" className="w-full border border-border px-4 py-3" placeholder="Email" required />
-            <input className="w-full border border-border px-4 py-3" placeholder="Subject" required />
-            <textarea className="w-full border border-border px-4 py-3 min-h-32" placeholder="Message" required />
-            <button type="submit" className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark text-white px-8 py-3 font-semibold transition-colors">
-              Send Message <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
+          ) : (
+            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+
+              {serverError && (
+                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 text-[13px] px-4 py-3 flex items-start gap-2 leading-relaxed">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  {serverError}
+                </div>
+              )}
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    className={`w-full border px-4 py-3 text-sm outline-none transition-all focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 ${errors.firstName ? "border-red-400 bg-red-50" : "border-border bg-white"}`}
+                    placeholder="First name *"
+                    value={form.firstName}
+                    onChange={set("firstName")}
+                    autoComplete="given-name"
+                  />
+                  {errors.firstName && <p className="text-red-600 text-[11px] mt-1">{errors.firstName}</p>}
+                </div>
+                <div>
+                  <input
+                    className={`w-full border px-4 py-3 text-sm outline-none transition-all focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 ${errors.lastName ? "border-red-400 bg-red-50" : "border-border bg-white"}`}
+                    placeholder="Last name *"
+                    value={form.lastName}
+                    onChange={set("lastName")}
+                    autoComplete="family-name"
+                  />
+                  {errors.lastName && <p className="text-red-600 text-[11px] mt-1">{errors.lastName}</p>}
+                </div>
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  className={`w-full border px-4 py-3 text-sm outline-none transition-all focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 ${errors.email ? "border-red-400 bg-red-50" : "border-border bg-white"}`}
+                  placeholder="Email address *"
+                  value={form.email}
+                  onChange={set("email")}
+                  autoComplete="email"
+                />
+                {errors.email && <p className="text-red-600 text-[11px] mt-1">{errors.email}</p>}
+              </div>
+
+              <input
+                className="w-full border border-border bg-white px-4 py-3 text-sm outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 transition-all"
+                placeholder="Subject (optional)"
+                value={form.subject}
+                onChange={set("subject")}
+              />
+
+              <div>
+                <textarea
+                  className={`w-full border px-4 py-3 text-sm min-h-32 resize-y outline-none transition-all focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 ${errors.message ? "border-red-400 bg-red-50" : "border-border bg-white"}`}
+                  placeholder="Your message *"
+                  value={form.message}
+                  onChange={set("message")}
+                />
+                {errors.message && <p className="text-red-600 text-[11px] mt-1">{errors.message}</p>}
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark disabled:opacity-60 text-white px-8 py-3 font-semibold transition-colors"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    Send Message <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+            </form>
+          )}
+
           <p className="mt-8 text-sm">
             Looking for a branch?{" "}
             <Link to="/locations" className="text-brand-green underline font-semibold">Find a location near you</Link>

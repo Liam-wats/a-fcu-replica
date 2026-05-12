@@ -12,6 +12,11 @@ const NAV = [
 ];
 
 const SESSION_KEY = "apfcu_admin_session";
+const TOKEN_KEY = "apfcu_admin_token";
+
+export function getAdminToken() {
+  return sessionStorage.getItem(TOKEN_KEY) || "";
+}
 
 function AdminLoginGate({ onAuth }: { onAuth: () => void }) {
   const [password, setPassword] = useState("");
@@ -36,6 +41,7 @@ function AdminLoginGate({ onAuth }: { onAuth: () => void }) {
       const data = await res.json();
       if (res.ok && data.success) {
         sessionStorage.setItem(SESSION_KEY, "1");
+        sessionStorage.setItem(TOKEN_KEY, data.token);
         onAuth();
       } else {
         setError(data.error || "Access denied.");
@@ -153,10 +159,15 @@ function AdminLoginGate({ onAuth }: { onAuth: () => void }) {
 
 function AdminLayout() {
   const location = useLocation();
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem(SESSION_KEY) === "1");
+  const [authed, setAuthed] = useState(() => {
+    const hasSession = sessionStorage.getItem(SESSION_KEY) === "1";
+    const hasToken = !!sessionStorage.getItem(TOKEN_KEY);
+    return hasSession && hasToken;
+  });
 
   const handleSignOut = () => {
     sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
     setAuthed(false);
   };
 

@@ -4,9 +4,10 @@ import {
   Search, X, ChevronUp, ChevronDown, CheckCircle2,
   Clock, XCircle, AlertCircle, RefreshCw, Save,
   Loader2, MoreHorizontal, Users, FileText, Check,
-  DollarSign, Trash2, Plus, Wallet, Bell, User,
+  DollarSign, Trash2, Plus, Wallet, Bell, User, Pencil,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAdminToken } from "@/routes/admin";
 
 interface AccountData {
   balance: { available: number; current: number };
@@ -60,6 +61,10 @@ const ACCOUNT_LABELS: Record<string, string> = {
 const ALL_STATUSES: Status[] = ["submitted", "pending", "approved", "rejected"];
 
 type SortKey = "submitted_at" | "first_name" | "status" | "account_type";
+
+function authHeaders() {
+  return { "Content-Type": "application/json", Authorization: `Bearer ${getAdminToken()}` };
+}
 
 function StatusChip({ status }: { status: Status }) {
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.submitted;
@@ -123,6 +128,9 @@ function EditDrawer({
   const [saved, setSaved]     = useState(false);
   const [tab, setTab]         = useState<"profile" | "account">("profile");
 
+  // Track the "clean" server copy so dirty-check works correctly after save
+  const [serverApp, setServerApp] = useState<Application>({ ...app });
+
   // Account data state
   const [acct, setAcct]               = useState<AccountData | null>(null);
   const [acctLoading, setAcctLoading] = useState(false);
@@ -136,10 +144,20 @@ function EditDrawer({
   const [addingTx, setAddingTx]   = useState(false);
   const [showTxForm, setShowTxForm] = useState(false);
 
+  // Edit transaction
+  const [editingTxId, setEditingTxId] = useState<number | null>(null);
+  const [editTxForm, setEditTxForm] = useState({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
+  const [savingTxId, setSavingTxId] = useState<number | null>(null);
+
   // New alert form
   const [alertForm, setAlertForm] = useState({ title: "", message: "", alert_type: "info" });
   const [addingAlert, setAddingAlert]   = useState(false);
   const [showAlertForm, setShowAlertForm] = useState(false);
+
+  // Edit alert
+  const [editingAlertId, setEditingAlertId] = useState<number | null>(null);
+  const [editAlertForm, setEditAlertForm] = useState({ title: "", message: "", alert_type: "info" });
+  const [savingAlertId, setSavingAlertId] = useState<number | null>(null);
 
   const loginId = form.login_id;
 
@@ -147,7 +165,9 @@ function EditDrawer({
     if (!loginId) return;
     setAcctLoading(true);
     try {
-      const res = await fetch(`/api/member/${loginId}/account`);
+      const res = await fetch(`/api/member/${loginId}/account-admin`, {
+        headers: { Authorization: `Bearer ${getAdminToken()}` },
+      });
       const data: AccountData = await res.json();
       setAcct(data);
       setBalAvail(data.balance.available.toFixed(2));
@@ -158,7 +178,7 @@ function EditDrawer({
 
   useEffect(() => { if (tab === "account") loadAccountData(); }, [tab, loadAccountData]);
 
-  const dirty = JSON.stringify(form) !== JSON.stringify(app);
+  const dirty = JSON.stringify(form) !== JSON.stringify(serverApp);
 
   const set = (name: string, value: string) => {
     setForm((f) => ({ ...f, [name]: value }));
@@ -170,22 +190,26 @@ function EditDrawer({
     try {
       const res = await fetch(`/api/applications/${app.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({
           firstName: form.first_name, lastName: form.last_name,
           email: form.email, phone: form.phone,
-          dob: form.date_of_birth, ssnLast4: form.ssn_last4,
-          street: form.street, apt: form.apt ?? "",
-          city: form.city, state: form.state, zip: form.zip,
+          dob: form.date_of_birth || undefined, ssnLast4: form.ssn_last4 || undefined,
+          street: form.street || undefined, apt: form.apt ?? "",
+          city: form.city || undefined, state: form.state || undefined,
+          zip: form.zip || undefined,
           accountType: form.account_type, loginId: form.login_id ?? "",
           status: form.status,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save");
+      const updated = data.application as Application;
       setSaved(true);
-      onSaved(data.application as Application);
-      setTimeout(() => setSaved(false), 2000);
+      setForm({ ...updated });
+      setServerApp({ ...updated });
+      onSaved(updated);
+      setTimeout(() => setSaved(false), 2500);
     } catch (e: any) { setError(e.message); }
     finally { setSaving(false); }
   };
@@ -196,11 +220,11 @@ function EditDrawer({
     try {
       await fetch(`/api/member/${loginId}/balance`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ available: parseFloat(balAvail), current: parseFloat(balCurrent) }),
       });
       setBalSaved(true);
-      setTimeout(() => setBalSaved(false), 2000);
+      setTimeout(() => setBalSaved(false), 2500);
       if (acct) setAcct({ ...acct, balance: { available: parseFloat(balAvail), current: parseFloat(balCurrent) } });
     } catch { /* silent */ }
     finally { setSavingBal(false); }
@@ -212,7 +236,7 @@ function EditDrawer({
     try {
       const res = await fetch(`/api/member/${loginId}/transactions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
       });
       const data = await res.json();
@@ -225,9 +249,44 @@ function EditDrawer({
     finally { setAddingTx(false); }
   };
 
+  const startEditTx = (tx: AccountData["transactions"][0]) => {
+    setEditingTxId(tx.id);
+    setEditTxForm({
+      txn_date: tx.txn_date,
+      description: tx.description,
+      category: tx.category,
+      amount: String(Math.abs(tx.amount)),
+      txn_type: tx.txn_type,
+    });
+  };
+
+  const saveEditTx = async (id: number) => {
+    if (!loginId) return;
+    setSavingTxId(id);
+    try {
+      const res = await fetch(`/api/member/${loginId}/transactions/${id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({ ...editTxForm, amount: parseFloat(editTxForm.amount) }),
+      });
+      const data = await res.json();
+      if (res.ok && acct) {
+        setAcct({
+          ...acct,
+          transactions: acct.transactions.map((t) => t.id === id ? data.transaction : t),
+        });
+        setEditingTxId(null);
+      }
+    } catch { /* silent */ }
+    finally { setSavingTxId(null); }
+  };
+
   const deleteTransaction = async (id: number) => {
     if (!loginId) return;
-    await fetch(`/api/member/${loginId}/transactions/${id}`, { method: "DELETE" });
+    await fetch(`/api/member/${loginId}/transactions/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${getAdminToken()}` },
+    });
     if (acct) setAcct({ ...acct, transactions: acct.transactions.filter(t => t.id !== id) });
   };
 
@@ -237,7 +296,7 @@ function EditDrawer({
     try {
       const res = await fetch(`/api/member/${loginId}/alerts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(alertForm),
       });
       const data = await res.json();
@@ -250,9 +309,38 @@ function EditDrawer({
     finally { setAddingAlert(false); }
   };
 
+  const startEditAlert = (alert: AccountData["alerts"][0]) => {
+    setEditingAlertId(alert.id);
+    setEditAlertForm({ title: alert.title, message: alert.message, alert_type: alert.alert_type });
+  };
+
+  const saveEditAlert = async (id: number) => {
+    if (!loginId) return;
+    setSavingAlertId(id);
+    try {
+      const res = await fetch(`/api/member/${loginId}/alerts/${id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify(editAlertForm),
+      });
+      const data = await res.json();
+      if (res.ok && acct) {
+        setAcct({
+          ...acct,
+          alerts: acct.alerts.map((a) => a.id === id ? data.alert : a),
+        });
+        setEditingAlertId(null);
+      }
+    } catch { /* silent */ }
+    finally { setSavingAlertId(null); }
+  };
+
   const deleteAlert = async (id: number) => {
     if (!loginId) return;
-    await fetch(`/api/member/${loginId}/alerts/${id}`, { method: "DELETE" });
+    await fetch(`/api/member/${loginId}/alerts/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${getAdminToken()}` },
+    });
     if (acct) setAcct({ ...acct, alerts: acct.alerts.filter(a => a.id !== id) });
   };
 
@@ -341,12 +429,12 @@ function EditDrawer({
               </FieldGroup>
 
               <FieldGroup label="Home Address">
-                <Field label="Street" name="street" value={form.street} onChange={set} />
+                <Field label="Street" name="street" value={form.street ?? ""} onChange={set} />
                 <Field label="Apt / Suite" name="apt" value={form.apt ?? ""} onChange={set} />
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-1"><Field label="City"  name="city"  value={form.city}  onChange={set} /></div>
-                  <div><Field label="State" name="state" value={form.state} onChange={set} /></div>
-                  <div><Field label="ZIP"   name="zip"   value={form.zip}   onChange={set} /></div>
+                  <div className="col-span-1"><Field label="City"  name="city"  value={form.city ?? ""}  onChange={set} /></div>
+                  <div><Field label="State" name="state" value={form.state ?? ""} onChange={set} /></div>
+                  <div><Field label="ZIP"   name="zip"   value={form.zip ?? ""}   onChange={set} /></div>
                 </div>
               </FieldGroup>
 
@@ -458,7 +546,7 @@ function EditDrawer({
                         </p>
                       </div>
                       <button
-                        onClick={() => setShowTxForm(v => !v)}
+                        onClick={() => { setShowTxForm(v => !v); setEditingTxId(null); }}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-green hover:underline"
                       >
                         <Plus className="w-3 h-3" /> Add
@@ -514,27 +602,20 @@ function EditDrawer({
                             <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Type</label>
                             <div className="flex gap-1">
                               {["debit", "credit"].map(t => (
-                                <button
-                                  key={t}
-                                  type="button"
+                                <button key={t} type="button"
                                   onClick={() => setTxForm(f => ({ ...f, txn_type: t }))}
-                                  className={cn(
-                                    "flex-1 text-[10px] font-semibold py-1.5 border rounded capitalize transition-all",
+                                  className={cn("flex-1 text-[10px] font-semibold py-1.5 border rounded capitalize transition-all",
                                     txForm.txn_type === t
                                       ? t === "debit" ? "bg-red-50 border-red-300 text-red-600" : "bg-emerald-50 border-emerald-300 text-emerald-700"
                                       : "border-slate-200 text-slate-400 hover:border-slate-300"
                                   )}
-                                >
-                                  {t}
-                                </button>
+                                >{t}</button>
                               ))}
                             </div>
                           </div>
                         </div>
                         <div className="flex gap-2 pt-1">
-                          <button
-                            onClick={addTransaction}
-                            disabled={addingTx}
+                          <button onClick={addTransaction} disabled={addingTx}
                             className="text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
                           >
                             {addingTx ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
@@ -548,34 +629,114 @@ function EditDrawer({
                     {(acct?.transactions ?? []).length === 0 ? (
                       <p className="text-xs text-slate-400 italic py-2">No transactions yet.</p>
                     ) : (
-                      <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
+                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
                         {(acct?.transactions ?? []).map(tx => (
-                          <div key={tx.id} className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded px-3 py-2 group">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <span className={cn(
-                                "w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-full shrink-0",
-                                tx.txn_type === "debit" ? "bg-red-100 text-red-500" : "bg-emerald-100 text-emerald-600"
-                              )}>
-                                {tx.txn_type === "debit" ? "−" : "+"}
-                              </span>
-                              <div className="min-w-0">
-                                <p className="text-xs font-semibold text-slate-800 truncate">{tx.description}</p>
-                                <p className="text-[10px] text-slate-400">{tx.category} · {tx.txn_date}</p>
+                          <div key={tx.id}>
+                            {editingTxId === tx.id ? (
+                              <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2 space-y-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Date</label>
+                                    <input
+                                      className="w-full text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-brand-green"
+                                      value={editTxForm.txn_date}
+                                      onChange={e => setEditTxForm(f => ({ ...f, txn_date: e.target.value }))}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Category</label>
+                                    <select
+                                      className="w-full text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-brand-green bg-white"
+                                      value={editTxForm.category}
+                                      onChange={e => setEditTxForm(f => ({ ...f, category: e.target.value }))}
+                                    >
+                                      {TX_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                                    </select>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Description</label>
+                                  <input
+                                    className="w-full text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-brand-green"
+                                    value={editTxForm.description}
+                                    onChange={e => setEditTxForm(f => ({ ...f, description: e.target.value }))}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Amount</label>
+                                    <div className="relative">
+                                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                                      <input
+                                        type="number" step="0.01" min="0"
+                                        className="w-full pl-5 pr-2 py-1 text-xs border border-slate-200 rounded outline-none focus:border-brand-green"
+                                        value={editTxForm.amount}
+                                        onChange={e => setEditTxForm(f => ({ ...f, amount: e.target.value }))}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Type</label>
+                                    <div className="flex gap-1">
+                                      {["debit", "credit"].map(t => (
+                                        <button key={t} type="button"
+                                          onClick={() => setEditTxForm(f => ({ ...f, txn_type: t }))}
+                                          className={cn("flex-1 text-[10px] font-semibold py-1 border rounded capitalize transition-all",
+                                            editTxForm.txn_type === t
+                                              ? t === "debit" ? "bg-red-50 border-red-300 text-red-600" : "bg-emerald-50 border-emerald-300 text-emerald-700"
+                                              : "border-slate-200 text-slate-400 hover:border-slate-300"
+                                          )}
+                                        >{t}</button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2 pt-1">
+                                  <button onClick={() => saveEditTx(tx.id)} disabled={savingTxId === tx.id}
+                                    className="text-xs font-semibold bg-brand-green text-white px-3 py-1 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
+                                  >
+                                    {savingTxId === tx.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                                    Save
+                                  </button>
+                                  <button onClick={() => setEditingTxId(null)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span className={cn("text-xs font-bold tabular-nums",
-                                tx.txn_type === "debit" ? "text-slate-700" : "text-emerald-600"
-                              )}>
-                                {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(tx.amount))}
-                              </span>
-                              <button
-                                onClick={() => deleteTransaction(tx.id)}
-                                className="p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            </div>
+                            ) : (
+                              <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded px-3 py-2 group">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className={cn("w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-full shrink-0",
+                                    tx.txn_type === "debit" ? "bg-red-100 text-red-500" : "bg-emerald-100 text-emerald-600"
+                                  )}>
+                                    {tx.txn_type === "debit" ? "−" : "+"}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-slate-800 truncate">{tx.description}</p>
+                                    <p className="text-[10px] text-slate-400">{tx.category} · {tx.txn_date}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className={cn("text-xs font-bold tabular-nums",
+                                    tx.txn_type === "debit" ? "text-slate-700" : "text-emerald-600"
+                                  )}>
+                                    {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(tx.amount))}
+                                  </span>
+                                  <button
+                                    onClick={() => startEditTx(tx)}
+                                    className="p-0.5 text-slate-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all"
+                                    title="Edit transaction"
+                                  >
+                                    <Pencil className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteTransaction(tx.id)}
+                                    className="p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                                    title="Delete transaction"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -594,7 +755,7 @@ function EditDrawer({
                         </p>
                       </div>
                       <button
-                        onClick={() => setShowAlertForm(v => !v)}
+                        onClick={() => { setShowAlertForm(v => !v); setEditingAlertId(null); }}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-green hover:underline"
                       >
                         <Plus className="w-3 h-3" /> Add
@@ -614,8 +775,7 @@ function EditDrawer({
                         </div>
                         <div>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Message</label>
-                          <textarea
-                            rows={2}
+                          <textarea rows={2}
                             placeholder="Alert message text…"
                             className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green resize-none"
                             value={alertForm.message}
@@ -626,28 +786,21 @@ function EditDrawer({
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">Type</label>
                           <div className="flex gap-1.5">
                             {ALERT_TYPES.map(({ id, label }) => (
-                              <button
-                                key={id}
-                                type="button"
+                              <button key={id} type="button"
                                 onClick={() => setAlertForm(f => ({ ...f, alert_type: id }))}
-                                className={cn(
-                                  "flex-1 text-[10px] font-semibold py-1.5 border rounded transition-all",
+                                className={cn("flex-1 text-[10px] font-semibold py-1.5 border rounded transition-all",
                                   alertForm.alert_type === id
                                     ? id === "warning" ? "bg-amber-50 border-amber-300 text-amber-700"
                                       : id === "success" ? "bg-emerald-50 border-emerald-300 text-emerald-700"
                                       : "bg-blue-50 border-blue-300 text-blue-700"
                                     : "border-slate-200 text-slate-400 hover:border-slate-300"
                                 )}
-                              >
-                                {label}
-                              </button>
+                              >{label}</button>
                             ))}
                           </div>
                         </div>
                         <div className="flex gap-2 pt-1">
-                          <button
-                            onClick={addAlert}
-                            disabled={addingAlert}
+                          <button onClick={addAlert} disabled={addingAlert}
                             className="text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
                           >
                             {addingAlert ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
@@ -663,22 +816,81 @@ function EditDrawer({
                     ) : (
                       <div className="space-y-1">
                         {(acct?.alerts ?? []).map(alert => (
-                          <div key={alert.id} className={cn(
-                            "flex items-start justify-between rounded px-3 py-2 border group",
-                            alert.alert_type === "warning" ? "bg-amber-50 border-amber-100"
-                              : alert.alert_type === "success" ? "bg-emerald-50 border-emerald-100"
-                              : "bg-blue-50 border-blue-100"
-                          )}>
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-slate-800">{alert.title}</p>
-                              <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">{alert.message}</p>
-                            </div>
-                            <button
-                              onClick={() => deleteAlert(alert.id)}
-                              className="ml-2 p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                          <div key={alert.id}>
+                            {editingAlertId === alert.id ? (
+                              <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2 space-y-2">
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Title</label>
+                                  <input
+                                    className="w-full text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-brand-green"
+                                    value={editAlertForm.title}
+                                    onChange={e => setEditAlertForm(f => ({ ...f, title: e.target.value }))}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Message</label>
+                                  <textarea rows={2}
+                                    className="w-full text-xs border border-slate-200 rounded px-2 py-1 outline-none focus:border-brand-green resize-none"
+                                    value={editAlertForm.message}
+                                    onChange={e => setEditAlertForm(f => ({ ...f, message: e.target.value }))}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-500 mb-1">Type</label>
+                                  <div className="flex gap-1.5">
+                                    {ALERT_TYPES.map(({ id, label }) => (
+                                      <button key={id} type="button"
+                                        onClick={() => setEditAlertForm(f => ({ ...f, alert_type: id }))}
+                                        className={cn("flex-1 text-[10px] font-semibold py-1 border rounded transition-all",
+                                          editAlertForm.alert_type === id
+                                            ? id === "warning" ? "bg-amber-50 border-amber-300 text-amber-700"
+                                              : id === "success" ? "bg-emerald-50 border-emerald-300 text-emerald-700"
+                                              : "bg-blue-50 border-blue-300 text-blue-700"
+                                            : "border-slate-200 text-slate-400 hover:border-slate-300"
+                                        )}
+                                      >{label}</button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex gap-2 pt-1">
+                                  <button onClick={() => saveEditAlert(alert.id)} disabled={savingAlertId === alert.id}
+                                    className="text-xs font-semibold bg-brand-green text-white px-3 py-1 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
+                                  >
+                                    {savingAlertId === alert.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                                    Save
+                                  </button>
+                                  <button onClick={() => setEditingAlertId(null)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className={cn(
+                                "flex items-start justify-between rounded px-3 py-2 border group",
+                                alert.alert_type === "warning" ? "bg-amber-50 border-amber-100"
+                                  : alert.alert_type === "success" ? "bg-emerald-50 border-emerald-100"
+                                  : "bg-blue-50 border-blue-100"
+                              )}>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-semibold text-slate-800">{alert.title}</p>
+                                  <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">{alert.message}</p>
+                                </div>
+                                <div className="flex items-center gap-0.5 ml-2 shrink-0">
+                                  <button
+                                    onClick={() => startEditAlert(alert)}
+                                    className="p-0.5 text-slate-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all"
+                                    title="Edit alert"
+                                  >
+                                    <Pencil className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteAlert(alert.id)}
+                                    className="p-0.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                                    title="Delete alert"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -697,14 +909,12 @@ function EditDrawer({
             {!error && saved && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Saved successfully</p>}
             {!error && !saved && <span />}
             <div className="flex gap-2 ml-auto">
-              <button
-                type="button" onClick={onClose}
+              <button type="button" onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 rounded transition-all"
               >
                 Cancel
               </button>
-              <button
-                type="button" onClick={handleSave} disabled={saving || !dirty}
+              <button type="button" onClick={handleSave} disabled={saving || !dirty}
                 className="px-4 py-2 text-sm font-semibold bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 text-white rounded inline-flex items-center gap-1.5 transition-colors"
               >
                 {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -733,7 +943,9 @@ function AdminApplicationsPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/applications");
+      const res = await fetch("/api/applications", {
+        headers: { Authorization: `Bearer ${getAdminToken()}` },
+      });
       const data = await res.json();
       setApps(data.applications ?? []);
     } catch {
@@ -749,7 +961,7 @@ function AdminApplicationsPage() {
     setOpenMenuId(null);
     const res = await fetch(`/api/applications/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(),
       body: JSON.stringify({ status }),
     });
     if (res.ok) {
@@ -758,8 +970,8 @@ function AdminApplicationsPage() {
   };
 
   const handleDrawerSave = (updated: Application) => {
-    setApps((prev) => prev.map((a) => a.id === updated.id ? { ...a, ...updated } : a));
-    setSelected((s) => s ? { ...s, ...updated } : s);
+    setApps((prev) => prev.map((a) => a.id === updated.id ? { ...updated } : a));
+    setSelected(updated);
   };
 
   // Stats
@@ -807,8 +1019,7 @@ function AdminApplicationsPage() {
           <h1 className="font-semibold text-slate-900 text-[15px]">Membership Applications</h1>
           <p className="text-[11px] text-slate-400">{apps.length} total records</p>
         </div>
-        <button
-          onClick={load}
+        <button onClick={load}
           className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 px-3 py-1.5 border border-slate-200 rounded hover:border-slate-300 transition-all"
         >
           <RefreshCw className={cn("w-3 h-3", loading && "animate-spin")} />
@@ -836,7 +1047,6 @@ function AdminApplicationsPage() {
 
       {/* Toolbar */}
       <div className="px-6 py-3 bg-white border-b border-slate-200 flex items-center gap-3 shrink-0">
-        {/* Search */}
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
           <input
@@ -853,17 +1063,11 @@ function AdminApplicationsPage() {
           )}
         </div>
 
-        {/* Status tabs */}
         <div className="flex items-center gap-1 bg-slate-100 rounded p-0.5">
           {(["all", ...ALL_STATUSES] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={cn(
-                "px-3 py-1 text-xs font-medium rounded transition-all capitalize",
-                statusFilter === s
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+            <button key={s} onClick={() => setStatusFilter(s)}
+              className={cn("px-3 py-1 text-xs font-medium rounded transition-all capitalize",
+                statusFilter === s ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
               {s === "all" ? "All" : STATUS_CONFIG[s].label}
@@ -895,18 +1099,15 @@ function AdminApplicationsPage() {
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
                 {[
-                  { label: "Member",       key: "first_name"   as SortKey },
-                  { label: "Login ID",     key: null },
-                  { label: "Account",      key: "account_type" as SortKey },
-                  { label: "Status",       key: "status"       as SortKey },
-                  { label: "Applied",      key: "submitted_at" as SortKey },
-                  { label: "",             key: null },
+                  { label: "Member",   key: "first_name"   as SortKey },
+                  { label: "Login ID", key: null },
+                  { label: "Account",  key: "account_type" as SortKey },
+                  { label: "Status",   key: "status"       as SortKey },
+                  { label: "Applied",  key: "submitted_at" as SortKey },
+                  { label: "",         key: null },
                 ].map(({ label, key }, i) => (
-                  <th
-                    key={i}
-                    onClick={() => key && toggleSort(key)}
-                    className={cn(
-                      "text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 select-none",
+                  <th key={i} onClick={() => key && toggleSort(key)}
+                    className={cn("text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 select-none",
                       key && "cursor-pointer hover:text-slate-700",
                       i === 0 && "pl-6"
                     )}
@@ -921,9 +1122,7 @@ function AdminApplicationsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((app) => (
-                <tr
-                  key={app.id}
-                  onClick={() => setSelected(app)}
+                <tr key={app.id} onClick={() => setSelected(app)}
                   className="bg-white hover:bg-slate-50 cursor-pointer transition-colors group"
                 >
                   <td className="pl-6 pr-4 py-3">
@@ -932,9 +1131,7 @@ function AdminApplicationsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {app.login_id ? (
-                      <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
-                        {app.login_id}
-                      </span>
+                      <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{app.login_id}</span>
                     ) : (
                       <span className="text-xs text-slate-300 italic">none</span>
                     )}
@@ -942,46 +1139,28 @@ function AdminApplicationsPage() {
                   <td className="px-4 py-3 text-slate-600 text-[13px]">
                     {ACCOUNT_LABELS[app.account_type] ?? app.account_type}
                   </td>
-                  <td className="px-4 py-3">
-                    <StatusChip status={app.status} />
-                  </td>
+                  <td className="px-4 py-3"><StatusChip status={app.status} /></td>
                   <td className="px-4 py-3 text-[12px] text-slate-400 tabular-nums">
-                    {new Date(app.submitted_at).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", year: "numeric",
-                    })}
+                    {new Date(app.submitted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </td>
-                  <td
-                    className="px-4 py-3 text-right"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="relative inline-block">
-                      <button
-                        onClick={() => setOpenMenuId(openMenuId === app.id ? null : app.id)}
+                      <button onClick={() => setOpenMenuId(openMenuId === app.id ? null : app.id)}
                         className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                       {openMenuId === app.id && (
                         <div className="absolute right-0 top-8 w-44 bg-white border border-slate-200 rounded shadow-lg z-20 py-1">
-                          <button
-                            onClick={() => { setSelected(app); setOpenMenuId(null); }}
+                          <button onClick={() => { setSelected(app); setOpenMenuId(null); }}
                             className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50"
                           >
                             Edit Details
                           </button>
                           <div className="my-1 border-t border-slate-100" />
-                          <button onClick={() => quickStatus(app.id, "approved")}
-                            className="w-full text-left px-3 py-2 text-xs text-emerald-700 hover:bg-emerald-50">
-                            ✓ Approve
-                          </button>
-                          <button onClick={() => quickStatus(app.id, "pending")}
-                            className="w-full text-left px-3 py-2 text-xs text-amber-700 hover:bg-amber-50">
-                            ⏳ Mark Pending
-                          </button>
-                          <button onClick={() => quickStatus(app.id, "rejected")}
-                            className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50">
-                            ✕ Reject
-                          </button>
+                          <button onClick={() => quickStatus(app.id, "approved")} className="w-full text-left px-3 py-2 text-xs text-emerald-700 hover:bg-emerald-50">✓ Approve</button>
+                          <button onClick={() => quickStatus(app.id, "pending")} className="w-full text-left px-3 py-2 text-xs text-amber-700 hover:bg-amber-50">⏳ Mark Pending</button>
+                          <button onClick={() => quickStatus(app.id, "rejected")} className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50">✕ Reject</button>
                         </div>
                       )}
                     </div>
@@ -993,17 +1172,6 @@ function AdminApplicationsPage() {
         )}
       </div>
 
-      {/* Row count footer */}
-      {!loading && !error && (
-        <div className="px-6 py-2.5 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
-          <p className="text-[11px] text-slate-400">
-            Showing <span className="font-semibold text-slate-600">{filtered.length}</span> of{" "}
-            <span className="font-semibold text-slate-600">{apps.length}</span> applications
-          </p>
-        </div>
-      )}
-
-      {/* Edit drawer */}
       {selected && (
         <EditDrawer
           app={selected}

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   ArrowLeftRight, CreditCard, Smartphone, FileText, BookCheck,
   Eye, EyeOff, TrendingUp, ShieldCheck, HelpCircle,
@@ -37,8 +37,14 @@ const ACCOUNT_NUMBERS: Record<string, string> = {
   "money-market":       "••••  ••••  0256",
 };
 
+const POLL_INTERVAL_MS = 60_000;
+
 function fmt(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+function getToken() {
+  return sessionStorage.getItem("apfcu_token") || "";
 }
 
 function DashboardOverview() {
@@ -49,6 +55,7 @@ function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const h = new Date().getHours();
@@ -59,7 +66,6 @@ function DashboardOverview() {
     if (!raw) return;
     const parsed: Session = JSON.parse(raw);
 
-    // Session is missing loginId (logged in before server update) — repair it silently
     if (!parsed.loginId && parsed.referenceNumber) {
       fetch(`/api/session/repair?ref=${encodeURIComponent(parsed.referenceNumber)}`)
         .then(r => r.json())
@@ -78,32 +84,56 @@ function DashboardOverview() {
     }
   }, []);
 
-  const fetchData = useCallback(async (loginId: string) => {
-    setLoading(true);
+  const fetchData = useCallback(async (loginId: string, silent = false) => {
+    if (!silent) setLoading(true);
     try {
-      const res = await fetch(`/api/member/${loginId}/account`);
-      const json = await res.json();
-      setData(json);
-      setLastRefreshed(new Date());
+      const res = await fetch(`/api/member/${loginId}/account`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+        setLastRefreshed(new Date());
+      }
     } catch { /* silent */ }
-    finally { setLoading(false); }
+    finally {
+      if (!silent) setLoading(false);
+    }
   }, []);
 
   const handleRefresh = useCallback(async () => {
     if (!session?.loginId || refreshing) return;
     setRefreshing(true);
     try {
-      const res = await fetch(`/api/member/${session.loginId}/account`);
-      const json = await res.json();
-      setData(json);
-      setLastRefreshed(new Date());
+      const res = await fetch(`/api/member/${session.loginId}/account`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+        setLastRefreshed(new Date());
+      }
     } catch { /* silent */ }
     finally { setRefreshing(false); }
   }, [session, refreshing]);
 
+  // Initial load
   useEffect(() => {
     if (session?.loginId) fetchData(session.loginId);
     else if (session) setLoading(false);
+  }, [session, fetchData]);
+
+  // Auto-polling every 60 seconds
+  useEffect(() => {
+    if (!session?.loginId) return;
+
+    pollRef.current = setInterval(() => {
+      fetchData(session.loginId, true);
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, [session, fetchData]);
 
   if (!session) return null;
@@ -343,6 +373,13 @@ function DashboardOverview() {
             </div>
           </div>
         </div>
+
+        {/* Auto-refresh notice */}
+        {lastRefreshed && (
+          <p className="text-[11px] text-ink/35 text-center">
+            Balance auto-updates every minute · Last: {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </p>
+        )}
 
         {/* Help */}
         <div className="bg-white border border-border shadow-sm p-5">

@@ -43,12 +43,51 @@ function DashboardLayout() {
 
   useEffect(() => {
     const raw = sessionStorage.getItem("apfcu_session");
-    if (!raw) { navigate({ to: "/login" }); return; }
-    setSession(JSON.parse(raw));
+    const token = sessionStorage.getItem("apfcu_token");
+
+    if (!raw || !token) {
+      navigate({ to: "/login" });
+      return;
+    }
+
+    const parsed: Session = JSON.parse(raw);
+
+    // Verify token with the server
+    fetch("/api/auth/verify", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => {
+      if (!res.ok) {
+        sessionStorage.removeItem("apfcu_session");
+        sessionStorage.removeItem("apfcu_token");
+        navigate({ to: "/login" });
+        return;
+      }
+      // Session is missing loginId — repair it silently
+      if (!parsed.loginId && parsed.referenceNumber) {
+        fetch(`/api/session/repair?ref=${encodeURIComponent(parsed.referenceNumber)}`)
+          .then((r) => r.json())
+          .then((fresh) => {
+            if (fresh.loginId) {
+              const repaired = { ...parsed, loginId: fresh.loginId };
+              sessionStorage.setItem("apfcu_session", JSON.stringify(repaired));
+              setSession(repaired);
+            } else {
+              setSession(parsed);
+            }
+          })
+          .catch(() => setSession(parsed));
+      } else {
+        setSession(parsed);
+      }
+    }).catch(() => {
+      // Network error — allow session to continue using local data
+      setSession(parsed);
+    });
   }, [navigate]);
 
   const handleSignOut = () => {
     sessionStorage.removeItem("apfcu_session");
+    sessionStorage.removeItem("apfcu_token");
     navigate({ to: "/" });
   };
 
