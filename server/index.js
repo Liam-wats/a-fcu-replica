@@ -4,6 +4,9 @@ import pg from "pg";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { existsSync } from "fs";
 
 const { Pool } = pg;
 
@@ -641,9 +644,21 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+// ── Static frontend (production) ─────────────────────────────────────────────
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const distPath = join(__dirname, "../dist");
+
+if (existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get("*", (req, res) => {
+    res.sendFile(join(distPath, "index.html"));
+  });
+}
+
 // ── Start ────────────────────────────────────────────────────────────────────
 
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.PORT || process.env.API_PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`API server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
