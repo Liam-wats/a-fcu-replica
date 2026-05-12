@@ -35,6 +35,7 @@ import { Route as LoansHomeLoansRouteImport } from './routes/loans/home-loans'
 import { Route as JoinReviewRouteImport } from './routes/join/review'
 import { Route as JoinPersonalRouteImport } from './routes/join/personal'
 import { Route as JoinGoalsRouteImport } from './routes/join/goals'
+import { Route as JoinCredentialsRouteImport } from './routes/join/credentials'
 import { Route as JoinConfirmationRouteImport } from './routes/join/confirmation'
 import { Route as JoinAddressRouteImport } from './routes/join/address'
 import { Route as JoinAccountRouteImport } from './routes/join/account'
@@ -180,6 +181,11 @@ const JoinGoalsRoute = JoinGoalsRouteImport.update({
   path: '/goals',
   getParentRoute: () => JoinRoute,
 } as any)
+const JoinCredentialsRoute = JoinCredentialsRouteImport.update({
+  id: '/credentials',
+  path: '/credentials',
+  getParentRoute: () => JoinRoute,
+} as any)
 const JoinConfirmationRoute = JoinConfirmationRouteImport.update({
   id: '/confirmation',
   path: '/confirmation',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/join/account': typeof JoinAccountRoute
   '/join/address': typeof JoinAddressRoute
   '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/credentials': typeof JoinCredentialsRoute
   '/join/goals': typeof JoinGoalsRoute
   '/join/personal': typeof JoinPersonalRoute
   '/join/review': typeof JoinReviewRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/join/account': typeof JoinAccountRoute
   '/join/address': typeof JoinAddressRoute
   '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/credentials': typeof JoinCredentialsRoute
   '/join/goals': typeof JoinGoalsRoute
   '/join/personal': typeof JoinPersonalRoute
   '/join/review': typeof JoinReviewRoute
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/join/account': typeof JoinAccountRoute
   '/join/address': typeof JoinAddressRoute
   '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/credentials': typeof JoinCredentialsRoute
   '/join/goals': typeof JoinGoalsRoute
   '/join/personal': typeof JoinPersonalRoute
   '/join/review': typeof JoinReviewRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/join/account'
     | '/join/address'
     | '/join/confirmation'
+    | '/join/credentials'
     | '/join/goals'
     | '/join/personal'
     | '/join/review'
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/join/account'
     | '/join/address'
     | '/join/confirmation'
+    | '/join/credentials'
     | '/join/goals'
     | '/join/personal'
     | '/join/review'
@@ -472,6 +483,7 @@ export interface FileRouteTypes {
     | '/join/account'
     | '/join/address'
     | '/join/confirmation'
+    | '/join/credentials'
     | '/join/goals'
     | '/join/personal'
     | '/join/review'
@@ -714,6 +726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinGoalsRouteImport
       parentRoute: typeof JoinRoute
     }
+    '/join/credentials': {
+      id: '/join/credentials'
+      path: '/credentials'
+      fullPath: '/join/credentials'
+      preLoaderRoute: typeof JoinCredentialsRouteImport
+      parentRoute: typeof JoinRoute
+    }
     '/join/confirmation': {
       id: '/join/confirmation'
       path: '/confirmation'
@@ -812,6 +831,7 @@ interface JoinRouteChildren {
   JoinAccountRoute: typeof JoinAccountRoute
   JoinAddressRoute: typeof JoinAddressRoute
   JoinConfirmationRoute: typeof JoinConfirmationRoute
+  JoinCredentialsRoute: typeof JoinCredentialsRoute
   JoinGoalsRoute: typeof JoinGoalsRoute
   JoinPersonalRoute: typeof JoinPersonalRoute
   JoinReviewRoute: typeof JoinReviewRoute
@@ -822,6 +842,7 @@ const JoinRouteChildren: JoinRouteChildren = {
   JoinAccountRoute: JoinAccountRoute,
   JoinAddressRoute: JoinAddressRoute,
   JoinConfirmationRoute: JoinConfirmationRoute,
+  JoinCredentialsRoute: JoinCredentialsRoute,
   JoinGoalsRoute: JoinGoalsRoute,
   JoinPersonalRoute: JoinPersonalRoute,
   JoinReviewRoute: JoinReviewRoute,

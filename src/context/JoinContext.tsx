@@ -17,11 +17,17 @@ export interface AddressData {
   zip: string;
 }
 
+export interface CredentialsData {
+  loginId: string;
+  password: string;
+}
+
 interface JoinState {
   goals: string[];
   personal: PersonalData;
   address: AddressData;
   account: string;
+  credentials: CredentialsData;
 }
 
 interface JoinContextValue extends JoinState {
@@ -29,6 +35,7 @@ interface JoinContextValue extends JoinState {
   setPersonal: (data: PersonalData) => void;
   setAddress: (data: AddressData) => void;
   setAccount: (id: string) => void;
+  setCredentials: (data: CredentialsData) => void;
   reset: () => void;
 }
 
@@ -37,6 +44,7 @@ const EMPTY: JoinState = {
   personal: { firstName: "", lastName: "", email: "", phone: "", dob: "", ssn: "" },
   address: { street: "", apt: "", city: "", state: "", zip: "" },
   account: "",
+  credentials: { loginId: "", password: "" },
 };
 
 const SESSION_KEY = "apfcu_join";
@@ -62,13 +70,14 @@ export function JoinProvider({ children }: { children: ReactNode }) {
   const setPersonal = (personal: PersonalData) => setState((s) => ({ ...s, personal }));
   const setAddress = (address: AddressData) => setState((s) => ({ ...s, address }));
   const setAccount = (account: string) => setState((s) => ({ ...s, account }));
+  const setCredentials = (credentials: CredentialsData) => setState((s) => ({ ...s, credentials }));
   const reset = () => {
     sessionStorage.removeItem(SESSION_KEY);
     setState(EMPTY);
   };
 
   return (
-    <JoinContext.Provider value={{ ...state, setGoals, setPersonal, setAddress, setAccount, reset }}>
+    <JoinContext.Provider value={{ ...state, setGoals, setPersonal, setAddress, setAccount, setCredentials, reset }}>
       {children}
     </JoinContext.Provider>
   );
@@ -85,5 +94,6 @@ export const STEP_META = [
   { id: 2, slug: "personal", label: "Personal Info", path: "/join/personal" },
   { id: 3, slug: "address", label: "Address", path: "/join/address" },
   { id: 4, slug: "account", label: "Account", path: "/join/account" },
-  { id: 5, slug: "review", label: "Review", path: "/join/review" },
+  { id: 5, slug: "credentials", label: "Online Banking", path: "/join/credentials" },
+  { id: 6, slug: "review", label: "Review", path: "/join/review" },
 ] as const;

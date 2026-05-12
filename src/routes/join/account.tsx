@@ -82,7 +82,7 @@ function AccountPage() {
   return (
     <div>
       <div className="px-8 pt-10 pb-6 border-b border-border">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 4 of 5</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 4 of 6</p>
         <h1 className="font-serif text-3xl md:text-4xl text-ink mb-2">Choose your first account</h1>
         <p className="text-muted-foreground">You can always open additional accounts after you become a member.</p>
       </div>
@@ -162,10 +162,10 @@ function AccountPage() {
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground">Step 4 of 5</span>
+            <span className="text-xs text-muted-foreground">Step 4 of 6</span>
             <button
               type="button"
-              onClick={() => account && navigate({ to: "/join/review" })}
+              onClick={() => account && navigate({ to: "/join/credentials" })}
               disabled={!account}
               className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-7 py-3 font-semibold text-sm transition-colors"
             >

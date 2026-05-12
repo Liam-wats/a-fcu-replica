@@ -70,7 +70,7 @@ function ReviewPage() {
   return (
     <div>
       <div className="px-8 pt-10 pb-6 border-b border-border">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 5 of 5</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 6 of 6</p>
         <h1 className="font-serif text-3xl md:text-4xl text-ink mb-2">Review your application</h1>
         <p className="text-muted-foreground">Please confirm your information is accurate before submitting.</p>
       </div>
@@ -129,13 +129,13 @@ function ReviewPage() {
         <div className="mt-8 flex items-center justify-between pt-6 border-t border-border">
           <button
             type="button"
-            onClick={() => navigate({ to: "/join/account" })}
+            onClick={() => navigate({ to: "/join/credentials" })}
             className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-brand-green transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground">Step 5 of 5</span>
+            <span className="text-xs text-muted-foreground">Step 6 of 6</span>
             <button
               type="button"
               onClick={handleSubmit}

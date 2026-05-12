@@ -41,7 +41,7 @@ function generateRef(): string {
 }
 
 function ConfirmationPage() {
-  const { personal, account, goals, address, reset } = useJoin();
+  const { personal, account, goals, address, credentials, reset } = useJoin();
   const [refNumber] = useState(generateRef);
   const [saveStatus, setSaveStatus] = useState<"pending" | "saved" | "error">("pending");
   const submitted = useRef(false);
@@ -55,7 +55,7 @@ function ConfirmationPage() {
         const res = await fetch("/api/applications", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ goals, personal, address, account, referenceNumber: refNumber }),
+          body: JSON.stringify({ goals, personal, address, account, credentials, referenceNumber: refNumber }),
         });
         if (res.ok) {
           setSaveStatus("saved");

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Eye, EyeOff, Lock, ShieldCheck, BadgeDollarSign, Headphones } from "lucide-react";
 
@@ -28,13 +28,14 @@ const TRUST_ITEMS = [
 ];
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!loginId.trim() || !password.trim()) {
@@ -42,12 +43,26 @@ function LoginPage() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginId: loginId.trim(), password }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Store session info and redirect to a dashboard or home
+        sessionStorage.setItem("apfcu_session", JSON.stringify(data.member));
+        navigate({ to: "/" });
+      } else {
+        setError(data.error || "Login failed. Please try again.");
+      }
+    } catch {
+      setError("Unable to connect. Please check your connection and try again.");
+    } finally {
       setLoading(false);
-      setError(
-        "Incorrect Login ID or password. Please check your credentials and try again."
-      );
-    }, 1400);
+    }
   };
 
   return (
