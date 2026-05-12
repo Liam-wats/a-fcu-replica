@@ -55,29 +55,22 @@ export function HeroCarousel() {
                   </div>
                 </div>
 
-                {/* Right — yellow panel with embedded image */}
-                <div className="relative bg-brand-yellow overflow-hidden flex flex-col">
-                  {/* Diagonal white wedge on left edge */}
+                {/* Right — yellow panel with image filling it completely */}
+                <div className="relative bg-brand-yellow overflow-hidden">
+                  {/* Image fills the entire yellow area */}
+                  <img
+                    src={slide.image}
+                    alt={slide.alt}
+                    className="absolute inset-0 w-full h-full object-cover object-center"
+                    loading={i === 0 ? "eager" : "lazy"}
+                  />
+                  {/* Diagonal white wedge on left edge, on top of the image */}
                   <img
                     src={ANGLE_OVERLAY}
                     alt=""
                     aria-hidden="true"
                     className="hidden lg:block absolute inset-y-0 -left-px h-full pointer-events-none z-10"
                   />
-
-                  {/* Image embedded inside yellow — constrained height so yellow frames the bottom */}
-                  <div className="relative z-0 flex-1 flex items-start">
-                    <img
-                      src={slide.image}
-                      alt={slide.alt}
-                      className="w-full object-cover object-top"
-                      style={{ height: "calc(100% - 3rem)" }}
-                      loading={i === 0 ? "eager" : "lazy"}
-                    />
-                  </div>
-
-                  {/* Yellow footer strip visible below image */}
-                  <div className="h-12 bg-brand-yellow shrink-0" />
                 </div>
 
               </div>

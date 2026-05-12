@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ContactUsRouteImport } from './routes/contact-us'
@@ -48,6 +49,11 @@ import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
 import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
 import { Route as AccountsCertificatesRouteImport } from './routes/accounts/certificates'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationsRoute = LocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/contact-us': typeof ContactUsRoute
   '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
+  '/login': typeof LoginRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/contact-us'
     | '/join'
     | '/locations'
+    | '/login'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/'
     | '/contact-us'
     | '/locations'
+    | '/login'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -447,6 +458,7 @@ export interface FileRouteTypes {
     | '/contact-us'
     | '/join'
     | '/locations'
+    | '/login'
     | '/accounts/certificates'
     | '/accounts/checking'
     | '/accounts/savings'
@@ -488,6 +500,7 @@ export interface RootRouteChildren {
   ContactUsRoute: typeof ContactUsRoute
   JoinRoute: typeof JoinRouteWithChildren
   LocationsRoute: typeof LocationsRoute
+  LoginRoute: typeof LoginRoute
   AccountsCertificatesRoute: typeof AccountsCertificatesRoute
   AccountsCheckingRoute: typeof AccountsCheckingRoute
   AccountsSavingsRoute: typeof AccountsSavingsRoute
@@ -519,6 +532,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations': {
       id: '/locations'
       path: '/locations'
@@ -815,6 +835,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactUsRoute: ContactUsRoute,
   JoinRoute: JoinRouteWithChildren,
   LocationsRoute: LocationsRoute,
+  LoginRoute: LoginRoute,
   AccountsCertificatesRoute: AccountsCertificatesRoute,
   AccountsCheckingRoute: AccountsCheckingRoute,
   AccountsSavingsRoute: AccountsSavingsRoute,
