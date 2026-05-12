@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WhoWeAreIndexRouteImport } from './routes/who-we-are/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as LoansIndexRouteImport } from './routes/loans/index'
+import { Route as JoinIndexRouteImport } from './routes/join/index'
 import { Route as GuidanceIndexRouteImport } from './routes/guidance/index'
 import { Route as BusinessIndexRouteImport } from './routes/business/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
@@ -30,6 +31,12 @@ import { Route as LoansVehicleLoansRouteImport } from './routes/loans/vehicle-lo
 import { Route as LoansStudentLoansRouteImport } from './routes/loans/student-loans'
 import { Route as LoansPersonalCreditRouteImport } from './routes/loans/personal-credit'
 import { Route as LoansHomeLoansRouteImport } from './routes/loans/home-loans'
+import { Route as JoinReviewRouteImport } from './routes/join/review'
+import { Route as JoinPersonalRouteImport } from './routes/join/personal'
+import { Route as JoinGoalsRouteImport } from './routes/join/goals'
+import { Route as JoinConfirmationRouteImport } from './routes/join/confirmation'
+import { Route as JoinAddressRouteImport } from './routes/join/address'
+import { Route as JoinAccountRouteImport } from './routes/join/account'
 import { Route as GuidanceToolsRouteImport } from './routes/guidance/tools'
 import { Route as GuidanceRatesRouteImport } from './routes/guidance/rates'
 import { Route as GuidanceFinancialEducationRouteImport } from './routes/guidance/financial-education'
@@ -75,6 +82,11 @@ const LoansIndexRoute = LoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const JoinIndexRoute = JoinIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => JoinRoute,
 } as any)
 const GuidanceIndexRoute = GuidanceIndexRouteImport.update({
   id: '/guidance/',
@@ -147,6 +159,36 @@ const LoansHomeLoansRoute = LoansHomeLoansRouteImport.update({
   path: '/loans/home-loans',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JoinReviewRoute = JoinReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => JoinRoute,
+} as any)
+const JoinPersonalRoute = JoinPersonalRouteImport.update({
+  id: '/personal',
+  path: '/personal',
+  getParentRoute: () => JoinRoute,
+} as any)
+const JoinGoalsRoute = JoinGoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => JoinRoute,
+} as any)
+const JoinConfirmationRoute = JoinConfirmationRouteImport.update({
+  id: '/confirmation',
+  path: '/confirmation',
+  getParentRoute: () => JoinRoute,
+} as any)
+const JoinAddressRoute = JoinAddressRouteImport.update({
+  id: '/address',
+  path: '/address',
+  getParentRoute: () => JoinRoute,
+} as any)
+const JoinAccountRoute = JoinAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => JoinRoute,
+} as any)
 const GuidanceToolsRoute = GuidanceToolsRouteImport.update({
   id: '/guidance/tools',
   path: '/guidance/tools',
@@ -202,7 +244,7 @@ const AccountsCertificatesRoute = AccountsCertificatesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
-  '/join': typeof JoinRoute
+  '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
@@ -214,6 +256,12 @@ export interface FileRoutesByFullPath {
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
+  '/join/account': typeof JoinAccountRoute
+  '/join/address': typeof JoinAddressRoute
+  '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/goals': typeof JoinGoalsRoute
+  '/join/personal': typeof JoinPersonalRoute
+  '/join/review': typeof JoinReviewRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -228,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
+  '/join/': typeof JoinIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
@@ -235,7 +284,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
-  '/join': typeof JoinRoute
   '/locations': typeof LocationsRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
@@ -247,6 +295,12 @@ export interface FileRoutesByTo {
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
+  '/join/account': typeof JoinAccountRoute
+  '/join/address': typeof JoinAddressRoute
+  '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/goals': typeof JoinGoalsRoute
+  '/join/personal': typeof JoinPersonalRoute
+  '/join/review': typeof JoinReviewRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -261,6 +315,7 @@ export interface FileRoutesByTo {
   '/accounts': typeof AccountsIndexRoute
   '/business': typeof BusinessIndexRoute
   '/guidance': typeof GuidanceIndexRoute
+  '/join': typeof JoinIndexRoute
   '/loans': typeof LoansIndexRoute
   '/services': typeof ServicesIndexRoute
   '/who-we-are': typeof WhoWeAreIndexRoute
@@ -269,7 +324,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact-us': typeof ContactUsRoute
-  '/join': typeof JoinRoute
+  '/join': typeof JoinRouteWithChildren
   '/locations': typeof LocationsRoute
   '/accounts/certificates': typeof AccountsCertificatesRoute
   '/accounts/checking': typeof AccountsCheckingRoute
@@ -281,6 +336,12 @@ export interface FileRoutesById {
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
   '/guidance/rates': typeof GuidanceRatesRoute
   '/guidance/tools': typeof GuidanceToolsRoute
+  '/join/account': typeof JoinAccountRoute
+  '/join/address': typeof JoinAddressRoute
+  '/join/confirmation': typeof JoinConfirmationRoute
+  '/join/goals': typeof JoinGoalsRoute
+  '/join/personal': typeof JoinPersonalRoute
+  '/join/review': typeof JoinReviewRoute
   '/loans/home-loans': typeof LoansHomeLoansRoute
   '/loans/personal-credit': typeof LoansPersonalCreditRoute
   '/loans/student-loans': typeof LoansStudentLoansRoute
@@ -295,6 +356,7 @@ export interface FileRoutesById {
   '/accounts/': typeof AccountsIndexRoute
   '/business/': typeof BusinessIndexRoute
   '/guidance/': typeof GuidanceIndexRoute
+  '/join/': typeof JoinIndexRoute
   '/loans/': typeof LoansIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/who-we-are/': typeof WhoWeAreIndexRoute
@@ -316,6 +378,12 @@ export interface FileRouteTypes {
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
+    | '/join/account'
+    | '/join/address'
+    | '/join/confirmation'
+    | '/join/goals'
+    | '/join/personal'
+    | '/join/review'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -330,6 +398,7 @@ export interface FileRouteTypes {
     | '/accounts/'
     | '/business/'
     | '/guidance/'
+    | '/join/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
@@ -337,7 +406,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contact-us'
-    | '/join'
     | '/locations'
     | '/accounts/certificates'
     | '/accounts/checking'
@@ -349,6 +417,12 @@ export interface FileRouteTypes {
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
+    | '/join/account'
+    | '/join/address'
+    | '/join/confirmation'
+    | '/join/goals'
+    | '/join/personal'
+    | '/join/review'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -363,6 +437,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/business'
     | '/guidance'
+    | '/join'
     | '/loans'
     | '/services'
     | '/who-we-are'
@@ -382,6 +457,12 @@ export interface FileRouteTypes {
     | '/guidance/financial-education'
     | '/guidance/rates'
     | '/guidance/tools'
+    | '/join/account'
+    | '/join/address'
+    | '/join/confirmation'
+    | '/join/goals'
+    | '/join/personal'
+    | '/join/review'
     | '/loans/home-loans'
     | '/loans/personal-credit'
     | '/loans/student-loans'
@@ -396,6 +477,7 @@ export interface FileRouteTypes {
     | '/accounts/'
     | '/business/'
     | '/guidance/'
+    | '/join/'
     | '/loans/'
     | '/services/'
     | '/who-we-are/'
@@ -404,7 +486,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactUsRoute: typeof ContactUsRoute
-  JoinRoute: typeof JoinRoute
+  JoinRoute: typeof JoinRouteWithChildren
   LocationsRoute: typeof LocationsRoute
   AccountsCertificatesRoute: typeof AccountsCertificatesRoute
   AccountsCheckingRoute: typeof AccountsCheckingRoute
@@ -485,6 +567,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/loans/'
       preLoaderRoute: typeof LoansIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/join/': {
+      id: '/join/'
+      path: '/'
+      fullPath: '/join/'
+      preLoaderRoute: typeof JoinIndexRouteImport
+      parentRoute: typeof JoinRoute
     }
     '/guidance/': {
       id: '/guidance/'
@@ -584,6 +673,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoansHomeLoansRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/join/review': {
+      id: '/join/review'
+      path: '/review'
+      fullPath: '/join/review'
+      preLoaderRoute: typeof JoinReviewRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/join/personal': {
+      id: '/join/personal'
+      path: '/personal'
+      fullPath: '/join/personal'
+      preLoaderRoute: typeof JoinPersonalRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/join/goals': {
+      id: '/join/goals'
+      path: '/goals'
+      fullPath: '/join/goals'
+      preLoaderRoute: typeof JoinGoalsRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/join/confirmation': {
+      id: '/join/confirmation'
+      path: '/confirmation'
+      fullPath: '/join/confirmation'
+      preLoaderRoute: typeof JoinConfirmationRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/join/address': {
+      id: '/join/address'
+      path: '/address'
+      fullPath: '/join/address'
+      preLoaderRoute: typeof JoinAddressRouteImport
+      parentRoute: typeof JoinRoute
+    }
+    '/join/account': {
+      id: '/join/account'
+      path: '/account'
+      fullPath: '/join/account'
+      preLoaderRoute: typeof JoinAccountRouteImport
+      parentRoute: typeof JoinRoute
+    }
     '/guidance/tools': {
       id: '/guidance/tools'
       path: '/guidance/tools'
@@ -657,10 +788,32 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface JoinRouteChildren {
+  JoinAccountRoute: typeof JoinAccountRoute
+  JoinAddressRoute: typeof JoinAddressRoute
+  JoinConfirmationRoute: typeof JoinConfirmationRoute
+  JoinGoalsRoute: typeof JoinGoalsRoute
+  JoinPersonalRoute: typeof JoinPersonalRoute
+  JoinReviewRoute: typeof JoinReviewRoute
+  JoinIndexRoute: typeof JoinIndexRoute
+}
+
+const JoinRouteChildren: JoinRouteChildren = {
+  JoinAccountRoute: JoinAccountRoute,
+  JoinAddressRoute: JoinAddressRoute,
+  JoinConfirmationRoute: JoinConfirmationRoute,
+  JoinGoalsRoute: JoinGoalsRoute,
+  JoinPersonalRoute: JoinPersonalRoute,
+  JoinReviewRoute: JoinReviewRoute,
+  JoinIndexRoute: JoinIndexRoute,
+}
+
+const JoinRouteWithChildren = JoinRoute._addFileChildren(JoinRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactUsRoute: ContactUsRoute,
-  JoinRoute: JoinRoute,
+  JoinRoute: JoinRouteWithChildren,
   LocationsRoute: LocationsRoute,
   AccountsCertificatesRoute: AccountsCertificatesRoute,
   AccountsCheckingRoute: AccountsCheckingRoute,
