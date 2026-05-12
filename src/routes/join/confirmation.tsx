@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, ArrowRight, Mail, DollarSign, Smartphone } from "lucide-react";
+import { CheckCircle2, ArrowRight, Mail, DollarSign, Smartphone, Loader2, AlertCircle } from "lucide-react";
 import { useJoin } from "@/context/JoinContext";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const Route = createFileRoute("/join/confirmation")({
   head: () => ({ meta: [{ title: "Join A+FCU — Welcome!" }] }),
@@ -36,11 +36,36 @@ const NEXT_STEPS = [
   },
 ];
 
+function generateRef(): string {
+  return "APFCU-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 function ConfirmationPage() {
-  const { personal, account, reset } = useJoin();
+  const { personal, account, goals, address, reset } = useJoin();
+  const [refNumber] = useState(generateRef);
+  const [saveStatus, setSaveStatus] = useState<"pending" | "saved" | "error">("pending");
+  const submitted = useRef(false);
 
   useEffect(() => {
-    return () => {};
+    if (submitted.current) return;
+    submitted.current = true;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/applications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ goals, personal, address, account, referenceNumber: refNumber }),
+        });
+        if (res.ok) {
+          setSaveStatus("saved");
+        } else {
+          setSaveStatus("error");
+        }
+      } catch {
+        setSaveStatus("error");
+      }
+    })();
   }, []);
 
   return (
@@ -93,13 +118,32 @@ function ConfirmationPage() {
         </div>
       </div>
 
-      <div className="bg-brand-cream border border-border p-6 mb-8 text-center">
+      <div className="bg-brand-cream border border-border p-6 mb-4 text-center">
         <p className="text-sm text-muted-foreground mb-1">Member application reference number</p>
-        <p className="font-mono font-bold text-lg text-ink tracking-widest">
-          APFCU-{Math.random().toString(36).substring(2, 8).toUpperCase()}
+        <p className="font-mono font-bold text-lg text-ink tracking-widest">{refNumber}</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Keep this for your records.{personal.email ? ` A copy was sent to ${personal.email}.` : ""}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">Keep this for your records. A copy was sent to {personal.email || "your email"}.</p>
       </div>
+
+      {saveStatus === "pending" && (
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-6">
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          Saving your application…
+        </div>
+      )}
+      {saveStatus === "saved" && (
+        <div className="flex items-center justify-center gap-2 text-xs text-brand-green mb-6">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Application securely saved to our records.
+        </div>
+      )}
+      {saveStatus === "error" && (
+        <div className="flex items-center justify-center gap-2 text-xs text-destructive mb-6">
+          <AlertCircle className="w-3.5 h-3.5" />
+          We couldn't save your application right now — please call us at (512) 302-6800.
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link

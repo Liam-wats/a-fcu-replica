@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { ShieldCheck, Check } from "lucide-react";
-import { Logo } from "@/components/site/Logo";
 import { JoinProvider, STEP_META } from "@/context/JoinContext";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -81,8 +80,7 @@ function JoinLayout() {
     <JoinProvider>
       <div className="min-h-screen bg-brand-cream flex flex-col">
         <header className="bg-white border-b border-border">
-          <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Logo />
+          <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-end">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="w-4 h-4 text-brand-green" />
               <span>256-bit SSL Encrypted</span>
