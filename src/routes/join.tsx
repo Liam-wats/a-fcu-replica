@@ -1,174 +1,120 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
-import { Logo } from "@/components/site/Logo";
-import { StepProgress } from "@/components/onboarding/StepProgress";
-import { StepGoals } from "@/components/onboarding/StepGoals";
-import { StepPersonal, type PersonalData } from "@/components/onboarding/StepPersonal";
-import { StepAddress, type AddressData } from "@/components/onboarding/StepAddress";
-import { StepAccount } from "@/components/onboarding/StepAccount";
-import { StepReview } from "@/components/onboarding/StepReview";
-import { StepConfirmation } from "@/components/onboarding/StepConfirmation";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { ShieldCheck, Check } from "lucide-react";
+import { JoinProvider, STEP_META } from "@/context/JoinContext";
+import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/join")({
-  head: () => ({
-    meta: [
-      { title: "Join A+FCU — Become a Member" },
-      { name: "description", content: "Open your A+ Federal Credit Union membership in minutes." },
-    ],
-  }),
-  component: JoinPage,
+  component: JoinLayout,
 });
 
-const EMPTY_PERSONAL: PersonalData = {
-  firstName: "", lastName: "", email: "", phone: "", dob: "", ssn: "",
-};
-
-const EMPTY_ADDRESS: AddressData = {
-  street: "", apt: "", city: "", state: "", zip: "",
-};
-
-function validate<T extends object>(data: T, required: (keyof T)[]): Partial<Record<keyof T, string>> {
-  const errs: Partial<Record<keyof T, string>> = {};
-  for (const key of required) {
-    if (!String(data[key]).trim()) errs[key] = "This field is required";
-  }
-  return errs;
-}
-
-function JoinPage() {
-  const [step, setStep] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
-
-  const [goals, setGoals] = useState<string[]>([]);
-  const [personal, setPersonal] = useState<PersonalData>(EMPTY_PERSONAL);
-  const [address, setAddress] = useState<AddressData>(EMPTY_ADDRESS);
-  const [account, setAccount] = useState("");
-
-  const [personalErrors, setPersonalErrors] = useState<Partial<Record<keyof PersonalData, string>>>({});
-  const [addressErrors, setAddressErrors] = useState<Partial<Record<keyof AddressData, string>>>({});
-
-  const canAdvance = (): boolean => {
-    if (step === 1) return goals.length > 0;
-    if (step === 4) return !!account;
-    return true;
-  };
-
-  const handleNext = () => {
-    if (step === 2) {
-      const errs = validate(personal, ["firstName", "lastName", "email", "phone", "dob", "ssn"]);
-      setPersonalErrors(errs);
-      if (Object.keys(errs).length > 0) return;
-    }
-    if (step === 3) {
-      const errs = validate(address, ["street", "city", "state", "zip"]);
-      setAddressErrors(errs);
-      if (Object.keys(errs).length > 0) return;
-    }
-    if (step === 5) {
-      setSubmitted(true);
-      return;
-    }
-    setStep((s) => s + 1);
-  };
-
-  const handleBack = () => setStep((s) => s - 1);
-
-  const renderStep = () => {
-    switch (step) {
-      case 1: return <StepGoals selected={goals} onChange={setGoals} />;
-      case 2: return <StepPersonal data={personal} onChange={setPersonal} errors={personalErrors} />;
-      case 3: return <StepAddress data={address} onChange={setAddress} errors={addressErrors} />;
-      case 4: return <StepAccount selected={account} onChange={setAccount} />;
-      case 5: return (
-        <StepReview
-          goals={goals}
-          personal={personal}
-          address={address}
-          account={account}
-          onEdit={(s) => setStep(s)}
-        />
-      );
-      default: return null;
-    }
-  };
+function StepSidebar({ currentPath }: { currentPath: string }) {
+  const currentStep = STEP_META.find((s) => currentPath.includes(s.slug));
+  const currentId = currentStep?.id ?? 1;
 
   return (
-    <div className="min-h-screen bg-brand-cream flex flex-col">
-      <header className="bg-white border-b border-border">
-        <div className="container-x h-16 flex items-center justify-between">
-          <Logo />
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="w-4 h-4 text-brand-green" />
-            <span>256-bit SSL Encrypted</span>
-          </div>
+    <aside className="lg:w-64 shrink-0">
+      <div className="bg-white border border-border sticky top-6">
+        <div className="px-6 py-5 border-b border-border">
+          <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">
+            Membership Application
+          </p>
         </div>
-      </header>
-
-      {submitted ? (
-        <main className="flex-1 container-x py-12 max-w-3xl">
-          <StepConfirmation firstName={personal.firstName} account={account} />
-        </main>
-      ) : (
-        <main className="flex-1 container-x py-10 max-w-5xl">
-          <div className="flex flex-col lg:flex-row gap-10">
-            <aside className="lg:w-56 shrink-0">
-              <div className="bg-white border border-border p-6 sticky top-6">
-                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-5">
-                  Membership Application
-                </p>
-                <StepProgress current={step} />
-                <div className="mt-6 pt-5 border-t border-border text-xs text-muted-foreground space-y-1.5">
-                  <p>✓ No application fee</p>
-                  <p>✓ Soft credit check only</p>
-                  <p>✓ Takes ~5 minutes</p>
-                </div>
-              </div>
-            </aside>
-
-            <div className="flex-1">
-              <div className="bg-white border border-border p-6 md:p-10">
-                {renderStep()}
-
-                <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
-                  {step > 1 ? (
-                    <button
-                      type="button"
-                      onClick={handleBack}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-brand-green transition-colors"
-                    >
-                      <ArrowLeft className="w-4 h-4" /> Back
-                    </button>
-                  ) : (
-                    <div />
-                  )}
-
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-muted-foreground">
-                      Step {step} of 5
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleNext}
-                      disabled={!canAdvance()}
-                      className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-2.5 font-semibold text-sm transition-colors"
-                    >
-                      {step === 5 ? "Submit Application" : "Continue"}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+        <ol className="px-6 py-5 flex flex-col gap-0">
+          {STEP_META.map((step, i) => {
+            const done = currentId > step.id;
+            const active = currentId === step.id;
+            const last = i === STEP_META.length - 1;
+            return (
+              <li key={step.id} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center border-2 text-sm font-bold shrink-0 transition-all",
+                      done && "bg-brand-green border-brand-green text-white",
+                      active && "border-brand-green text-brand-green bg-brand-green/5",
+                      !done && !active && "border-border text-muted-foreground bg-white"
+                    )}
+                  >
+                    {done ? <Check className="w-4 h-4" /> : step.id}
                   </div>
+                  {!last && (
+                    <div className={cn("w-px flex-1 my-1.5 min-h-[28px]", done ? "bg-brand-green" : "bg-border")} />
+                  )}
+                </div>
+                <div className="pb-7">
+                  <p
+                    className={cn(
+                      "text-sm font-semibold leading-8",
+                      active ? "text-brand-green" : done ? "text-ink" : "text-muted-foreground"
+                    )}
+                  >
+                    {step.label}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <div className="px-6 pb-5 pt-0 border-t border-border space-y-2">
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-4">
+            <Check className="w-3 h-3 text-brand-green" /> No application fee
+          </p>
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+            <Check className="w-3 h-3 text-brand-green" /> Soft credit check only
+          </p>
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+            <Check className="w-3 h-3 text-brand-green" /> Takes about 5 minutes
+          </p>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function JoinLayout() {
+  const location = useLocation();
+  const isConfirmation = location.pathname.includes("confirmation");
+
+  return (
+    <JoinProvider>
+      <div className="min-h-screen bg-brand-cream flex flex-col">
+        <header className="bg-white border-b border-border">
+          <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-end">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShieldCheck className="w-4 h-4 text-brand-green" />
+              <span>256-bit SSL Encrypted</span>
+            </div>
+          </div>
+        </header>
+
+        {isConfirmation ? (
+          <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">
+            <Outlet />
+          </main>
+        ) : (
+          <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-10">
+            <div className="flex flex-col lg:flex-row gap-8">
+              <StepSidebar currentPath={location.pathname} />
+              <div className="flex-1 min-w-0">
+                <div className="bg-white border border-border">
+                  <Outlet />
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      )}
+          </main>
+        )}
 
-      <footer className="border-t border-border bg-white py-4">
-        <div className="container-x text-xs text-muted-foreground text-center">
-          © {new Date().getFullYear()} A+ Federal Credit Union · Federally insured by NCUA · Equal Housing Lender
-        </div>
-      </footer>
-    </div>
+        <footer className="border-t border-border bg-white py-4">
+          <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span>© {new Date().getFullYear()} A+ Federal Credit Union · Federally insured by NCUA · Equal Housing Lender</span>
+            <div className="flex gap-4">
+              <Link to="/" className="hover:text-brand-green transition-colors">Privacy Policy</Link>
+              <Link to="/" className="hover:text-brand-green transition-colors">Terms</Link>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </JoinProvider>
   );
 }
