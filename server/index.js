@@ -8,7 +8,8 @@ import nodemailer from "nodemailer";
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.PG_CONNECTION_STRING || process.env.DATABASE_URL,
+  ssl: process.env.PG_CONNECTION_STRING ? { rejectUnauthorized: false } : false,
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || "apfcu_dev_secret_please_change_in_production";
