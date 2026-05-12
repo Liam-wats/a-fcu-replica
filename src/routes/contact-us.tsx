@@ -88,11 +88,17 @@ function ContactUsPage() {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          from_name: `${form.firstName} ${form.lastName}`,
-          from_email: form.email,
+          first_name: form.firstName,
+          last_name: form.lastName,
+          email: form.email,
           reply_to: form.email,
           subject: form.subject || "(No subject)",
           message: form.message,
+          time: new Date().toLocaleString("en-US", {
+            weekday: "long", year: "numeric", month: "long",
+            day: "numeric", hour: "2-digit", minute: "2-digit",
+            timeZoneName: "short",
+          }),
         },
         EMAILJS_PUBLIC_KEY
       );
