@@ -74,7 +74,7 @@ app.post("/api/applications", async (req, res) => {
        RETURNING id, reference_number, submitted_at`,
       [
         referenceNumber,
-        goals ? JSON.stringify(goals) : null,
+        Array.isArray(goals) ? goals.join(",") : (goals ?? null),
         personal.firstName,
         personal.lastName,
         personal.email,
