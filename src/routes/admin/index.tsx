@@ -349,7 +349,7 @@ function EditDrawer({
   return (
     <>
       <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-[1px]" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-[520px] max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="fixed right-0 top-0 h-full w-full sm:w-[520px] sm:max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100">
@@ -368,7 +368,7 @@ function EditDrawer({
             </div>
           </div>
           {/* Tabs */}
-          <div className="flex gap-0 mt-4 border-b border-slate-100 -mb-4">
+          <div className="flex gap-0 mt-4 border-b border-slate-100 -mb-4 overflow-x-auto">
             {[
               { id: "profile" as const,  label: "Profile",      icon: User },
               { id: "account" as const,  label: "Account Data", icon: Wallet },
