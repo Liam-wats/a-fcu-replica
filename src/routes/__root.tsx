@@ -50,15 +50,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = { pathname: typeof window !== "undefined" ? window.location.pathname : "" };
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <Footer />
-      </div>
+      {isAdmin ? (
+        <Outlet />
+      ) : (
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
+      )}
     </QueryClientProvider>
   );
 }

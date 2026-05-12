@@ -153,6 +153,56 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// PUT /api/applications/:id — update any field on an application
+app.put("/api/applications/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    firstName, lastName, email, phone, dob, ssnLast4,
+    street, apt, city, state, zip, accountType, loginId, status,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE membership_applications SET
+         first_name   = COALESCE($1,  first_name),
+         last_name    = COALESCE($2,  last_name),
+         email        = COALESCE($3,  email),
+         phone        = COALESCE($4,  phone),
+         date_of_birth = COALESCE($5, date_of_birth),
+         ssn_last4    = COALESCE($6,  ssn_last4),
+         street       = COALESCE($7,  street),
+         apt          = $8,
+         city         = COALESCE($9,  city),
+         state        = COALESCE($10, state),
+         zip          = COALESCE($11, zip),
+         account_type = COALESCE($12, account_type),
+         login_id     = COALESCE($13, login_id),
+         status       = COALESCE($14, status)
+       WHERE id = $15
+       RETURNING *`,
+      [
+        firstName || null, lastName || null, email || null, phone || null,
+        dob || null, ssnLast4 || null, street || null,
+        apt !== undefined ? (apt || null) : undefined,
+        city || null, state || null, zip || null,
+        accountType || null, loginId || null, status || null,
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+    return res.json({ success: true, application: result.rows[0] });
+  } catch (err) {
+    console.error("Error updating application:", err);
+    if (err.code === "23505") {
+      return res.status(409).json({ error: "That Login ID is already taken by another member." });
+    }
+    return res.status(500).json({ error: "Failed to update application" });
+  }
+});
+
 // GET /api/applications — list all applications (admin use)
 app.get("/api/applications", async (_req, res) => {
   try {
