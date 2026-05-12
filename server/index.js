@@ -51,7 +51,7 @@ async function migrate() {
   `);
 }
 
-migrate().catch(console.error);
+migrate().catch((err) => console.warn("DB migrate skipped:", err.message));
 
 async function migrateAccountData() {
   await pool.query(`
@@ -85,7 +85,7 @@ async function migrateAccountData() {
     )
   `);
 }
-migrateAccountData().catch(console.error);
+migrateAccountData().catch((err) => console.warn("DB migrateAccountData skipped:", err.message));
 
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password + "apfcu_salt").digest("hex");
