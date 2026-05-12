@@ -67,14 +67,14 @@ function GoalsPage() {
 
   return (
     <div>
-      <div className="px-8 pt-10 pb-6 border-b border-border">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 1 of 5</p>
-        <h1 className="font-serif text-3xl md:text-4xl text-ink mb-2">What brings you to A+FCU?</h1>
+      <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-5 sm:pb-6 border-b border-border">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 1 of 4</p>
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-ink mb-2">What brings you to A+FCU?</h1>
         <p className="text-muted-foreground">Select everything that applies — we'll tailor your membership.</p>
       </div>
 
-      <div className="px-8 py-8">
-        <div className="grid sm:grid-cols-2 gap-3">
+      <div className="px-5 sm:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {GOALS.map(({ id, icon: Icon, label, desc }) => {
             const active = goals.includes(id);
             return (
@@ -125,19 +125,16 @@ function GoalsPage() {
           </p>
         )}
 
-        <div className="mt-10 flex items-center justify-between pt-6 border-t border-border">
-          <div />
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground">Step 1 of 5</span>
-            <button
-              type="button"
-              onClick={handleContinue}
-              disabled={goals.length === 0}
-              className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-7 py-3 font-semibold text-sm transition-colors"
-            >
-              Continue <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+        <div className="mt-8 sm:mt-10 flex items-center justify-between gap-3 pt-6 border-t border-border">
+          <span className="text-xs text-muted-foreground hidden sm:inline">Step 1 of 4</span>
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={goals.length === 0}
+            className="inline-flex items-center justify-center gap-2 bg-brand-green hover:bg-brand-green-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 sm:px-7 py-3 font-semibold text-sm transition-colors w-full sm:w-auto min-h-[44px] ml-auto"
+          >
+            Continue <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
