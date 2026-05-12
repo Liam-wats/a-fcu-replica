@@ -349,7 +349,7 @@ function EditDrawer({
   return (
     <>
       <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-[1px]" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-[520px] max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="fixed right-0 top-0 h-full w-full sm:w-[520px] sm:max-w-full bg-white z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100">
@@ -368,7 +368,7 @@ function EditDrawer({
             </div>
           </div>
           {/* Tabs */}
-          <div className="flex gap-0 mt-4 border-b border-slate-100 -mb-4">
+          <div className="flex gap-0 mt-4 border-b border-slate-100 -mb-4 overflow-x-auto">
             {[
               { id: "profile" as const,  label: "Profile",      icon: User },
               { id: "account" as const,  label: "Account Data", icon: Wallet },
@@ -1014,31 +1014,31 @@ function AdminApplicationsPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Top bar */}
-      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-        <div>
-          <h1 className="font-semibold text-slate-900 text-[15px]">Membership Applications</h1>
+      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 shrink-0">
+        <div className="min-w-0">
+          <h1 className="font-semibold text-slate-900 text-[15px] truncate">Membership Applications</h1>
           <p className="text-[11px] text-slate-400">{apps.length} total records</p>
         </div>
         <button onClick={load}
-          className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 px-3 py-1.5 border border-slate-200 rounded hover:border-slate-300 transition-all"
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 px-3 py-1.5 border border-slate-200 rounded hover:border-slate-300 transition-all shrink-0"
         >
           <RefreshCw className={cn("w-3 h-3", loading && "animate-spin")} />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </button>
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-4 gap-px bg-slate-200 border-b border-slate-200 shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-slate-200 border-b border-slate-200 shrink-0">
         {[
           { label: "Total",    value: apps.length,           icon: Users,        color: "text-slate-700" },
           { label: "Pending",  value: (counts.pending ?? 0) + (counts.submitted ?? 0), icon: Clock,  color: "text-amber-600" },
           { label: "Approved", value: counts.approved ?? 0,  icon: CheckCircle2, color: "text-emerald-600" },
           { label: "Rejected", value: counts.rejected ?? 0,  icon: XCircle,      color: "text-red-500" },
         ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white px-6 py-4 flex items-center gap-3">
-            <Icon className={cn("w-5 h-5", color)} />
+          <div key={label} className="bg-white px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3">
+            <Icon className={cn("w-5 h-5 shrink-0", color)} />
             <div>
-              <p className="text-2xl font-bold text-slate-900 leading-none">{value}</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-900 leading-none">{value}</p>
               <p className="text-[11px] text-slate-400 mt-0.5">{label}</p>
             </div>
           </div>
@@ -1046,13 +1046,13 @@ function AdminApplicationsPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="px-6 py-3 bg-white border-b border-slate-200 flex items-center gap-3 shrink-0">
-        <div className="relative flex-1 max-w-xs">
+      <div className="px-4 sm:px-6 py-3 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
           <input
             type="text"
             placeholder="Search name, email, Login ID…"
-            className="w-full pl-8 pr-3 py-1.5 text-sm border border-slate-200 rounded outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20 transition-all placeholder:text-slate-400"
+            className="w-full pl-8 pr-8 py-2 text-sm border border-slate-200 rounded outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20 transition-all placeholder:text-slate-400"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -1063,10 +1063,10 @@ function AdminApplicationsPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-100 rounded p-0.5">
+        <div className="flex items-center gap-1 bg-slate-100 rounded p-0.5 overflow-x-auto -mx-1 sm:mx-0 px-1 sm:px-0">
           {(["all", ...ALL_STATUSES] as const).map((s) => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={cn("px-3 py-1 text-xs font-medium rounded transition-all capitalize",
+              className={cn("px-3 py-1.5 text-xs font-medium rounded transition-all capitalize whitespace-nowrap shrink-0",
                 statusFilter === s ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
@@ -1081,7 +1081,7 @@ function AdminApplicationsPage() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table / list */}
       <div className="flex-1 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-64 gap-2 text-sm text-slate-400">
@@ -1095,7 +1095,34 @@ function AdminApplicationsPage() {
             <p className="text-sm">No applications found</p>
           </div>
         ) : (
-          <table className="w-full text-sm border-collapse">
+          <>
+          {/* Mobile card list */}
+          <ul className="md:hidden divide-y divide-slate-100">
+            {filtered.map((app) => (
+              <li key={app.id}>
+                <button onClick={() => setSelected(app)}
+                  className="w-full text-left bg-white hover:bg-slate-50 px-4 py-3 flex flex-col gap-1.5 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 text-sm truncate">{app.first_name} {app.last_name}</p>
+                      <p className="text-[11px] text-slate-400 font-mono truncate">{app.reference_number}</p>
+                    </div>
+                    <StatusChip status={app.status} />
+                  </div>
+                  <p className="text-xs text-slate-500 truncate">{app.email}</p>
+                  <div className="flex items-center justify-between gap-2 text-[11px] text-slate-400">
+                    <span className="truncate">{ACCOUNT_LABELS[app.account_type] ?? app.account_type}</span>
+                    <span className="tabular-nums shrink-0">
+                      {new Date(app.submitted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {/* Desktop table */}
+          <table className="hidden md:table w-full text-sm border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
                 {[
@@ -1169,6 +1196,7 @@ function AdminApplicationsPage() {
               ))}
             </tbody>
           </table>
+          </>
         )}
       </div>
 

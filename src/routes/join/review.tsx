@@ -69,13 +69,13 @@ function ReviewPage() {
 
   return (
     <div>
-      <div className="px-8 pt-10 pb-6 border-b border-border">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 6 of 6</p>
-        <h1 className="font-serif text-3xl md:text-4xl text-ink mb-2">Review your application</h1>
+      <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-5 sm:pb-6 border-b border-border">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1">Step 4 of 4</p>
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-ink mb-2">Review your application</h1>
         <p className="text-muted-foreground">Please confirm your information is accurate before submitting.</p>
       </div>
 
-      <div className="px-8 py-8">
+      <div className="px-5 sm:px-8 py-6 sm:py-8">
         <div className="flex flex-col gap-4">
           <Section title="Your Goals" editPath="/join/goals">
             <div className="flex flex-wrap gap-2">
@@ -95,7 +95,7 @@ function ReviewPage() {
             <Row label="SSN (last 4)" value={personal.ssn ? `••• – •• – ••${personal.ssn}` : ""} />
           </Section>
 
-          <Section title="Home Address" editPath="/join/address">
+          <Section title="Home Address" editPath="/join/personal">
             <Row
               label="Street"
               value={`${address.street}${address.apt ? `, ${address.apt}` : ""}`}
@@ -126,21 +126,15 @@ function ReviewPage() {
           </p>
         </div>
 
-        <div className="mt-8 flex items-center justify-between pt-6 border-t border-border">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/join/credentials" })}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-brand-green transition-colors"
-          >
+        <div className="mt-8 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-6 border-t border-border">
+          <button type="button" onClick={() => navigate({ to: "/join/account" })}
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-ink hover:text-brand-green transition-colors py-3 sm:py-0">
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground">Step 6 of 6</span>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="inline-flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark text-white px-7 py-3 font-semibold text-sm transition-colors"
-            >
+          <div className="flex items-center justify-between sm:justify-end gap-4">
+            <span className="text-xs text-muted-foreground hidden sm:inline">Step 4 of 4</span>
+            <button type="button" onClick={handleSubmit}
+              className="inline-flex items-center justify-center gap-2 bg-brand-green hover:bg-brand-green-dark text-white px-6 sm:px-7 py-3 font-semibold text-sm transition-colors w-full sm:w-auto min-h-[44px]">
               Submit Application <ArrowRight className="w-4 h-4" />
             </button>
           </div>

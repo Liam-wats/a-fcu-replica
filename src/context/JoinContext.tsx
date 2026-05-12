@@ -91,9 +91,7 @@ export function useJoin(): JoinContextValue {
 
 export const STEP_META = [
   { id: 1, slug: "goals", label: "Your Goals", path: "/join/goals" },
-  { id: 2, slug: "personal", label: "Personal Info", path: "/join/personal" },
-  { id: 3, slug: "address", label: "Address", path: "/join/address" },
-  { id: 4, slug: "account", label: "Account", path: "/join/account" },
-  { id: 5, slug: "credentials", label: "Online Banking", path: "/join/credentials" },
-  { id: 6, slug: "review", label: "Review", path: "/join/review" },
+  { id: 2, slug: "personal", label: "About You", path: "/join/personal" },
+  { id: 3, slug: "account", label: "Account & Login", path: "/join/account" },
+  { id: 4, slug: "review", label: "Review", path: "/join/review" },
 ] as const;
