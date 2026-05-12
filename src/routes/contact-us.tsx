@@ -2,6 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { SplitHero } from "@/components/site/SplitHero";
 import { useState } from "react";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID = "service_qkfr2cn";
+const EMAILJS_TEMPLATE_ID = "template_wvtlxvb";
+const EMAILJS_PUBLIC_KEY = "Q46p2-WKKDd4yU00l";
 
 export const Route = createFileRoute("/contact-us")({
   head: () => ({
@@ -79,20 +84,22 @@ function ContactUsPage() {
     setErrors({});
     setSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setSubmitted(true);
-        setForm({ firstName: "", lastName: "", email: "", subject: "", message: "" });
-      } else {
-        setServerError(data.error || "Something went wrong. Please try again.");
-      }
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: `${form.firstName} ${form.lastName}`,
+          from_email: form.email,
+          reply_to: form.email,
+          subject: form.subject || "(No subject)",
+          message: form.message,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      setSubmitted(true);
+      setForm({ firstName: "", lastName: "", email: "", subject: "", message: "" });
     } catch {
-      setServerError("Unable to send your message. Please check your connection and try again.");
+      setServerError("Unable to send your message. Please try again or call us directly.");
     } finally {
       setSubmitting(false);
     }
