@@ -290,7 +290,7 @@ app.put("/api/applications/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const {
     firstName, lastName, email, phone, dob, ssnLast4,
-    street, apt, city, state, zip, accountType, loginId, status,
+    street, apt, city, state, zip, accountType, loginId, status, submittedAt,
   } = req.body;
 
   try {
@@ -309,7 +309,8 @@ app.put("/api/applications/:id", requireAdmin, async (req, res) => {
          zip           = COALESCE($11, zip),
          account_type  = COALESCE($12, account_type),
          login_id      = COALESCE($13, login_id),
-         status        = COALESCE($14, status)
+         status        = COALESCE($14, status),
+         submitted_at  = COALESCE($16, submitted_at)
        WHERE id = $15
        RETURNING *`,
       [
@@ -319,6 +320,7 @@ app.put("/api/applications/:id", requireAdmin, async (req, res) => {
         city || null, state || null, zip || null,
         accountType || null, loginId || null, status || null,
         id,
+        submittedAt ? new Date(submittedAt).toISOString() : null,
       ]
     );
 

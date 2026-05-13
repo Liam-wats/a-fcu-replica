@@ -200,6 +200,7 @@ function EditDrawer({
           zip: form.zip || undefined,
           accountType: form.account_type, loginId: form.login_id ?? "",
           status: form.status,
+          submittedAt: form.submitted_at || undefined,
         }),
       });
       const data = await res.json();
@@ -470,7 +471,13 @@ function EditDrawer({
 
               <FieldGroup label="Audit">
                 <Field label="Reference #" name="reference_number" value={form.reference_number} readOnly />
-                <Field label="Applied" name="submitted_at" value={new Date(form.submitted_at).toLocaleString()} readOnly />
+                <Field
+                  label="Application Date"
+                  name="submitted_at"
+                  value={form.submitted_at ? new Date(form.submitted_at).toISOString().slice(0, 16) : ""}
+                  onChange={set}
+                  type="datetime-local"
+                />
               </FieldGroup>
             </div>
           )}
