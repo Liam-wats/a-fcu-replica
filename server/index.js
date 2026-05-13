@@ -445,21 +445,46 @@ app.get("/api/member/:loginId/account", requireAuth, async (req, res) => {
       balance = ins.rows[0];
     }
     const txRes = await pool.query(
-      "SELECT * FROM member_transactions WHERE login_id = $1 ORDER BY created_at DESC LIMIT 50", [loginId]
+      "SELECT * FROM member_transactions WHERE login_id = $1 ORDER BY txn_date DESC, created_at DESC LIMIT 200", [loginId]
     );
     const alertRes = await pool.query(
       "SELECT * FROM member_alerts WHERE login_id = $1 ORDER BY created_at DESC", [loginId]
     );
+    const appRes = await pool.query(
+      "SELECT membership_year FROM membership_applications WHERE login_id = $1 LIMIT 1", [loginId]
+    );
+    const membershipYear = appRes.rows[0]?.membership_year ?? null;
     return res.json({
       balance: { available: parseFloat(balance.available_balance), current: parseFloat(balance.current_balance) },
       transactions: txRes.rows,
       alerts: alertRes.rows,
+      membershipYear,
     });
   } catch (err) {
     console.error("Error fetching account data:", err);
     return res.status(500).json({ error: "Failed to fetch account data" });
   }
 });
+
+// Helper: recompute balance from all transactions and persist it
+async function recalcBalance(loginId) {
+  const txRes = await pool.query(
+    `SELECT COALESCE(
+       SUM(CASE WHEN txn_type = 'credit' THEN amount ELSE -amount END), 0
+     ) AS net
+     FROM member_transactions WHERE login_id = $1`,
+    [loginId]
+  );
+  const net = parseFloat(txRes.rows[0].net) || 0;
+  await pool.query(
+    `INSERT INTO member_balances (login_id, available_balance, current_balance, updated_at)
+     VALUES ($1, $2, $2, NOW())
+     ON CONFLICT (login_id) DO UPDATE SET
+       available_balance = $2, current_balance = $2, updated_at = NOW()`,
+    [loginId, net.toFixed(2)]
+  );
+  return net;
+}
 
 // PUT /api/member/:loginId/balance (admin only)
 app.put("/api/member/:loginId/balance", requireAdmin, async (req, res) => {
@@ -520,7 +545,12 @@ app.post("/api/member/:loginId/transactions", requireAdmin, async (req, res) => 
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [loginId, txn_date, description, category || "Other", amount, txn_type || "debit"]
     );
-    return res.status(201).json({ success: true, transaction: result.rows[0] });
+    const newBalance = await recalcBalance(loginId);
+    return res.status(201).json({
+      success: true,
+      transaction: result.rows[0],
+      newBalance: { available: newBalance, current: newBalance },
+    });
   } catch (err) {
     console.error("Error adding transaction:", err);
     return res.status(500).json({ error: "Failed to add transaction" });
@@ -545,7 +575,12 @@ app.put("/api/member/:loginId/transactions/:id", requireAdmin, async (req, res) 
        amount != null ? parseFloat(amount) : null, txn_type || null, id, loginId]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: "Transaction not found" });
-    return res.json({ success: true, transaction: result.rows[0] });
+    const newBalance = await recalcBalance(loginId);
+    return res.json({
+      success: true,
+      transaction: result.rows[0],
+      newBalance: { available: newBalance, current: newBalance },
+    });
   } catch (err) {
     console.error("Error updating transaction:", err);
     return res.status(500).json({ error: "Failed to update transaction" });
@@ -557,7 +592,11 @@ app.delete("/api/member/:loginId/transactions/:id", requireAdmin, async (req, re
   const { loginId, id } = req.params;
   try {
     await pool.query("DELETE FROM member_transactions WHERE id = $1 AND login_id = $2", [id, loginId]);
-    return res.json({ success: true });
+    const newBalance = await recalcBalance(loginId);
+    return res.json({
+      success: true,
+      newBalance: { available: newBalance, current: newBalance },
+    });
   } catch {
     return res.status(500).json({ error: "Failed to delete transaction" });
   }
@@ -673,6 +712,27 @@ app.post("/api/contact", async (req, res) => {
 });
 
 // ── Chat endpoints ────────────────────────────────────────────────────────────
+
+// PUT /api/chat/conversations/:id/close — member closes their own conversation
+app.put("/api/chat/conversations/:id/close", requireAuth, async (req, res) => {
+  const { loginId } = req.user;
+  const { id } = req.params;
+  try {
+    const convRes = await pool.query(
+      "SELECT * FROM chat_conversations WHERE id = $1 AND login_id = $2",
+      [id, loginId]
+    );
+    if (convRes.rows.length === 0) return res.status(403).json({ error: "Access denied" });
+    await pool.query(
+      "UPDATE chat_conversations SET status = 'closed', updated_at = NOW() WHERE id = $1",
+      [id]
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Chat close error:", err);
+    return res.status(500).json({ error: "Failed to close conversation" });
+  }
+});
 
 // GET /api/chat/conversation — member's most recent conversation + messages
 app.get("/api/chat/conversation", requireAuth, async (req, res) => {

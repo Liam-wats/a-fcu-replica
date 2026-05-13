@@ -233,6 +233,15 @@ function EditDrawer({
     finally { setSavingBal(false); }
   };
 
+  const applyNewBalance = (nb: { available: number; current: number } | undefined) => {
+    if (!nb) return;
+    const avail = nb.available.toFixed(2);
+    const curr  = nb.current.toFixed(2);
+    setBalAvail(avail);
+    setBalCurrent(curr);
+    if (acct) setAcct(a => a ? { ...a, balance: { available: nb.available, current: nb.current } } : a);
+  };
+
   const addTransaction = async () => {
     if (!loginId || !txForm.description || !txForm.amount || !txForm.txn_date) return;
     setAddingTx(true);
@@ -247,6 +256,7 @@ function EditDrawer({
         setAcct({ ...acct, transactions: [data.transaction, ...acct.transactions] });
         setTxForm({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
         setShowTxForm(false);
+        applyNewBalance(data.newBalance);
       }
     } catch { /* silent */ }
     finally { setAddingTx(false); }
@@ -279,6 +289,7 @@ function EditDrawer({
           transactions: acct.transactions.map((t) => t.id === id ? data.transaction : t),
         });
         setEditingTxId(null);
+        applyNewBalance(data.newBalance);
       }
     } catch { /* silent */ }
     finally { setSavingTxId(null); }
@@ -286,11 +297,17 @@ function EditDrawer({
 
   const deleteTransaction = async (id: number) => {
     if (!loginId) return;
-    await fetch(`/api/member/${loginId}/transactions/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${getAdminToken()}` },
-    });
-    if (acct) setAcct({ ...acct, transactions: acct.transactions.filter(t => t.id !== id) });
+    try {
+      const res = await fetch(`/api/member/${loginId}/transactions/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok && acct) {
+        setAcct({ ...acct, transactions: acct.transactions.filter(t => t.id !== id) });
+        applyNewBalance(data.newBalance);
+      }
+    } catch { /* silent */ }
   };
 
   const addAlert = async () => {

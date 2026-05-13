@@ -21,6 +21,7 @@ interface AccountData {
     category: string; amount: number; txn_type: string;
   }[];
   alerts: { id: number; title: string; message: string; alert_type: string }[];
+  membershipYear?: number | null;
 }
 
 const QUICK_ACTIONS = [
@@ -355,7 +356,7 @@ function DashboardOverview() {
           <div className="space-y-2 text-[13px]">
             <div className="flex justify-between">
               <span className="text-ink/55">Member since</span>
-              <span className="font-semibold text-ink">2024</span>
+              <span className="font-semibold text-ink">{data?.membershipYear ?? "—"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-ink/55">Reference #</span>

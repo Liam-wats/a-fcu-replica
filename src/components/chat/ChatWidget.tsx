@@ -156,6 +156,17 @@ export function ChatWidget({ session }: { session: Session }) {
     setSending(false);
   };
 
+  const closeConversation = async () => {
+    if (!conversation) return;
+    try {
+      const res = await fetch(`/api/chat/conversations/${conversation.id}/close`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token()}` },
+      });
+      if (res.ok) setConversation((c) => c ? { ...c, status: "closed" } : c);
+    } catch {}
+  };
+
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -236,10 +247,19 @@ export function ChatWidget({ session }: { session: Session }) {
                 </div>
               ))
             )}
-            {conversation?.status === "closed" && (
-              <p className="text-center text-[11px] text-ink/35 pt-2">
-                This conversation has been closed by support.
+            {conversation?.status === "closed" ? (
+              <p className="text-center text-[11px] text-ink/35 pt-2 pb-1">
+                This conversation is closed. Start typing to open a new one.
               </p>
+            ) : conversation && messages.length > 0 && (
+              <div className="flex justify-center pt-1">
+                <button
+                  onClick={closeConversation}
+                  className="text-[11px] text-ink/35 hover:text-red-400 transition-colors underline underline-offset-2"
+                >
+                  Mark as resolved
+                </button>
+              </div>
             )}
             <div ref={bottomRef} />
           </div>
