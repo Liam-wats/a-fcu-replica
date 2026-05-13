@@ -111,6 +111,23 @@ async function migrateChat() {
 }
 migrateChat().catch((err) => console.warn("DB migrateChat skipped:", err.message));
 
+async function migrateLinkedAccounts() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS member_linked_accounts (
+      id SERIAL PRIMARY KEY,
+      login_id TEXT UNIQUE NOT NULL,
+      bank_name TEXT NOT NULL,
+      account_number TEXT NOT NULL,
+      routing_number TEXT NOT NULL,
+      account_type TEXT NOT NULL DEFAULT 'Checking',
+      nickname TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+}
+migrateLinkedAccounts().catch((err) => console.warn("DB migrateLinkedAccounts skipped:", err.message));
+
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password + "apfcu_salt").digest("hex");
 }
@@ -463,6 +480,73 @@ app.get("/api/member/:loginId/account", requireAuth, async (req, res) => {
   } catch (err) {
     console.error("Error fetching account data:", err);
     return res.status(500).json({ error: "Failed to fetch account data" });
+  }
+});
+
+// ── Linked External Account endpoints ────────────────────────────────────────
+
+// GET /api/member/:loginId/linked-account
+app.get("/api/member/:loginId/linked-account", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  try {
+    const result = await pool.query(
+      "SELECT * FROM member_linked_accounts WHERE login_id = $1",
+      [loginId]
+    );
+    return res.json({ account: result.rows[0] || null });
+  } catch (err) {
+    console.error("Error fetching linked account:", err);
+    return res.status(500).json({ error: "Failed to fetch linked account" });
+  }
+});
+
+// POST /api/member/:loginId/linked-account — create or replace
+app.post("/api/member/:loginId/linked-account", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  const { bankName, accountNumber, routingNumber, accountType, nickname } = req.body;
+  if (!bankName || !accountNumber || !routingNumber || !accountType) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+  if (!/^\d{9}$/.test(routingNumber)) {
+    return res.status(400).json({ error: "Routing number must be exactly 9 digits." });
+  }
+  if (!/^\d{4,17}$/.test(accountNumber)) {
+    return res.status(400).json({ error: "Account number must be 4–17 digits." });
+  }
+  try {
+    const result = await pool.query(
+      `INSERT INTO member_linked_accounts
+         (login_id, bank_name, account_number, routing_number, account_type, nickname, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
+       ON CONFLICT (login_id) DO UPDATE SET
+         bank_name = EXCLUDED.bank_name,
+         account_number = EXCLUDED.account_number,
+         routing_number = EXCLUDED.routing_number,
+         account_type = EXCLUDED.account_type,
+         nickname = EXCLUDED.nickname,
+         updated_at = NOW()
+       RETURNING *`,
+      [loginId, bankName, accountNumber, routingNumber, accountType, nickname || null]
+    );
+    return res.json({ account: result.rows[0] });
+  } catch (err) {
+    console.error("Error saving linked account:", err);
+    return res.status(500).json({ error: "Failed to save linked account" });
+  }
+});
+
+// DELETE /api/member/:loginId/linked-account
+app.delete("/api/member/:loginId/linked-account", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  try {
+    await pool.query("DELETE FROM member_linked_accounts WHERE login_id = $1", [loginId]);
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting linked account:", err);
+    return res.status(500).json({ error: "Failed to remove linked account" });
   }
 });
 
