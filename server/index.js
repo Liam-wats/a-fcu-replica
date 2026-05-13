@@ -47,7 +47,8 @@ async function migrate() {
   await pool.query(`
     ALTER TABLE membership_applications
       ADD COLUMN IF NOT EXISTS login_id TEXT UNIQUE,
-      ADD COLUMN IF NOT EXISTS password_hash TEXT
+      ADD COLUMN IF NOT EXISTS password_hash TEXT,
+      ADD COLUMN IF NOT EXISTS membership_year INTEGER
   `);
 }
 
@@ -290,27 +291,28 @@ app.put("/api/applications/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const {
     firstName, lastName, email, phone, dob, ssnLast4,
-    street, apt, city, state, zip, accountType, loginId, status, submittedAt,
+    street, apt, city, state, zip, accountType, loginId, membershipYear, status, submittedAt,
   } = req.body;
 
   try {
     const result = await pool.query(
       `UPDATE membership_applications SET
-         first_name    = COALESCE($1,  first_name),
-         last_name     = COALESCE($2,  last_name),
-         email         = COALESCE($3,  email),
-         phone         = COALESCE($4,  phone),
-         date_of_birth = COALESCE($5,  date_of_birth),
-         ssn_last4     = COALESCE($6,  ssn_last4),
-         street        = COALESCE($7,  street),
-         apt           = $8,
-         city          = COALESCE($9,  city),
-         state         = COALESCE($10, state),
-         zip           = COALESCE($11, zip),
-         account_type  = COALESCE($12, account_type),
-         login_id      = COALESCE($13, login_id),
-         status        = COALESCE($14, status),
-         submitted_at  = COALESCE($16, submitted_at)
+         first_name      = COALESCE($1,  first_name),
+         last_name       = COALESCE($2,  last_name),
+         email           = COALESCE($3,  email),
+         phone           = COALESCE($4,  phone),
+         date_of_birth   = COALESCE($5,  date_of_birth),
+         ssn_last4       = COALESCE($6,  ssn_last4),
+         street          = COALESCE($7,  street),
+         apt             = $8,
+         city            = COALESCE($9,  city),
+         state           = COALESCE($10, state),
+         zip             = COALESCE($11, zip),
+         account_type    = COALESCE($12, account_type),
+         login_id        = COALESCE($13, login_id),
+         status          = COALESCE($14, status),
+         submitted_at    = COALESCE($16, submitted_at),
+         membership_year = $17
        WHERE id = $15
        RETURNING *`,
       [
@@ -321,6 +323,7 @@ app.put("/api/applications/:id", requireAdmin, async (req, res) => {
         accountType || null, loginId || null, status || null,
         id,
         submittedAt ? new Date(submittedAt).toISOString() : null,
+        membershipYear != null ? parseInt(membershipYear, 10) : null,
       ]
     );
 
@@ -343,7 +346,7 @@ app.get("/api/applications", requireAdmin, async (_req, res) => {
     const result = await pool.query(
       `SELECT id, reference_number, first_name, last_name, email, phone,
               date_of_birth, ssn_last4, street, apt, city, state, zip,
-              account_type, login_id, status, submitted_at
+              account_type, login_id, membership_year, status, submitted_at
        FROM membership_applications
        ORDER BY submitted_at DESC
        LIMIT 200`
@@ -361,7 +364,7 @@ app.get("/api/applications/:ref", requireAdmin, async (req, res) => {
     const result = await pool.query(
       `SELECT id, reference_number, first_name, last_name, email, phone,
               street, apt, city, state, zip, date_of_birth, ssn_last4,
-              account_type, login_id, status, submitted_at
+              account_type, login_id, membership_year, status, submitted_at
        FROM membership_applications WHERE reference_number = $1`,
       [req.params.ref]
     );

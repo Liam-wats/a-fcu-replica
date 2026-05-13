@@ -40,6 +40,7 @@ interface Application {
   zip: string;
   account_type: string;
   login_id: string | null;
+  membership_year: number | null;
   status: Status;
   submitted_at: string;
 }
@@ -199,6 +200,7 @@ function EditDrawer({
           city: form.city || undefined, state: form.state || undefined,
           zip: form.zip || undefined,
           accountType: form.account_type, loginId: form.login_id ?? "",
+          membershipYear: form.membership_year ?? null,
           status: form.status,
           submittedAt: form.submitted_at || undefined,
         }),
@@ -466,6 +468,25 @@ function EditDrawer({
                 <div className="text-[11px] text-slate-400 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" />
                   Password hash is stored separately and cannot be viewed.
+                </div>
+              </FieldGroup>
+
+              <FieldGroup label="Membership">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-500 mb-0.5">Membership Year</label>
+                  <input
+                    type="number"
+                    min="1900"
+                    max="2100"
+                    placeholder="e.g. 2024"
+                    value={form.membership_year ?? ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setForm((f) => ({ ...f, membership_year: val === "" ? null : parseInt(val, 10) }));
+                      setSaved(false);
+                    }}
+                    className="w-full text-sm text-slate-800 px-2.5 py-1.5 border border-slate-200 rounded outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/20 transition-all"
+                  />
                 </div>
               </FieldGroup>
 
