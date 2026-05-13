@@ -686,6 +686,47 @@ app.post("/api/member/:loginId/deposit", requireAuth, upload.fields([{ name: "fr
   }
 });
 
+// GET /api/member/:loginId/deposits — list past check deposits
+app.get("/api/member/:loginId/deposits", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  try {
+    const result = await pool.query(
+      `SELECT id, amount, status, created_at FROM check_deposits
+       WHERE login_id = $1 ORDER BY created_at DESC LIMIT 50`,
+      [loginId]
+    );
+    return res.json({ deposits: result.rows });
+  } catch (err) {
+    console.error("Deposits list error:", err);
+    return res.status(500).json({ error: "Failed to fetch deposit history." });
+  }
+});
+
+// GET /api/member/:loginId/deposits/:id/image/:side — serve check image
+app.get("/api/member/:loginId/deposits/:id/image/:side", requireAuth, async (req, res) => {
+  const { loginId, id, side } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  if (!["front", "back"].includes(side)) return res.status(400).json({ error: "Invalid side." });
+  try {
+    const col = side === "front" ? "front_image, front_mime" : "back_image, back_mime";
+    const result = await pool.query(
+      `SELECT ${col} FROM check_deposits WHERE id = $1 AND login_id = $2`,
+      [id, loginId]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: "Not found." });
+    const row = result.rows[0];
+    const image = side === "front" ? row.front_image : row.back_image;
+    const mime  = side === "front" ? row.front_mime  : row.back_mime;
+    res.set("Content-Type", mime);
+    res.set("Cache-Control", "private, max-age=3600");
+    return res.send(image);
+  } catch (err) {
+    console.error("Deposit image error:", err);
+    return res.status(500).json({ error: "Failed to load image." });
+  }
+});
+
 // GET /api/member/:loginId/linked-account
 app.get("/api/member/:loginId/linked-account", requireAuth, async (req, res) => {
   const { loginId } = req.params;

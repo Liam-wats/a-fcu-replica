@@ -176,13 +176,21 @@ function DepositPage() {
 
       <div className="bg-white border border-border shadow-sm">
         <div className="h-1 bg-brand-green" />
-        <div className="px-8 py-6 border-b border-border">
-          <div className="flex items-center gap-2 mb-1">
-            <Smartphone className="w-4 h-4 text-brand-green" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-brand-green">Online Banking</span>
+        <div className="px-8 py-6 border-b border-border flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Smartphone className="w-4 h-4 text-brand-green" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-green">Online Banking</span>
+            </div>
+            <h1 className="font-serif text-2xl text-ink">Mobile Check Deposit</h1>
+            <p className="text-[13px] text-ink/50 mt-1">Take a photo of your check to deposit it instantly.</p>
           </div>
-          <h1 className="font-serif text-2xl text-ink">Mobile Check Deposit</h1>
-          <p className="text-[13px] text-ink/50 mt-1">Take a photo of your check to deposit it instantly.</p>
+          <Link
+            to="/dashboard/deposit-history"
+            className="shrink-0 text-[12px] font-semibold text-brand-green hover:underline underline-offset-4 mt-1"
+          >
+            View History →
+          </Link>
         </div>
 
         <div className="px-8 py-6">
