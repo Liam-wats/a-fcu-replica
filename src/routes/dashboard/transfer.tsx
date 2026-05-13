@@ -2,11 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   ArrowLeftRight, ArrowLeft, Loader2, AlertCircle, Info,
-  Building2, X, ChevronRight, ShieldCheck, Mail, XCircle,
+  Building2, X, ChevronRight, ShieldCheck, XCircle,
 } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
-import { generateAccountNumber, maskAccountNumber, getLinkedAccount } from "@/lib/utils";
+import { generateAccountNumber, getLinkedAccount } from "@/lib/utils";
 import emailjs from "@emailjs/browser";
 
 export const Route = createFileRoute("/dashboard/transfer")({
@@ -29,7 +29,7 @@ function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-type Step = "form" | "otp" | "failed";
+type Step = "form" | "failed";
 
 function TransferPage() {
   const navigate = useNavigate();
@@ -37,18 +37,12 @@ function TransferPage() {
   const [balance, setBalance] = useState<{ available: number; current: number } | null>(null);
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
-  const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [showExtModal, setShowExtModal] = useState(false);
-  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
   const [step, setStep] = useState<Step>("form");
-  const [otpCode, setOtpCode] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
-  const [otpError, setOtpError] = useState("");
-  const [sendingOtp, setSendingOtp] = useState(false);
-  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [sending, setSending] = useState(false);
+  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   useEffect(() => {
     const raw = sessionStorage.getItem("apfcu_session");
@@ -77,11 +71,9 @@ function TransferPage() {
       return setError(`Amount exceeds your available balance of ${fmt(balance.available)}.`);
     if (!session?.loginId) return setError("Session expired. Please log in again.");
 
-    setSendingOtp(true);
+    setSending(true);
     try {
       const otp = generateOtp();
-      setGeneratedOtp(otp);
-
       await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
@@ -100,63 +92,10 @@ function TransferPage() {
         },
         EMAILJS_PUBLIC_KEY
       );
-
-      setStep("otp");
     } catch {
-      setError("Unable to send verification code. Please try again.");
     } finally {
-      setSendingOtp(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setOtpError("");
-
-    if (otpCode.trim().length !== 6) {
-      return setOtpError("Please enter the 6-digit code sent to your email.");
-    }
-
-    if (otpCode.trim() !== generatedOtp) {
-      return setOtpError("Incorrect verification code. Please check your email and try again.");
-    }
-
-    setVerifyingOtp(true);
-    await new Promise(r => setTimeout(r, 1800));
-    setVerifyingOtp(false);
-    setStep("failed");
-  };
-
-  const handleResend = async () => {
-    if (!session) return;
-    setSendingOtp(true);
-    setOtpError("");
-    setOtpCode("");
-    try {
-      const otp = generateOtp();
-      setGeneratedOtp(otp);
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          first_name: session.firstName,
-          last_name: session.lastName,
-          email: session.email,
-          reply_to: session.email,
-          subject: "Your A+FCU Transfer Verification Code (Resent)",
-          message: `Your new one-time verification code is:\n\n${otp}\n\nThis code expires in 10 minutes.`,
-          time: new Date().toLocaleString("en-US", {
-            weekday: "long", year: "numeric", month: "long",
-            day: "numeric", hour: "2-digit", minute: "2-digit",
-            timeZoneName: "short",
-          }),
-        },
-        EMAILJS_PUBLIC_KEY
-      );
-    } catch {
-      setOtpError("Could not resend code. Please try again.");
-    } finally {
-      setSendingOtp(false);
+      setSending(false);
+      setStep("failed");
     }
   };
 
@@ -166,7 +105,6 @@ function TransferPage() {
   const linked = getLinkedAccount(session.referenceNumber);
   const parsedAmount = parseFloat(amount) || 0;
   const afterBalance = balance ? balance.available - parsedAmount : null;
-  const maskedEmail = session.email.replace(/(.{2}).+(@.+)/, "$1•••$2");
 
   return (
     <div className="container-x py-8 max-w-2xl">
@@ -293,99 +231,18 @@ function TransferPage() {
 
                 <button
                   type="submit"
-                  disabled={sendingOtp || fetching || !amount || parsedAmount <= 0 || (!!balance && parsedAmount > balance.available)}
+                  disabled={sending || fetching || !amount || parsedAmount <= 0 || (!!balance && parsedAmount > balance.available)}
                   className="w-full bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors"
                 >
-                  {sendingOtp ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Sending Code…</>
+                  {sending ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
                   ) : (
-                    <><ArrowLeftRight className="w-4 h-4" /> Continue to Verify</>
+                    <><ArrowLeftRight className="w-4 h-4" /> Confirm Withdrawal</>
                   )}
                 </button>
               </form>
             </div>
           </>
-        )}
-
-        {/* ── STEP: OTP VERIFICATION ── */}
-        {step === "otp" && (
-          <div className="px-8 py-8">
-            <div className="flex flex-col items-center text-center mb-8">
-              <div className="w-14 h-14 bg-brand-green/10 border border-brand-green/20 flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-brand-green" />
-              </div>
-              <h2 className="font-serif text-xl text-ink mb-1">Verify Your Identity</h2>
-              <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed">
-                We sent a 6-digit verification code to <span className="font-semibold text-ink">{maskedEmail}</span>.
-                Enter it below to authorize the transfer.
-              </p>
-            </div>
-
-            <div className="bg-secondary/40 border border-border px-5 py-4 flex justify-between items-center mb-6 text-[13px]">
-              <span className="text-ink/50">Transfer Amount</span>
-              <span className="font-semibold text-ink font-serif text-base">{fmt(parsedAmount)}</span>
-            </div>
-
-            {otpError && (
-              <div className="mb-5 bg-red-50 border-l-4 border-red-500 text-red-700 text-[13px] px-4 py-3 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> {otpError}
-              </div>
-            )}
-
-            <form onSubmit={handleVerifyOtp} className="space-y-5">
-              <div>
-                <label className="block text-[13px] font-semibold text-ink mb-1.5">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  placeholder="000000"
-                  autoFocus
-                  className="w-full border border-border bg-white px-4 py-3 text-center text-2xl font-mono tracking-[0.5em] text-ink outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 transition-all"
-                  value={otpCode}
-                  onChange={e => {
-                    setOtpError("");
-                    setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6));
-                  }}
-                />
-                <p className="text-[11px] text-ink/40 mt-1.5 text-center">
-                  Check your spam folder if you don't see it.
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={verifyingOtp || otpCode.length !== 6}
-                className="w-full bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors"
-              >
-                {verifyingOtp ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing Transfer…</>
-                ) : (
-                  "Confirm Transfer"
-                )}
-              </button>
-            </form>
-
-            <div className="mt-5 flex items-center justify-between text-[12px] text-ink/50">
-              <button
-                type="button"
-                onClick={() => { setStep("form"); setOtpCode(""); setOtpError(""); }}
-                className="hover:text-ink transition-colors"
-              >
-                ← Go back
-              </button>
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={sendingOtp}
-                className="hover:text-brand-green transition-colors disabled:opacity-50"
-              >
-                {sendingOtp ? "Resending…" : "Resend code"}
-              </button>
-            </div>
-          </div>
         )}
 
         {/* ── STEP: FAILED ── */}
@@ -412,7 +269,7 @@ function TransferPage() {
             </div>
             <div className="flex gap-3 w-full">
               <button
-                onClick={() => { setStep("form"); setOtpCode(""); setOtpError(""); setGeneratedOtp(""); }}
+                onClick={() => { setStep("form"); setError(""); setAmount(""); setMemo(""); }}
                 className="flex-1 border border-border bg-secondary/40 hover:bg-secondary text-ink py-3 font-semibold text-sm transition-colors"
               >
                 Try Again
