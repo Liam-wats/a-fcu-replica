@@ -4,6 +4,7 @@ import pg from "pg";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import multer from "multer";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { existsSync } from "fs";
@@ -53,6 +54,23 @@ async function migrate() {
 }
 
 migrate().catch((err) => console.warn("DB migrate skipped:", err.message));
+
+async function migrateCheckDeposits() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS check_deposits (
+      id SERIAL PRIMARY KEY,
+      login_id TEXT NOT NULL,
+      amount NUMERIC NOT NULL,
+      front_image BYTEA NOT NULL,
+      front_mime TEXT NOT NULL,
+      back_image BYTEA NOT NULL,
+      back_mime TEXT NOT NULL,
+      status TEXT DEFAULT 'submitted',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+}
+migrateCheckDeposits().catch((err) => console.warn("DB migrateCheckDeposits skipped:", err.message));
 
 async function migrateAccountData() {
   await pool.query(`
@@ -185,6 +203,17 @@ function createTransporter() {
     auth: { user, pass },
   });
 }
+
+// ── Multer (memory storage — images stored in DB) ────────────────────────────
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB per file
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Only image files are allowed."));
+  },
+});
 
 // ── Express setup ────────────────────────────────────────────────────────────
 
@@ -595,6 +624,67 @@ app.get("/api/member/:loginId/account", requireAuth, async (req, res) => {
 });
 
 // ── Linked External Account endpoints ────────────────────────────────────────
+
+// POST /api/member/:loginId/deposit — submit a mobile check deposit with images
+app.post("/api/member/:loginId/deposit", requireAuth, upload.fields([{ name: "front", maxCount: 1 }, { name: "back", maxCount: 1 }]), async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+
+  const files = req.files;
+  const frontFile = files?.front?.[0];
+  const backFile  = files?.back?.[0];
+
+  if (!frontFile || !backFile) {
+    return res.status(400).json({ error: "Both front and back check images are required." });
+  }
+
+  const amount = parseFloat(req.body.amount);
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: "Invalid deposit amount." });
+  }
+  if (amount > 5000) {
+    return res.status(400).json({ error: "Amount exceeds the $5,000 daily mobile deposit limit." });
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  try {
+    await pool.query(
+      `INSERT INTO check_deposits (login_id, amount, front_image, front_mime, back_image, back_mime)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [loginId, amount, frontFile.buffer, frontFile.mimetype, backFile.buffer, backFile.mimetype]
+    );
+
+    const balRes = await pool.query("SELECT available_balance, current_balance FROM member_balances WHERE login_id = $1", [loginId]);
+    const cur = balRes.rows[0] ?? { available_balance: 0, current_balance: 0 };
+    const newAvail   = parseFloat(cur.available_balance)   + amount;
+    const newCurrent = parseFloat(cur.current_balance) + amount;
+
+    await pool.query(
+      `INSERT INTO member_balances (login_id, available_balance, current_balance, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (login_id) DO UPDATE
+       SET available_balance = $2, current_balance = $3, updated_at = NOW()`,
+      [loginId, newAvail, newCurrent]
+    );
+
+    const txnDate = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const txRes = await pool.query(
+      `INSERT INTO member_transactions (login_id, txn_date, description, category, amount, txn_type)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [loginId, txnDate, "Mobile Check Deposit", "Deposit", amount, "credit"]
+    );
+
+    return res.status(201).json({
+      success: true,
+      transaction: txRes.rows[0],
+      newBalance: { available: newAvail, current: newCurrent },
+    });
+  } catch (err) {
+    console.error("Deposit error:", err);
+    return res.status(500).json({ error: "Failed to process deposit. Please try again." });
+  }
+});
 
 // GET /api/member/:loginId/linked-account
 app.get("/api/member/:loginId/linked-account", requireAuth, async (req, res) => {

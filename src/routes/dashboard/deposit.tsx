@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { Smartphone, CheckCircle2, ArrowLeft, Loader2, AlertCircle, Upload } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Smartphone, CheckCircle2, ArrowLeft, Loader2, AlertCircle, Upload, X } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
 
@@ -12,16 +12,105 @@ function fmt(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
+function getToken() {
+  return sessionStorage.getItem("apfcu_token") || "";
+}
+
+interface ImageFile {
+  file: File;
+  preview: string;
+}
+
+function CheckImageUpload({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: ImageFile | null;
+  onChange: (img: ImageFile | null) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (file: File) => {
+    const preview = URL.createObjectURL(file);
+    onChange({ file, preview });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) handleFile(file);
+  };
+
+  const handleRemove = () => {
+    if (value) URL.revokeObjectURL(value.preview);
+    onChange(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[13px] font-semibold text-ink">{label}</span>
+      {value ? (
+        <div className="relative border-2 border-brand-green rounded overflow-hidden bg-brand-green/5">
+          <img
+            src={value.preview}
+            alt={label}
+            className="w-full h-36 object-contain p-2"
+          />
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-1.5 right-1.5 bg-white border border-border rounded-full p-0.5 shadow hover:bg-red-50 hover:border-red-200 transition-colors"
+          >
+            <X className="w-3.5 h-3.5 text-ink/60" />
+          </button>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-t border-brand-green/20 bg-brand-green/10">
+            <CheckCircle2 className="w-3.5 h-3.5 text-brand-green shrink-0" />
+            <span className="text-[12px] font-semibold text-brand-green truncate">{value.file.name}</span>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDrop={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+          className="border-2 border-dashed border-border hover:border-brand-green/50 rounded p-6 flex flex-col items-center gap-2 transition-all text-center cursor-pointer bg-secondary/30 hover:bg-brand-green/5"
+        >
+          <Upload className="w-6 h-6 text-ink/30" />
+          <span className="text-[13px] font-semibold text-ink/50">Upload {label}</span>
+          <span className="text-[11px] text-ink/35">Click to browse or drag &amp; drop</span>
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleChange}
+      />
+    </div>
+  );
+}
+
 function DepositPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [balance, setBalance] = useState<{ available: number; current: number } | null>(null);
   const [amount, setAmount] = useState("");
-  const [checkFront, setCheckFront] = useState(false);
-  const [checkBack, setCheckBack] = useState(false);
+  const [frontImage, setFrontImage] = useState<ImageFile | null>(null);
+  const [backImage, setBackImage]   = useState<ImageFile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const [successAmount, setSuccessAmount] = useState("");
 
   useEffect(() => {
     const raw = sessionStorage.getItem("apfcu_session");
@@ -29,7 +118,9 @@ function DepositPage() {
     const s: Session = JSON.parse(raw);
     setSession(s);
     if (s.loginId) {
-      fetch(`/api/member/${s.loginId}/account`)
+      fetch(`/api/member/${s.loginId}/account`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
         .then(r => r.json())
         .then(d => setBalance(d.balance));
     }
@@ -38,39 +129,37 @@ function DepositPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     const num = parseFloat(amount);
     if (!num || num <= 0) return setError("Please enter a valid deposit amount.");
-    if (!checkFront || !checkBack) return setError("Please confirm you have uploaded both sides of the check.");
+    if (!frontImage) return setError("Please upload the front of the check.");
+    if (!backImage)  return setError("Please upload the back of the check.");
     if (!session?.loginId) return setError("Session expired. Please log in again.");
 
     setLoading(true);
     try {
-      const newAvail = (balance?.available ?? 0) + num;
-      const newCurrent = (balance?.current ?? 0) + num;
+      const formData = new FormData();
+      formData.append("amount", String(num));
+      formData.append("front", frontImage.file);
+      formData.append("back",  backImage.file);
 
-      await fetch(`/api/member/${session.loginId}/balance`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ available: newAvail, current: newCurrent }),
-      });
-      await fetch(`/api/member/${session.loginId}/transactions`, {
+      const res = await fetch(`/api/member/${session.loginId}/deposit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          txn_date: today,
-          description: "Mobile Check Deposit",
-          category: "Deposit",
-          amount: num,
-          txn_type: "credit",
-        }),
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: formData,
       });
-      setBalance({ available: newAvail, current: newCurrent });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Deposit failed.");
+
+      setSuccessAmount(fmt(num));
+      setBalance(data.newBalance);
       setSuccess(true);
       setAmount("");
-      setCheckFront(false);
-      setCheckBack(false);
-    } catch {
-      setError("Deposit failed. Please try again.");
+      setFrontImage(null);
+      setBackImage(null);
+    } catch (err: any) {
+      setError(err.message || "Deposit failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -93,7 +182,7 @@ function DepositPage() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-brand-green">Online Banking</span>
           </div>
           <h1 className="font-serif text-2xl text-ink">Mobile Check Deposit</h1>
-          <p className="text-[13px] text-ink/50 mt-1">Deposit a check by confirming the details below.</p>
+          <p className="text-[13px] text-ink/50 mt-1">Take a photo of your check to deposit it instantly.</p>
         </div>
 
         <div className="px-8 py-6">
@@ -103,7 +192,7 @@ function DepositPage() {
               <div>
                 <p className="font-semibold text-emerald-800 text-sm">Deposit Submitted</p>
                 <p className="text-[13px] text-emerald-700 mt-0.5">
-                  Your deposit of {amount && fmt(parseFloat(amount) || 0)} has been accepted. Funds will be available by end of business day.
+                  Your deposit of {successAmount} has been accepted. Funds will be available by end of business day.
                 </p>
               </div>
             </div>
@@ -130,6 +219,7 @@ function DepositPage() {
                   type="number"
                   step="0.01"
                   min="0.01"
+                  max="5000"
                   placeholder="0.00"
                   className="w-full border border-border bg-white pl-8 pr-4 py-3 text-sm text-ink outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/10 transition-all"
                   value={amount}
@@ -138,30 +228,9 @@ function DepositPage() {
               </div>
             </div>
 
-            {/* Simulated upload areas */}
             <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { label: "Front of Check", state: checkFront, set: setCheckFront },
-                { label: "Back of Check", state: checkBack, set: setCheckBack },
-              ].map(({ label, state, set }) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => set(v => !v)}
-                  className={`border-2 border-dashed p-6 flex flex-col items-center gap-2 transition-all text-center ${
-                    state ? "border-brand-green bg-brand-green/5" : "border-border hover:border-brand-green/50"
-                  }`}
-                >
-                  {state
-                    ? <CheckCircle2 className="w-6 h-6 text-brand-green" />
-                    : <Upload className="w-6 h-6 text-ink/30" />
-                  }
-                  <span className={`text-[13px] font-semibold ${state ? "text-brand-green" : "text-ink/50"}`}>
-                    {state ? "✓ Uploaded" : label}
-                  </span>
-                  {!state && <span className="text-[11px] text-ink/35">Click to simulate upload</span>}
-                </button>
-              ))}
+              <CheckImageUpload label="Front of Check" value={frontImage} onChange={setFrontImage} />
+              <CheckImageUpload label="Back of Check"  value={backImage}  onChange={setBackImage} />
             </div>
 
             <div className="border border-border bg-secondary/30 px-4 py-3">
