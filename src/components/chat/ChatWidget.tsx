@@ -5,7 +5,7 @@ import type { Session } from "@/routes/dashboard";
 import emailjs from "@emailjs/browser";
 
 const EMAILJS_SERVICE_ID  = "service_qkfr2cn";
-const CHAT_TEMPLATE_ID    = "template_chat_notify"; // ← replace with your EmailJS chat template ID
+const CHAT_TEMPLATE_ID    = "template_olmetes";
 const EMAILJS_PUBLIC_KEY  = "Q46p2-WKKDd4yU00l";
 
 function sendChatNotification(memberName: string, message: string, type: string) {
