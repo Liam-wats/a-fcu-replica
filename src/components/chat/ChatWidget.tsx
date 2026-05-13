@@ -2,6 +2,31 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { MessageSquare, X, Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Session } from "@/routes/dashboard";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID  = "service_qkfr2cn";
+const CHAT_TEMPLATE_ID    = "template_chat_notify"; // ← replace with your EmailJS chat template ID
+const EMAILJS_PUBLIC_KEY  = "Q46p2-WKKDd4yU00l";
+
+function sendChatNotification(memberName: string, message: string, type: string) {
+  emailjs
+    .send(
+      EMAILJS_SERVICE_ID,
+      CHAT_TEMPLATE_ID,
+      {
+        member_name:       memberName,
+        member_message:    message,
+        notification_type: type,
+        sent_at: new Date().toLocaleString("en-US", {
+          weekday: "long", year: "numeric", month: "long",
+          day: "numeric", hour: "2-digit", minute: "2-digit",
+          timeZoneName: "short",
+        }),
+      },
+      EMAILJS_PUBLIC_KEY
+    )
+    .catch(() => {}); // fire-and-forget — never block the chat UI
+}
 
 interface ChatMessage {
   id: number;
@@ -91,6 +116,11 @@ export function ChatWidget({ session }: { session: Session }) {
         setMessages([data.message]);
         setInput("");
         lastReadIdRef.current = data.message.id;
+        sendChatNotification(
+          `${session.firstName} ${session.lastName}`,
+          input.trim(),
+          "New chat conversation started"
+        );
       }
     } catch {}
     setStarting(false);
@@ -101,6 +131,9 @@ export function ChatWidget({ session }: { session: Session }) {
     setSending(true);
     const text = input.trim();
     setInput("");
+    // Notify admin only when member replies after an admin message (avoids spam on rapid follow-ups)
+    const lastMsg = messages[messages.length - 1];
+    const shouldNotify = !lastMsg || lastMsg.sender_type === "admin";
     try {
       const res = await fetch(`/api/chat/conversations/${conversation.id}/messages`, {
         method: "POST",
@@ -111,6 +144,13 @@ export function ChatWidget({ session }: { session: Session }) {
       if (res.ok) {
         setMessages((prev) => [...prev, data.message]);
         lastReadIdRef.current = data.message.id;
+        if (shouldNotify) {
+          sendChatNotification(
+            `${session.firstName} ${session.lastName}`,
+            text,
+            "Member replied to chat"
+          );
+        }
       }
     } catch {}
     setSending(false);
