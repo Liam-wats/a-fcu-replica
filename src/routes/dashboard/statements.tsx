@@ -145,8 +145,8 @@ function StatementsPage() {
       .map(([, v]) => v);
   }, [filtered]);
 
-  const totalCredits = filtered.filter(t => t.txn_type === "credit").reduce((s, t) => s + t.amount, 0);
-  const totalDebits  = filtered.filter(t => t.txn_type === "debit").reduce((s, t) => s + t.amount, 0);
+  const totalCredits = filtered.filter(t => t.txn_type === "credit").reduce((s, t) => s + Number(t.amount), 0);
+  const totalDebits  = filtered.filter(t => t.txn_type === "debit").reduce((s, t) => s + Number(t.amount), 0);
   const netFlow      = totalCredits - totalDebits;
 
   const hasFilters = search || typeFilter !== "all" || catFilter !== "all" || dateFrom || dateTo;
@@ -374,8 +374,8 @@ function StatementsPage() {
           ) : (
             <div className="space-y-6">
               {grouped.map(({ label, txns }) => {
-                const mCredits = txns.filter(t => t.txn_type === "credit").reduce((s, t) => s + t.amount, 0);
-                const mDebits  = txns.filter(t => t.txn_type === "debit").reduce((s, t) => s + t.amount, 0);
+                const mCredits = txns.filter(t => t.txn_type === "credit").reduce((s, t) => s + Number(t.amount), 0);
+                const mDebits  = txns.filter(t => t.txn_type === "debit").reduce((s, t) => s + Number(t.amount), 0);
                 return (
                   <div key={label}>
                     {/* Month header */}
@@ -427,7 +427,7 @@ function StatementsPage() {
                           <p className={`text-[14px] font-bold tabular-nums shrink-0 ml-4 ${
                             tx.txn_type === "debit" ? "text-ink" : "text-emerald-600"
                           }`}>
-                            {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(tx.amount))}
+                            {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(Number(tx.amount)))}
                           </p>
                         </div>
                       ))}
