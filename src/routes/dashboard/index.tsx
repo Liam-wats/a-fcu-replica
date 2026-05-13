@@ -47,6 +47,7 @@ function DashboardOverview() {
   const [data, setData] = useState<AccountData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
+  const [showAccountNumber, setShowAccountNumber] = useState(false);
   const [greeting, setGreeting] = useState("Good morning");
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
@@ -134,7 +135,11 @@ function DashboardOverview() {
   if (!session) return null;
 
   const accountLabel  = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
-  const accountNumber = maskAccountNumber(generateAccountNumber(session.referenceNumber));
+  const rawAccountNumber  = generateAccountNumber(session.referenceNumber);
+  const maskedAccountNumber = maskAccountNumber(rawAccountNumber);
+  const displayedAccountNumber = showAccountNumber
+    ? rawAccountNumber.replace(/(\d{4})(\d{3})(\d{3})/, "$1  $2  $3")
+    : maskedAccountNumber;
   const isChecking    = session.accountType.includes("checking");
   const available     = data?.balance.available ?? 0;
   const current       = data?.balance.current ?? 0;
@@ -215,7 +220,16 @@ function DashboardOverview() {
               </div>
               <div>
                 <p className="text-[11px] text-ink/45 font-semibold uppercase tracking-wide mb-1">Account Number</p>
-                <p className="font-mono text-base text-ink tracking-widest mt-2">{accountNumber}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="font-mono text-base text-ink tracking-widest">{displayedAccountNumber}</p>
+                  <button
+                    onClick={() => setShowAccountNumber(v => !v)}
+                    className="text-ink/25 hover:text-ink/60 transition-colors shrink-0"
+                    title={showAccountNumber ? "Hide account number" : "Show account number"}
+                  >
+                    {showAccountNumber ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
           )}

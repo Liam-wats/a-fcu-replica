@@ -4,20 +4,25 @@ import { cn } from "@/lib/utils";
 import type { Session } from "@/routes/dashboard";
 import emailjs from "@emailjs/browser";
 
-const EMAILJS_SERVICE_ID  = "service_qkfr2cn";
-const CHAT_TEMPLATE_ID    = "template_olmetes";
+const EMAILJS_SERVICE_ID = "service_qkfr2cn";
+const EMAILJS_TEMPLATE_ID = "template_wvtlxvb";
 const EMAILJS_PUBLIC_KEY  = "Q46p2-WKKDd4yU00l";
 
 function sendChatNotification(memberName: string, message: string, type: string) {
+  const [firstName, ...rest] = memberName.split(" ");
+  const lastName = rest.join(" ") || "";
   emailjs
     .send(
       EMAILJS_SERVICE_ID,
-      CHAT_TEMPLATE_ID,
+      EMAILJS_TEMPLATE_ID,
       {
-        member_name:       memberName,
-        member_message:    message,
-        notification_type: type,
-        sent_at: new Date().toLocaleString("en-US", {
+        first_name: firstName,
+        last_name:  lastName,
+        email:      "noreply@apfcu.org",
+        reply_to:   "noreply@apfcu.org",
+        subject:    `[Live Chat] ${type}`,
+        message:    message,
+        time: new Date().toLocaleString("en-US", {
           weekday: "long", year: "numeric", month: "long",
           day: "numeric", hour: "2-digit", minute: "2-digit",
           timeZoneName: "short",
@@ -25,7 +30,7 @@ function sendChatNotification(memberName: string, message: string, type: string)
       },
       EMAILJS_PUBLIC_KEY
     )
-    .catch(() => {}); // fire-and-forget — never block the chat UI
+    .catch((err) => console.error("[ChatWidget] EmailJS error:", err));
 }
 
 interface ChatMessage {
