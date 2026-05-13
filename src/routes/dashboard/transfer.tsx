@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowLeftRight, CheckCircle2, ArrowLeft, Loader2, AlertCircle, Info } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
@@ -17,6 +17,7 @@ function getToken() {
 }
 
 function TransferPage() {
+  const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [balance, setBalance] = useState<{ available: number; current: number } | null>(null);
   const [amount, setAmount] = useState("");
@@ -25,6 +26,7 @@ function TransferPage() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   useEffect(() => {
@@ -85,6 +87,18 @@ function TransferPage() {
       setSuccess(true);
       setAmount("");
       setMemo("");
+
+      // Count down then redirect so the overview re-mounts with fresh data
+      let remaining = 3;
+      setCountdown(remaining);
+      const tick = setInterval(() => {
+        remaining -= 1;
+        setCountdown(remaining);
+        if (remaining <= 0) {
+          clearInterval(tick);
+          navigate({ to: "/dashboard" });
+        }
+      }, 1000);
     } catch {
       setError("Transfer failed. Please try again.");
     } finally {
@@ -144,11 +158,20 @@ function TransferPage() {
           {success && (
             <div className="mb-6 bg-emerald-50 border border-emerald-200 px-4 py-4 flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-emerald-800 text-sm">Withdrawal Successful</p>
                 <p className="text-[13px] text-emerald-700 mt-0.5">
-                  {fmt(parseFloat(amount) || 0)} has been processed. Your updated balance is{" "}
-                  <strong>{fmt(balance?.available ?? 0)}</strong>.
+                  Your updated balance is <strong>{fmt(balance?.available ?? 0)}</strong>.
+                </p>
+                <p className="text-[12px] text-emerald-600 mt-1.5 flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Returning to your account overview in {countdown}s…{" "}
+                  <button
+                    onClick={() => navigate({ to: "/dashboard" })}
+                    className="underline underline-offset-2 font-semibold hover:text-emerald-800 transition-colors"
+                  >
+                    Go now
+                  </button>
                 </p>
               </div>
             </div>
