@@ -50,6 +50,3 @@ build = ["npm", "run", "build"]
 [userenv]
 
 [userenv.shared]
-JWT_SECRET = "aaf587c3563924fe2209937fe3f1ffe78e438d3a34a94aa81c3008d126122061af862c7b802e760be7e66606c4020790"
-ADMIN_PASSWORD = "Banks112"
-PG_CONNECTION_STRING = "postgresql://a_plus_fcu_user:NQkxlvedyjl4l8dotrs4aueru0WDDzjg@dpg-d81nn4l0lvsc73fmns5g-a/a_plus_fcu"
