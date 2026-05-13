@@ -1218,6 +1218,66 @@ app.put("/api/admin/chat/conversations/:id/status", requireAdmin, async (req, re
   }
 });
 
+// ── Admin deposit endpoints ───────────────────────────────────────────────────
+
+// GET /api/admin/deposits — list all deposits across all members
+app.get("/api/admin/deposits", requireAdmin, async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT cd.id, cd.login_id, cd.amount, cd.status, cd.created_at,
+             ma.first_name, ma.last_name, ma.email
+      FROM check_deposits cd
+      LEFT JOIN membership_applications ma ON ma.login_id = cd.login_id
+      ORDER BY cd.created_at DESC
+      LIMIT 200
+    `);
+    return res.json({ deposits: result.rows });
+  } catch (err) {
+    console.error("Admin deposits list error:", err);
+    return res.status(500).json({ error: "Failed to fetch deposits." });
+  }
+});
+
+// PUT /api/admin/deposits/:id/status — update deposit status
+app.put("/api/admin/deposits/:id/status", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!["submitted", "approved", "rejected"].includes(status)) {
+    return res.status(400).json({ error: "Invalid status." });
+  }
+  try {
+    const result = await pool.query(
+      "UPDATE check_deposits SET status = $1 WHERE id = $2 RETURNING id, status",
+      [status, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: "Deposit not found." });
+    return res.json({ success: true, deposit: result.rows[0] });
+  } catch (err) {
+    console.error("Admin deposit status error:", err);
+    return res.status(500).json({ error: "Failed to update status." });
+  }
+});
+
+// GET /api/admin/deposits/:id/image/:side — serve check image for admin
+app.get("/api/admin/deposits/:id/image/:side", requireAdmin, async (req, res) => {
+  const { id, side } = req.params;
+  if (!["front", "back"].includes(side)) return res.status(400).json({ error: "Invalid side." });
+  try {
+    const col = side === "front" ? "front_image, front_mime" : "back_image, back_mime";
+    const result = await pool.query(`SELECT ${col} FROM check_deposits WHERE id = $1`, [id]);
+    if (!result.rows[0]) return res.status(404).json({ error: "Not found." });
+    const row = result.rows[0];
+    const image = side === "front" ? row.front_image : row.back_image;
+    const mime  = side === "front" ? row.front_mime  : row.back_mime;
+    res.set("Content-Type", mime);
+    res.set("Cache-Control", "private, max-age=3600");
+    return res.send(image);
+  } catch (err) {
+    console.error("Admin deposit image error:", err);
+    return res.status(500).json({ error: "Failed to load image." });
+  }
+});
+
 // ── Static frontend (production) ─────────────────────────────────────────────
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

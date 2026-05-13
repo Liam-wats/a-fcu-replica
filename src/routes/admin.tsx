@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Globe, ChevronRight, Users, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Menu, X, MessageSquare } from "lucide-react";
+import { LayoutDashboard, LogOut, Globe, ChevronRight, Users, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Menu, X, MessageSquare, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
@@ -9,7 +9,8 @@ export const Route = createFileRoute("/admin")({
 
 const NAV = [
   { label: "Applications", icon: LayoutDashboard, href: "/admin" },
-  { label: "Live Chat", icon: MessageSquare, href: "/admin/chat" },
+  { label: "Live Chat",    icon: MessageSquare,   href: "/admin/chat" },
+  { label: "Deposits",     icon: Smartphone,      href: "/admin/deposits" },
 ];
 
 const SESSION_KEY = "apfcu_admin_session";

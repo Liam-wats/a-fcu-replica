@@ -54,6 +54,7 @@ import { Route as DashboardBillsRouteImport } from './routes/dashboard/bills'
 import { Route as BusinessServicesRouteImport } from './routes/business/services'
 import { Route as BusinessLendingRouteImport } from './routes/business/lending'
 import { Route as BusinessAccountsRouteImport } from './routes/business/accounts'
+import { Route as AdminDepositsRouteImport } from './routes/admin/deposits'
 import { Route as AdminChatRouteImport } from './routes/admin/chat'
 import { Route as AccountsYouthRouteImport } from './routes/accounts/youth'
 import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
@@ -287,6 +288,11 @@ const BusinessAccountsRoute = BusinessAccountsRouteImport.update({
   path: '/business/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDepositsRoute = AdminDepositsRouteImport.update({
+  id: '/deposits',
+  path: '/deposits',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChatRoute = AdminChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -326,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
   '/admin/chat': typeof AdminChatRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -375,6 +382,7 @@ export interface FileRoutesByTo {
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
   '/admin/chat': typeof AdminChatRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
   '/admin/chat': typeof AdminChatRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -482,6 +491,7 @@ export interface FileRouteTypes {
     | '/accounts/savings'
     | '/accounts/youth'
     | '/admin/chat'
+    | '/admin/deposits'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/accounts/savings'
     | '/accounts/youth'
     | '/admin/chat'
+    | '/admin/deposits'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -583,6 +594,7 @@ export interface FileRouteTypes {
     | '/accounts/savings'
     | '/accounts/youth'
     | '/admin/chat'
+    | '/admin/deposits'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -977,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/deposits': {
+      id: '/admin/deposits'
+      path: '/deposits'
+      fullPath: '/admin/deposits'
+      preLoaderRoute: typeof AdminDepositsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/chat': {
       id: '/admin/chat'
       path: '/chat'
@@ -1017,11 +1036,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminChatRoute: typeof AdminChatRoute
+  AdminDepositsRoute: typeof AdminDepositsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminChatRoute: AdminChatRoute,
+  AdminDepositsRoute: AdminDepositsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
