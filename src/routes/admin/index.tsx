@@ -118,10 +118,12 @@ function EditDrawer({
   app,
   onClose,
   onSaved,
+  onDeleted,
 }: {
   app: Application;
   onClose: () => void;
   onSaved: (updated: Application) => void;
+  onDeleted: (id: number, name: string) => void;
 }) {
   const [form, setForm]       = useState<Application>({ ...app });
   const [saving, setSaving]   = useState(false);
@@ -950,10 +952,16 @@ function EditDrawer({
         {/* Footer — only show profile save on profile tab */}
         {tab === "profile" && (
           <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3">
-            {error && <p className="text-xs text-red-600 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
-            {!error && saved && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Saved successfully</p>}
-            {!error && !saved && <span />}
-            <div className="flex gap-2 ml-auto">
+            <button
+              type="button"
+              onClick={() => onDeleted(app.id, `${app.first_name} ${app.last_name}`)}
+              className="px-3 py-2 text-xs font-semibold text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 hover:bg-red-50 rounded inline-flex items-center gap-1.5 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete Account
+            </button>
+            <div className="flex items-center gap-2">
+              {error && <p className="text-xs text-red-600 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
+              {!error && saved && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Saved successfully</p>}
               <button type="button" onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 rounded transition-all"
               >
@@ -1011,6 +1019,19 @@ function AdminApplicationsPage() {
     });
     if (res.ok) {
       setApps((prev) => prev.map((a) => a.id === id ? { ...a, status } : a));
+    }
+  };
+
+  const deleteApplication = async (id: number, name: string) => {
+    setOpenMenuId(null);
+    if (!window.confirm(`Permanently delete the account for ${name}? This cannot be undone.`)) return;
+    const res = await fetch(`/api/applications/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    if (res.ok) {
+      setApps((prev) => prev.filter((a) => a.id !== id));
+      setSelected((s) => s?.id === id ? null : s);
     }
   };
 
@@ -1233,6 +1254,10 @@ function AdminApplicationsPage() {
                           <button onClick={() => quickStatus(app.id, "approved")} className="w-full text-left px-3 py-2 text-xs text-emerald-700 hover:bg-emerald-50">✓ Approve</button>
                           <button onClick={() => quickStatus(app.id, "pending")} className="w-full text-left px-3 py-2 text-xs text-amber-700 hover:bg-amber-50">⏳ Mark Pending</button>
                           <button onClick={() => quickStatus(app.id, "rejected")} className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50">✕ Reject</button>
+                          <div className="my-1 border-t border-slate-100" />
+                          <button onClick={() => deleteApplication(app.id, `${app.first_name} ${app.last_name}`)} className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-1.5">
+                            <Trash2 className="w-3 h-3" /> Delete Account
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1250,6 +1275,7 @@ function AdminApplicationsPage() {
           app={selected}
           onClose={() => setSelected(null)}
           onSaved={handleDrawerSave}
+          onDeleted={deleteApplication}
         />
       )}
     </div>

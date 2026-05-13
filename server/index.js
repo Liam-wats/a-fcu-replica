@@ -398,6 +398,24 @@ app.get("/api/applications", requireAdmin, async (_req, res) => {
   }
 });
 
+// DELETE /api/applications/:id — permanently delete an application (admin only)
+app.delete("/api/applications/:id", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM membership_applications WHERE id = $1 RETURNING id",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting application:", err);
+    return res.status(500).json({ error: "Failed to delete application" });
+  }
+});
+
 // GET /api/applications/:ref — fetch single application by reference number (admin only)
 app.get("/api/applications/:ref", requireAdmin, async (req, res) => {
   try {

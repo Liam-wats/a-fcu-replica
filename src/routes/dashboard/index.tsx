@@ -279,7 +279,7 @@ function DashboardOverview() {
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {(data?.transactions ?? []).slice(0, 8).map(tx => (
+              {[...(data?.transactions ?? [])].sort((a, b) => new Date(b.txn_date).getTime() - new Date(a.txn_date).getTime() || b.id - a.id).slice(0, 8).map(tx => (
                 <div key={tx.id} className="flex items-center justify-between px-6 py-3.5 hover:bg-secondary/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className={`w-8 h-8 flex items-center justify-center text-xs font-bold border shrink-0 ${
