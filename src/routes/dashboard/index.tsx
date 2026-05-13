@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
+import { generateAccountNumber, maskAccountNumber } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardOverview,
@@ -29,13 +30,6 @@ const QUICK_ACTIONS = [
   { icon: FileText,       label: "e\nStatements",      href: "/dashboard/statements" },
   { icon: BookCheck,      label: "Order\nChecks",      href: "/dashboard/checks" },
 ];
-
-const ACCOUNT_NUMBERS: Record<string, string> = {
-  "cash-back-checking": "••••  ••••  4821",
-  "free-checking":      "••••  ••••  3304",
-  "regular-savings":    "••••  ••••  7719",
-  "money-market":       "••••  ••••  0256",
-};
 
 const POLL_INTERVAL_MS = 60_000;
 
@@ -139,7 +133,7 @@ function DashboardOverview() {
   if (!session) return null;
 
   const accountLabel  = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
-  const accountNumber = ACCOUNT_NUMBERS[session.accountType] ?? "••••  ••••  0000";
+  const accountNumber = maskAccountNumber(generateAccountNumber(session.referenceNumber));
   const isChecking    = session.accountType.includes("checking");
   const available     = data?.balance.available ?? 0;
   const current       = data?.balance.current ?? 0;

@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowLeftRight, CheckCircle2, ArrowLeft, Loader2, AlertCircle, Info } from "lucide-react";
+import { ArrowLeftRight, CheckCircle2, ArrowLeft, Loader2, AlertCircle, Info, Building2, X, ChevronRight, ShieldCheck } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
+import { generateAccountNumber, maskAccountNumber, getLinkedAccount } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/transfer")({
   component: TransferPage,
@@ -27,6 +28,7 @@ function TransferPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(3);
+  const [showExtModal, setShowExtModal] = useState(false);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   useEffect(() => {
@@ -107,7 +109,9 @@ function TransferPage() {
   };
 
   if (!session) return null;
-  const accountLabel = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
+  const accountLabel  = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
+  const acctNumber    = generateAccountNumber(session.referenceNumber);
+  const linked        = getLinkedAccount(session.referenceNumber);
   const parsedAmount = parseFloat(amount) || 0;
   const afterBalance = balance ? balance.available - parsedAmount : null;
 
@@ -182,15 +186,25 @@ function TransferPage() {
             <div className="border border-brand-green/30 bg-brand-green/5 p-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-ink/40 mb-1.5">From</p>
               <p className="font-semibold text-ink text-sm">{accountLabel}</p>
+              <p className="text-[12px] font-mono text-ink/50 mt-0.5">••••  ••••  {acctNumber.slice(-4)}</p>
               <p className="text-[12px] text-ink/50 mt-0.5">
                 {fetching ? "Loading…" : `Available: ${fmt(balance?.available ?? 0)}`}
               </p>
             </div>
-            <div className="border border-border bg-secondary/40 p-4">
+            <button
+              type="button"
+              onClick={() => setShowExtModal(true)}
+              className="border border-border bg-secondary/40 p-4 text-left hover:border-brand-green hover:bg-brand-green/5 transition-all group"
+            >
               <p className="text-[10px] font-bold uppercase tracking-widest text-ink/40 mb-1.5">To</p>
-              <p className="font-semibold text-ink text-sm">External Account</p>
-              <p className="text-[12px] text-ink/50 mt-0.5">Linked Bank · ••••  6629</p>
-            </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-ink text-sm group-hover:text-brand-green transition-colors">{linked.bankName}</p>
+                  <p className="text-[12px] font-mono text-ink/50 mt-0.5">{linked.accountType} · ••••  {linked.last4}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-ink/25 group-hover:text-brand-green transition-colors" />
+              </div>
+            </button>
           </div>
 
           {error && (
@@ -259,6 +273,77 @@ function TransferPage() {
           </form>
         </div>
       </div>
+
+      {/* ── External Account Modal ── */}
+      {showExtModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowExtModal(false)} />
+          <div className="relative bg-white w-full max-w-sm shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-brand-green" />
+                <span className="font-bold text-sm text-ink">Linked External Account</span>
+              </div>
+              <button onClick={() => setShowExtModal(false)} className="text-ink/30 hover:text-ink transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Account details */}
+            <div className="px-6 py-5 space-y-4">
+              <div className="flex items-center gap-4 p-4 bg-secondary/50 border border-border">
+                <div className="w-10 h-10 bg-brand-green/10 border border-brand-green/20 flex items-center justify-center shrink-0">
+                  <Building2 className="w-5 h-5 text-brand-green" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-ink">{linked.bankName}</p>
+                  <p className="text-[12px] text-ink/50">{linked.accountType} Account</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-[13px]">
+                <div className="flex justify-between items-center py-2 border-b border-border">
+                  <span className="text-ink/50">Account Number</span>
+                  <span className="font-mono font-semibold text-ink">••••  ••••  {linked.last4}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-border">
+                  <span className="text-ink/50">Routing Number</span>
+                  <span className="font-mono font-semibold text-ink">{linked.routing}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-border">
+                  <span className="text-ink/50">Account Type</span>
+                  <span className="font-semibold text-ink">{linked.accountType}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-ink/50">Status</span>
+                  <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                    Verified &amp; Active
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 px-3 py-2.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-[11px] text-blue-700 leading-relaxed">
+                  This account is verified and secured with 256-bit encryption. Transfers typically arrive within 1–3 business days.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border flex gap-3">
+              <button
+                onClick={() => setShowExtModal(false)}
+                className="flex-1 bg-brand-green hover:bg-brand-green-dark text-white py-2.5 font-semibold text-sm transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
