@@ -46,6 +46,7 @@ import { Route as GuidanceRatesRouteImport } from './routes/guidance/rates'
 import { Route as GuidanceFinancialEducationRouteImport } from './routes/guidance/financial-education'
 import { Route as DashboardTransferRouteImport } from './routes/dashboard/transfer'
 import { Route as DashboardStatementsRouteImport } from './routes/dashboard/statements'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardDepositRouteImport } from './routes/dashboard/deposit'
 import { Route as DashboardChecksRouteImport } from './routes/dashboard/checks'
 import { Route as DashboardBillsRouteImport } from './routes/dashboard/bills'
@@ -245,6 +246,11 @@ const DashboardStatementsRoute = DashboardStatementsRouteImport.update({
   path: '/statements',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardDepositRoute = DashboardDepositRouteImport.update({
   id: '/deposit',
   path: '/deposit',
@@ -320,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/bills': typeof DashboardBillsRoute
   '/dashboard/checks': typeof DashboardChecksRoute
   '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/statements': typeof DashboardStatementsRoute
   '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
@@ -367,6 +374,7 @@ export interface FileRoutesByTo {
   '/dashboard/bills': typeof DashboardBillsRoute
   '/dashboard/checks': typeof DashboardChecksRoute
   '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/statements': typeof DashboardStatementsRoute
   '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
@@ -418,6 +426,7 @@ export interface FileRoutesById {
   '/dashboard/bills': typeof DashboardBillsRoute
   '/dashboard/checks': typeof DashboardChecksRoute
   '/dashboard/deposit': typeof DashboardDepositRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/statements': typeof DashboardStatementsRoute
   '/dashboard/transfer': typeof DashboardTransferRoute
   '/guidance/financial-education': typeof GuidanceFinancialEducationRoute
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/dashboard/bills'
     | '/dashboard/checks'
     | '/dashboard/deposit'
+    | '/dashboard/profile'
     | '/dashboard/statements'
     | '/dashboard/transfer'
     | '/guidance/financial-education'
@@ -517,6 +527,7 @@ export interface FileRouteTypes {
     | '/dashboard/bills'
     | '/dashboard/checks'
     | '/dashboard/deposit'
+    | '/dashboard/profile'
     | '/dashboard/statements'
     | '/dashboard/transfer'
     | '/guidance/financial-education'
@@ -567,6 +578,7 @@ export interface FileRouteTypes {
     | '/dashboard/bills'
     | '/dashboard/checks'
     | '/dashboard/deposit'
+    | '/dashboard/profile'
     | '/dashboard/statements'
     | '/dashboard/transfer'
     | '/guidance/financial-education'
@@ -897,6 +909,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardStatementsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/deposit': {
       id: '/dashboard/deposit'
       path: '/deposit'
@@ -993,6 +1012,7 @@ interface DashboardRouteChildren {
   DashboardBillsRoute: typeof DashboardBillsRoute
   DashboardChecksRoute: typeof DashboardChecksRoute
   DashboardDepositRoute: typeof DashboardDepositRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardStatementsRoute: typeof DashboardStatementsRoute
   DashboardTransferRoute: typeof DashboardTransferRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -1002,6 +1022,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBillsRoute: DashboardBillsRoute,
   DashboardChecksRoute: DashboardChecksRoute,
   DashboardDepositRoute: DashboardDepositRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
   DashboardStatementsRoute: DashboardStatementsRoute,
   DashboardTransferRoute: DashboardTransferRoute,
   DashboardIndexRoute: DashboardIndexRoute,

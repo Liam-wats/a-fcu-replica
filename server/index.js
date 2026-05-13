@@ -444,6 +444,99 @@ app.get("/api/session/repair", async (req, res) => {
 
 // ── Member account endpoints (require member JWT) ────────────────────────────
 
+// GET /api/member/:loginId/profile — fetch member contact info
+app.get("/api/member/:loginId/profile", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  try {
+    const result = await pool.query(
+      `SELECT first_name, last_name, email, phone, street, apt, city, state, zip, account_type, reference_number
+       FROM membership_applications WHERE login_id = $1`,
+      [loginId]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: "Member not found." });
+    const m = result.rows[0];
+    return res.json({
+      firstName: m.first_name,
+      lastName: m.last_name,
+      email: m.email,
+      phone: m.phone,
+      street: m.street,
+      apt: m.apt,
+      city: m.city,
+      state: m.state,
+      zip: m.zip,
+      accountType: m.account_type,
+      referenceNumber: m.reference_number,
+    });
+  } catch (err) {
+    console.error("Error fetching profile:", err);
+    return res.status(500).json({ error: "Failed to fetch profile." });
+  }
+});
+
+// PUT /api/member/:loginId/profile — update contact info
+app.put("/api/member/:loginId/profile", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  const { firstName, lastName, email, phone, street, apt, city, state, zip } = req.body;
+  if (!firstName || !lastName || !email || !phone) {
+    return res.status(400).json({ error: "First name, last name, email, and phone are required." });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return res.status(400).json({ error: "Please enter a valid email address." });
+  try {
+    const result = await pool.query(
+      `UPDATE membership_applications SET
+         first_name = $1, last_name = $2, email = $3, phone = $4,
+         street = COALESCE($5, street), apt = $6,
+         city = COALESCE($7, city), state = COALESCE($8, state), zip = COALESCE($9, zip)
+       WHERE login_id = $10
+       RETURNING first_name, last_name, email, phone, street, apt, city, state, zip`,
+      [firstName, lastName, email, phone, street || null, apt || null, city || null, state || null, zip || null, loginId]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: "Member not found." });
+    const m = result.rows[0];
+    return res.json({
+      success: true,
+      profile: {
+        firstName: m.first_name, lastName: m.last_name,
+        email: m.email, phone: m.phone,
+        street: m.street, apt: m.apt, city: m.city, state: m.state, zip: m.zip,
+      },
+    });
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    return res.status(500).json({ error: "Failed to update profile." });
+  }
+});
+
+// PUT /api/member/:loginId/password — change password
+app.put("/api/member/:loginId/password", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) return res.status(400).json({ error: "Current and new password are required." });
+  if (newPassword.length < 8) return res.status(400).json({ error: "New password must be at least 8 characters." });
+  try {
+    const currentHash = hashPassword(currentPassword);
+    const check = await pool.query(
+      "SELECT id FROM membership_applications WHERE login_id = $1 AND password_hash = $2",
+      [loginId, currentHash]
+    );
+    if (check.rows.length === 0) return res.status(401).json({ error: "Current password is incorrect." });
+    const newHash = hashPassword(newPassword);
+    await pool.query(
+      "UPDATE membership_applications SET password_hash = $1 WHERE login_id = $2",
+      [newHash, loginId]
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    return res.status(500).json({ error: "Failed to change password." });
+  }
+});
+
 // GET /api/member/:loginId/account
 app.get("/api/member/:loginId/account", requireAuth, async (req, res) => {
   const { loginId } = req.params;

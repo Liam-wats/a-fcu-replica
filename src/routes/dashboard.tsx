@@ -127,7 +127,8 @@ function DashboardLayout() {
   const handleSignOut = () => {
     sessionStorage.removeItem("apfcu_session");
     sessionStorage.removeItem("apfcu_token");
-    navigate({ to: "/" });
+    setShowProfile(false);
+    navigate({ to: "/login" });
   };
 
   if (!session) return null;
@@ -266,14 +267,23 @@ function DashboardLayout() {
 
                   {/* Actions */}
                   <div className="py-1.5">
-                    <button className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-ink/65 hover:bg-secondary hover:text-ink transition-colors text-left">
+                    <Link
+                      to="/dashboard/profile"
+                      search={{ tab: "security" } as never}
+                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-ink/65 hover:bg-secondary hover:text-ink transition-colors"
+                      onClick={() => setShowProfile(false)}
+                    >
                       <Settings className="w-3.5 h-3.5 shrink-0" />
                       Account Settings
-                    </button>
-                    <button className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-ink/65 hover:bg-secondary hover:text-ink transition-colors text-left">
+                    </Link>
+                    <Link
+                      to="/dashboard/profile"
+                      className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-ink/65 hover:bg-secondary hover:text-ink transition-colors"
+                      onClick={() => setShowProfile(false)}
+                    >
                       <User className="w-3.5 h-3.5 shrink-0" />
                       Update Contact Info
-                    </button>
+                    </Link>
                     <Link
                       to="/contact-us"
                       className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-ink/65 hover:bg-secondary hover:text-ink transition-colors"
