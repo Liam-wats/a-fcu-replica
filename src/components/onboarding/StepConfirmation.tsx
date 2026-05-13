@@ -51,12 +51,12 @@ export function StepConfirmation({ firstName, account }: Props) {
         >
           Go to Homepage <ArrowRight className="w-4 h-4" />
         </Link>
-        <a
-          href="#"
+        <Link
+          to="/login"
           className="inline-flex items-center justify-center gap-2 border border-border hover:border-brand-green text-ink px-6 py-3 font-semibold text-sm transition-colors"
         >
           Enroll in Online Banking
-        </a>
+        </Link>
       </div>
     </div>
   );

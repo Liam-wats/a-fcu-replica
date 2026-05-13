@@ -153,12 +153,13 @@ function ConfirmationPage() {
         >
           Go to Homepage <ArrowRight className="w-4 h-4" />
         </Link>
-        <a
-          href="#"
+        <Link
+          to="/login"
+          onClick={reset}
           className="inline-flex items-center justify-center gap-2 border-2 border-border hover:border-brand-green text-ink hover:text-brand-green px-8 py-3.5 font-semibold text-sm transition-colors"
         >
           Enroll in Online Banking
-        </a>
+        </Link>
       </div>
     </div>
   );
