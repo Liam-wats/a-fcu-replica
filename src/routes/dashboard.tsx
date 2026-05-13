@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { cn } from "@/lib/utils";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -335,6 +336,8 @@ function DashboardLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
+
+      <ChatWidget session={session} />
 
       {/* ── Footer strip ───────────────────────── */}
       <footer className="bg-white border-t border-border mt-auto">

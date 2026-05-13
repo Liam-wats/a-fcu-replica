@@ -52,6 +52,7 @@ import { Route as DashboardBillsRouteImport } from './routes/dashboard/bills'
 import { Route as BusinessServicesRouteImport } from './routes/business/services'
 import { Route as BusinessLendingRouteImport } from './routes/business/lending'
 import { Route as BusinessAccountsRouteImport } from './routes/business/accounts'
+import { Route as AdminChatRouteImport } from './routes/admin/chat'
 import { Route as AccountsYouthRouteImport } from './routes/accounts/youth'
 import { Route as AccountsSavingsRouteImport } from './routes/accounts/savings'
 import { Route as AccountsCheckingRouteImport } from './routes/accounts/checking'
@@ -274,6 +275,11 @@ const BusinessAccountsRoute = BusinessAccountsRouteImport.update({
   path: '/business/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminChatRoute = AdminChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountsYouthRoute = AccountsYouthRouteImport.update({
   id: '/accounts/youth',
   path: '/accounts/youth',
@@ -307,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/admin/chat': typeof AdminChatRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -353,6 +360,7 @@ export interface FileRoutesByTo {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/admin/chat': typeof AdminChatRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/accounts/checking': typeof AccountsCheckingRoute
   '/accounts/savings': typeof AccountsSavingsRoute
   '/accounts/youth': typeof AccountsYouthRoute
+  '/admin/chat': typeof AdminChatRoute
   '/business/accounts': typeof BusinessAccountsRoute
   '/business/lending': typeof BusinessLendingRoute
   '/business/services': typeof BusinessServicesRoute
@@ -454,6 +463,7 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/admin/chat'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/admin/chat'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -549,6 +560,7 @@ export interface FileRouteTypes {
     | '/accounts/checking'
     | '/accounts/savings'
     | '/accounts/youth'
+    | '/admin/chat'
     | '/business/accounts'
     | '/business/lending'
     | '/business/services'
@@ -927,6 +939,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/chat': {
+      id: '/admin/chat'
+      path: '/chat'
+      fullPath: '/admin/chat'
+      preLoaderRoute: typeof AdminChatRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/accounts/youth': {
       id: '/accounts/youth'
       path: '/accounts/youth'
@@ -959,10 +978,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminChatRoute: typeof AdminChatRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminChatRoute: AdminChatRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

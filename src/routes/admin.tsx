@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Globe, ChevronRight, Users, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Menu, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Globe, ChevronRight, Users, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Menu, X, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 
@@ -9,6 +9,7 @@ export const Route = createFileRoute("/admin")({
 
 const NAV = [
   { label: "Applications", icon: LayoutDashboard, href: "/admin" },
+  { label: "Live Chat", icon: MessageSquare, href: "/admin/chat" },
 ];
 
 const SESSION_KEY = "apfcu_admin_session";
@@ -165,6 +166,25 @@ function AdminLayout() {
     return hasSession && hasToken;
   });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
+
+  useEffect(() => {
+    if (!authed) return;
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch("/api/admin/chat/unread-count", {
+          headers: { Authorization: `Bearer ${sessionStorage.getItem(TOKEN_KEY) || ""}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setChatUnread(data.count ?? 0);
+        }
+      } catch {}
+    };
+    fetchUnread();
+    const id = setInterval(fetchUnread, 8000);
+    return () => clearInterval(id);
+  }, [authed]);
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
@@ -202,6 +222,7 @@ function AdminLayout() {
         <p className="text-[10px] font-bold uppercase tracking-widest text-ink/30 px-3 mb-2">Management</p>
         {NAV.map(({ label, icon: Icon, href }) => {
           const active = location.pathname === href || (href !== "/admin" && location.pathname.startsWith(href));
+          const badge = label === "Live Chat" && chatUnread > 0 ? chatUnread : 0;
           return (
             <Link key={href} to={href}
               className={cn(
@@ -212,7 +233,12 @@ function AdminLayout() {
               )}>
               <Icon className="w-4 h-4 shrink-0" />
               {label}
-              {active && <ChevronRight className="w-3.5 h-3.5 ml-auto text-brand-green/60" />}
+              {badge > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                  {badge}
+                </span>
+              )}
+              {active && badge === 0 && <ChevronRight className="w-3.5 h-3.5 ml-auto text-brand-green/60" />}
             </Link>
           );
         })}

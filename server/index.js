@@ -88,6 +88,29 @@ async function migrateAccountData() {
 }
 migrateAccountData().catch((err) => console.warn("DB migrateAccountData skipped:", err.message));
 
+async function migrateChat() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS chat_conversations (
+      id SERIAL PRIMARY KEY,
+      login_id TEXT NOT NULL,
+      member_name TEXT NOT NULL,
+      status TEXT DEFAULT 'open',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id SERIAL PRIMARY KEY,
+      conversation_id INTEGER NOT NULL REFERENCES chat_conversations(id) ON DELETE CASCADE,
+      sender_type TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+}
+migrateChat().catch((err) => console.warn("DB migrateChat skipped:", err.message));
+
 function hashPassword(password) {
   return crypto.createHash("sha256").update(password + "apfcu_salt").digest("hex");
 }
@@ -646,6 +669,166 @@ app.post("/api/contact", async (req, res) => {
   } catch (err) {
     console.error("Email send error:", err);
     return res.status(500).json({ error: "Failed to send message. Please try again or call us directly." });
+  }
+});
+
+// ── Chat endpoints ────────────────────────────────────────────────────────────
+
+// GET /api/chat/conversation — member's most recent conversation + messages
+app.get("/api/chat/conversation", requireAuth, async (req, res) => {
+  const { loginId } = req.user;
+  try {
+    const convRes = await pool.query(
+      "SELECT * FROM chat_conversations WHERE login_id = $1 ORDER BY created_at DESC LIMIT 1",
+      [loginId]
+    );
+    if (convRes.rows.length === 0) return res.json({ conversation: null, messages: [] });
+    const conv = convRes.rows[0];
+    const msgRes = await pool.query(
+      "SELECT * FROM chat_messages WHERE conversation_id = $1 ORDER BY created_at ASC",
+      [conv.id]
+    );
+    return res.json({ conversation: conv, messages: msgRes.rows });
+  } catch (err) {
+    console.error("Chat fetch error:", err);
+    return res.status(500).json({ error: "Failed to fetch conversation" });
+  }
+});
+
+// POST /api/chat/conversations — member starts a new conversation
+app.post("/api/chat/conversations", requireAuth, async (req, res) => {
+  const { loginId } = req.user;
+  const { message, memberName } = req.body;
+  if (!message) return res.status(400).json({ error: "Message required" });
+  try {
+    const convRes = await pool.query(
+      "INSERT INTO chat_conversations (login_id, member_name) VALUES ($1, $2) RETURNING *",
+      [loginId, memberName || loginId]
+    );
+    const conv = convRes.rows[0];
+    const msgRes = await pool.query(
+      "INSERT INTO chat_messages (conversation_id, sender_type, message) VALUES ($1, $2, $3) RETURNING *",
+      [conv.id, "member", message]
+    );
+    await pool.query("UPDATE chat_conversations SET updated_at = NOW() WHERE id = $1", [conv.id]);
+    return res.status(201).json({ conversation: conv, message: msgRes.rows[0] });
+  } catch (err) {
+    console.error("Chat create error:", err);
+    return res.status(500).json({ error: "Failed to start conversation" });
+  }
+});
+
+// POST /api/chat/conversations/:id/messages — member sends a message
+app.post("/api/chat/conversations/:id/messages", requireAuth, async (req, res) => {
+  const { loginId } = req.user;
+  const { id } = req.params;
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: "Message required" });
+  try {
+    const convRes = await pool.query(
+      "SELECT * FROM chat_conversations WHERE id = $1 AND login_id = $2",
+      [id, loginId]
+    );
+    if (convRes.rows.length === 0) return res.status(403).json({ error: "Access denied" });
+    const msgRes = await pool.query(
+      "INSERT INTO chat_messages (conversation_id, sender_type, message) VALUES ($1, $2, $3) RETURNING *",
+      [id, "member", message]
+    );
+    await pool.query("UPDATE chat_conversations SET updated_at = NOW() WHERE id = $1", [id]);
+    return res.status(201).json({ message: msgRes.rows[0] });
+  } catch (err) {
+    console.error("Chat member message error:", err);
+    return res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
+// GET /api/admin/chat/conversations — list all conversations (admin)
+app.get("/api/admin/chat/conversations", requireAdmin, async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT c.*,
+        (SELECT message FROM chat_messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) AS last_message,
+        (SELECT sender_type FROM chat_messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) AS last_sender,
+        (SELECT created_at FROM chat_messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) AS last_message_at
+      FROM chat_conversations c
+      ORDER BY c.updated_at DESC
+    `);
+    return res.json({ conversations: result.rows });
+  } catch (err) {
+    console.error("Admin chat list error:", err);
+    return res.status(500).json({ error: "Failed to fetch conversations" });
+  }
+});
+
+// GET /api/admin/chat/unread-count — count of conversations awaiting admin reply
+app.get("/api/admin/chat/unread-count", requireAdmin, async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT COUNT(*) AS count FROM chat_conversations c
+      WHERE c.status = 'open'
+        AND (
+          SELECT sender_type FROM chat_messages
+          WHERE conversation_id = c.id
+          ORDER BY created_at DESC LIMIT 1
+        ) = 'member'
+    `);
+    return res.json({ count: parseInt(result.rows[0].count, 10) });
+  } catch (err) {
+    console.error("Admin chat unread error:", err);
+    return res.status(500).json({ error: "Failed to fetch unread count" });
+  }
+});
+
+// GET /api/admin/chat/conversations/:id/messages — messages for a conversation (admin)
+app.get("/api/admin/chat/conversations/:id/messages", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const msgRes = await pool.query(
+      "SELECT * FROM chat_messages WHERE conversation_id = $1 ORDER BY created_at ASC",
+      [id]
+    );
+    return res.json({ messages: msgRes.rows });
+  } catch (err) {
+    console.error("Admin chat messages error:", err);
+    return res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+// POST /api/admin/chat/conversations/:id/messages — admin reply
+app.post("/api/admin/chat/conversations/:id/messages", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: "Message required" });
+  try {
+    const msgRes = await pool.query(
+      "INSERT INTO chat_messages (conversation_id, sender_type, message) VALUES ($1, $2, $3) RETURNING *",
+      [id, "admin", message]
+    );
+    await pool.query(
+      "UPDATE chat_conversations SET updated_at = NOW(), status = 'open' WHERE id = $1",
+      [id]
+    );
+    return res.status(201).json({ message: msgRes.rows[0] });
+  } catch (err) {
+    console.error("Admin chat reply error:", err);
+    return res.status(500).json({ error: "Failed to send reply" });
+  }
+});
+
+// PUT /api/admin/chat/conversations/:id/status — open or close a conversation (admin)
+app.put("/api/admin/chat/conversations/:id/status", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!["open", "closed"].includes(status)) return res.status(400).json({ error: "Invalid status" });
+  try {
+    const result = await pool.query(
+      "UPDATE chat_conversations SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+      [status, id]
+    );
+    return res.json({ conversation: result.rows[0] });
+  } catch (err) {
+    console.error("Admin chat status error:", err);
+    return res.status(500).json({ error: "Failed to update status" });
   }
 });
 
