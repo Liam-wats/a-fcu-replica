@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   FileText, ArrowLeft, Download, Loader2,
   Search, X, TrendingUp, TrendingDown, ArrowLeftRight,
-  ChevronDown, Calendar, Tag, Filter,
+  ChevronDown, Calendar, Tag, Filter, ChevronUp,
 } from "lucide-react";
+import { jsPDF } from "jspdf";
+import { cn } from "@/lib/utils";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
 
@@ -77,6 +79,203 @@ function exportCSV(txns: Txn[], label: string) {
   URL.revokeObjectURL(url);
 }
 
+function exportPDF(txns: Txn[], label: string, totalCredits: number, totalDebits: number) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "letter" });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const margin = 48;
+  const green: [number, number, number] = [0, 100, 60];
+  const ink:   [number, number, number] = [30, 35, 40];
+  const muted: [number, number, number] = [120, 130, 140];
+
+  const generated = new Date().toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+
+  // ── Header bar ──
+  doc.setFillColor(...green);
+  doc.rect(0, 0, W, 72, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text("A+ Federal Credit Union", margin, 32);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(200, 235, 215);
+  doc.text("Transaction Statement  ·  Online Banking", margin, 48);
+  doc.text(`Generated ${generated}`, margin, 62);
+
+  // ── Account info ──
+  let y = 96;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(...ink);
+  doc.text(label, margin, y);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  doc.text(`${txns.length} transaction${txns.length !== 1 ? "s" : ""}`, margin, y + 14);
+
+  // ── Summary box ──
+  y += 36;
+  const boxH = 54;
+  doc.setFillColor(248, 250, 248);
+  doc.setDrawColor(220, 230, 224);
+  doc.rect(margin, y, W - margin * 2, boxH, "FD");
+
+  const colW = (W - margin * 2) / 3;
+
+  const summaryItems = [
+    { label: "Total Credits", value: `+${fmt(totalCredits)}`, color: [0, 130, 70] as [number,number,number] },
+    { label: "Total Debits",  value: `−${fmt(totalDebits)}`,  color: ink },
+    { label: "Net Flow",
+      value: `${totalCredits - totalDebits >= 0 ? "+" : "−"}${fmt(Math.abs(totalCredits - totalDebits))}`,
+      color: totalCredits - totalDebits >= 0 ? [0, 130, 70] as [number,number,number] : [180, 40, 40] as [number,number,number],
+    },
+  ];
+
+  summaryItems.forEach(({ label: sl, value, color }, i) => {
+    const cx = margin + i * colW + colW / 2;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...muted);
+    doc.text(sl, cx, y + 18, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...color);
+    doc.text(value, cx, y + 36, { align: "center" });
+  });
+
+  // ── Column headers ──
+  y += boxH + 20;
+  doc.setFillColor(...green);
+  doc.rect(margin, y, W - margin * 2, 20, "F");
+
+  const cols = [
+    { label: "Date",        x: margin + 6,         w: 72 },
+    { label: "Description", x: margin + 84,        w: 220 },
+    { label: "Category",    x: margin + 310,       w: 90 },
+    { label: "Type",        x: margin + 406,       w: 54 },
+    { label: "Amount",      x: W - margin - 6,     w: 0, right: true },
+  ];
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  cols.forEach(c => {
+    if (c.right) doc.text(c.label, c.x, y + 13, { align: "right" });
+    else doc.text(c.label, c.x, y + 13);
+  });
+
+  y += 20;
+
+  // ── Rows ──
+  const rowH = 22;
+  let rowIndex = 0;
+
+  // Group by month for section headers
+  const monthMap = new Map<string, { label: string; txns: Txn[] }>();
+  txns.forEach(t => {
+    const key = monthKey(t.txn_date);
+    if (!monthMap.has(key)) {
+      const d = parseDate(t.txn_date);
+      const lbl = d ? d.toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "Unknown";
+      monthMap.set(key, { label: lbl, txns: [] });
+    }
+    monthMap.get(key)!.txns.push(t);
+  });
+
+  const groups = Array.from(monthMap.entries())
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([, v]) => v);
+
+  function addPageIfNeeded() {
+    if (y > H - 60) {
+      doc.addPage();
+      y = margin;
+      // repeat header stripe
+      doc.setFillColor(...green);
+      doc.rect(margin, y, W - margin * 2, 20, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(255, 255, 255);
+      cols.forEach(c => {
+        if (c.right) doc.text(c.label, c.x, y + 13, { align: "right" });
+        else doc.text(c.label, c.x, y + 13);
+      });
+      y += 20;
+    }
+  }
+
+  groups.forEach(({ label: monthLbl, txns: mTxns }) => {
+    addPageIfNeeded();
+    // Month section header
+    doc.setFillColor(240, 245, 242);
+    doc.rect(margin, y, W - margin * 2, 18, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...green);
+    doc.text(monthLbl.toUpperCase(), margin + 6, y + 12);
+    y += 18;
+
+    mTxns.forEach(tx => {
+      addPageIfNeeded();
+      const isCredit = tx.txn_type === "credit";
+      // alternating row
+      if (rowIndex % 2 === 1) {
+        doc.setFillColor(250, 252, 251);
+        doc.rect(margin, y, W - margin * 2, rowH, "F");
+      }
+      rowIndex++;
+
+      const amount = (isCredit ? tx.amount : -tx.amount);
+      const amtStr = `${isCredit ? "+" : "−"}${fmt(Math.abs(amount))}`;
+
+      const desc = tx.description.length > 38
+        ? tx.description.slice(0, 36) + "…"
+        : tx.description;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(...muted);
+      doc.text(tx.txn_date, cols[0].x, y + 14);
+
+      doc.setTextColor(...ink);
+      doc.text(desc, cols[1].x, y + 14);
+
+      doc.setTextColor(...muted);
+      doc.text(tx.category ?? "", cols[2].x, y + 14);
+      doc.text(tx.txn_type.charAt(0).toUpperCase() + tx.txn_type.slice(1), cols[3].x, y + 14);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...(isCredit ? ([0, 130, 70] as [number,number,number]) : ink));
+      doc.text(amtStr, cols[4].x, y + 14, { align: "right" });
+
+      y += rowH;
+    });
+  });
+
+  // ── Footer ──
+  const footerY = H - 28;
+  doc.setDrawColor(...muted);
+  doc.setLineWidth(0.5);
+  doc.line(margin, footerY - 8, W - margin, footerY - 8);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(...muted);
+  doc.text("A+ Federal Credit Union  ·  Member FDIC  ·  Equal Housing Lender", margin, footerY);
+  const pageCount = (doc.internal as any).getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.text(`Page ${i} of ${pageCount}`, W - margin, footerY, { align: "right" });
+  }
+
+  doc.save(`${label.replace(/\s+/g, "_")}_statement.pdf`);
+}
+
 function StatementsPage() {
   const [session, setSession]           = useState<Session | null>(null);
   const [transactions, setTransactions] = useState<Txn[]>([]);
@@ -89,6 +288,19 @@ function StatementsPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo]     = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showExportMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showExportMenu]);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("apfcu_session");
@@ -178,13 +390,45 @@ function StatementsPage() {
             <h1 className="font-serif text-2xl text-ink">Transaction History</h1>
             <p className="text-[13px] text-ink/50 mt-1">{accountLabel}</p>
           </div>
-          <button
-            onClick={() => exportCSV(filtered, accountLabel)}
-            disabled={filtered.length === 0}
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-green border border-brand-green/40 px-4 py-2 hover:bg-brand-green/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <Download className="w-3.5 h-3.5" /> Export CSV
-          </button>
+          <div ref={exportRef} className="relative">
+            <button
+              onClick={() => setShowExportMenu(v => !v)}
+              disabled={filtered.length === 0}
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-green border border-brand-green/40 px-4 py-2 hover:bg-brand-green/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors select-none"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export
+              {showExportMenu
+                ? <ChevronUp className="w-3.5 h-3.5 ml-0.5" />
+                : <ChevronDown className="w-3.5 h-3.5 ml-0.5" />}
+            </button>
+
+            {showExportMenu && (
+              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-border shadow-lg z-20">
+                <button
+                  onClick={() => { exportCSV(filtered, accountLabel); setShowExportMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-ink hover:bg-secondary/60 transition-colors text-left"
+                >
+                  <FileText className="w-3.5 h-3.5 text-brand-green shrink-0" />
+                  <div>
+                    <p className="font-semibold leading-none">CSV</p>
+                    <p className="text-[11px] text-ink/40 mt-0.5">Spreadsheet format</p>
+                  </div>
+                </button>
+                <div className="border-t border-border" />
+                <button
+                  onClick={() => { exportPDF(filtered, accountLabel, totalCredits, totalDebits); setShowExportMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-ink hover:bg-secondary/60 transition-colors text-left"
+                >
+                  <FileText className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                  <div>
+                    <p className="font-semibold leading-none">PDF</p>
+                    <p className="text-[11px] text-ink/40 mt-0.5">Printable statement</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── Summary stats ── */}
