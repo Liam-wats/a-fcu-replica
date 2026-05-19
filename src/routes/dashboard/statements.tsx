@@ -5,7 +5,6 @@ import {
   Search, X, TrendingUp, TrendingDown, ArrowLeftRight,
   ChevronDown, Calendar, Tag, Filter, ChevronUp,
 } from "lucide-react";
-import { jsPDF } from "jspdf";
 import { cn } from "@/lib/utils";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
@@ -79,7 +78,8 @@ function exportCSV(txns: Txn[], label: string) {
   URL.revokeObjectURL(url);
 }
 
-function exportPDF(txns: Txn[], label: string, totalCredits: number, totalDebits: number) {
+async function exportPDF(txns: Txn[], label: string, totalCredits: number, totalDebits: number) {
+  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "letter" });
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
