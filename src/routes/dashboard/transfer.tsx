@@ -2,21 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   ArrowLeftRight, ArrowLeft, Loader2, AlertCircle, Info,
-  Building2, X, ChevronRight, ShieldCheck, XCircle, Plus,
-  Pencil, Trash2, CheckCircle2,
+  Building2, X, ChevronRight, ShieldCheck, CheckCircle2, Plus,
+  Pencil, Trash2, Mail,
 } from "lucide-react";
 import type { Session } from "@/routes/dashboard";
 import { ACCOUNT_LABELS } from "@/routes/dashboard";
 import { generateAccountNumber } from "@/lib/utils";
-import emailjs from "@emailjs/browser";
 
 export const Route = createFileRoute("/dashboard/transfer")({
   component: TransferPage,
 });
-
-const EMAILJS_SERVICE_ID = "service_qkfr2cn";
-const EMAILJS_TEMPLATE_ID = "template_wvtlxvb";
-const EMAILJS_PUBLIC_KEY = "Q46p2-WKKDd4yU00l";
 
 function fmt(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
@@ -24,10 +19,6 @@ function fmt(n: number) {
 
 function getToken() {
   return sessionStorage.getItem("apfcu_token") || "";
-}
-
-function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 interface LinkedAccount {
@@ -47,7 +38,16 @@ interface LinkForm {
   nickname: string;
 }
 
-type Step = "form" | "failed";
+type Step = "form" | "success" | "failed";
+
+interface SuccessDetails {
+  amount: number;
+  bankName: string;
+  accountType: string;
+  last4: string;
+  memo: string;
+  newBalance: number;
+}
 
 const BLANK_FORM: LinkForm = {
   bankName: "", accountNumber: "", routingNumber: "",
@@ -64,6 +64,7 @@ function TransferPage() {
   const [error, setError] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [sending, setSending] = useState(false);
+  const [successDetails, setSuccessDetails] = useState<SuccessDetails | null>(null);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   const [linked, setLinked] = useState<LinkedAccount | null>(null);
@@ -160,29 +161,35 @@ function TransferPage() {
 
     setSending(true);
     try {
-      const otp = generateOtp();
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          first_name: session.firstName,
-          last_name: session.lastName,
-          email: session.email,
-          reply_to: session.email,
-          subject: "Your A+FCU Transfer Verification Code",
-          message: `You requested a transfer of ${fmt(num)} to ${linked.bank_name}.\n\nYour one-time verification code is:\n\n${otp}\n\nThis code expires in 10 minutes. If you did not initiate this transfer, please contact us immediately at 512.302.6800.`,
-          time: new Date().toLocaleString("en-US", {
-            weekday: "long", year: "numeric", month: "long",
-            day: "numeric", hour: "2-digit", minute: "2-digit",
-            timeZoneName: "short",
-          }),
-        },
-        EMAILJS_PUBLIC_KEY
-      );
+      const res = await fetch(`/api/member/${session.loginId}/transfer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({
+          amount: num,
+          memo: memo.trim() || null,
+          bankName: linked.nickname || linked.bank_name,
+          accountType: linked.account_type,
+          last4: linked.account_number.slice(-4),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Transfer failed. Please try again.");
+        return;
+      }
+      setSuccessDetails({
+        amount: num,
+        bankName: linked.nickname || linked.bank_name,
+        accountType: linked.account_type,
+        last4: linked.account_number.slice(-4),
+        memo: memo.trim(),
+        newBalance: data.newBalance,
+      });
+      setStep("success");
     } catch {
+      setError("Network error. Please check your connection and try again.");
     } finally {
       setSending(false);
-      setStep("failed");
     }
   };
 
@@ -376,28 +383,76 @@ function TransferPage() {
           </>
         )}
 
+        {/* ── STEP: SUCCESS ── */}
+        {step === "success" && successDetails && (
+          <div className="px-8 py-10 flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-5">
+              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+            </div>
+            <h2 className="font-serif text-xl text-ink mb-2">Transfer Submitted</h2>
+            <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed mb-6">
+              Your transfer of{" "}
+              <span className="font-semibold text-ink">{fmt(successDetails.amount)}</span>{" "}
+              to <span className="font-semibold text-ink">{successDetails.bankName}</span> has been processed.
+            </p>
+
+            {/* Summary box */}
+            <div className="w-full border border-border divide-y divide-border text-left mb-6">
+              <div className="flex justify-between px-5 py-3">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Amount</span>
+                <span className="text-[13px] font-bold text-red-600">−{fmt(successDetails.amount)}</span>
+              </div>
+              <div className="flex justify-between px-5 py-3">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Sent To</span>
+                <span className="text-[13px] font-semibold text-ink text-right">
+                  {successDetails.bankName}
+                  <span className="block text-[11px] font-normal text-ink/40">
+                    {successDetails.accountType} ····{successDetails.last4}
+                  </span>
+                </span>
+              </div>
+              {successDetails.memo && (
+                <div className="flex justify-between px-5 py-3">
+                  <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Memo</span>
+                  <span className="text-[13px] text-ink">{successDetails.memo}</span>
+                </div>
+              )}
+              <div className="flex justify-between px-5 py-3">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Date</span>
+                <span className="text-[13px] text-ink">{today}</span>
+              </div>
+              <div className="flex justify-between px-5 py-3 bg-secondary/30">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Remaining Balance</span>
+                <span className="text-[13px] font-bold text-brand-green">{fmt(successDetails.newBalance)}</span>
+              </div>
+            </div>
+
+            {/* Email notice */}
+            <div className="w-full bg-brand-green/5 border border-brand-green/20 px-5 py-3 text-[12px] text-ink/60 flex items-start gap-2 text-left mb-8">
+              <Mail className="w-3.5 h-3.5 shrink-0 mt-0.5 text-brand-green" />
+              <span>A debit notification has been sent to your registered email address.</span>
+            </div>
+
+            <button
+              onClick={() => navigate({ to: "/dashboard" })}
+              className="w-full bg-brand-green hover:bg-brand-green-dark text-white py-3 font-semibold text-sm transition-colors"
+            >
+              Back to Overview
+            </button>
+          </div>
+        )}
+
         {/* ── STEP: FAILED ── */}
         {step === "failed" && (
           <div className="px-8 py-10 flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-red-50 border border-red-200 flex items-center justify-center mb-5">
-              <XCircle className="w-8 h-8 text-red-500" />
+              <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="font-serif text-xl text-ink mb-2">Transaction Failed</h2>
-            <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed mb-1">
-              We were unable to process your transfer of{" "}
-              <span className="font-semibold text-ink">{fmt(parsedAmount)}</span> at this time.
-            </p>
+            <h2 className="font-serif text-xl text-ink mb-2">Transfer Failed</h2>
             <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed mb-8">
-              This may be due to a temporary system issue or a security hold on your account.
-              Please contact member services if the problem persists.
+              We were unable to process your transfer at this time. No funds have been deducted from your account.
+              Please try again or contact member services at <span className="font-semibold text-ink">512.302.6800</span>.
             </p>
-            <div className="w-full bg-red-50 border border-red-200 px-5 py-4 text-[12px] text-red-700 flex items-start gap-2 text-left mb-8">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-              <span>
-                Error code: <span className="font-mono font-semibold">TXN-{Date.now().toString().slice(-6)}</span> ·
-                No funds have been deducted from your account.
-              </span>
-            </div>
             <div className="flex gap-3 w-full">
               <button
                 onClick={() => { setStep("form"); setError(""); setAmount(""); setMemo(""); }}

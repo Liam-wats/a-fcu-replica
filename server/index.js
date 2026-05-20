@@ -792,6 +792,120 @@ app.delete("/api/member/:loginId/linked-account", requireAuth, async (req, res) 
   }
 });
 
+// POST /api/member/:loginId/transfer — process a debit transfer + send email
+app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
+  const { loginId } = req.params;
+  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
+
+  const { amount, memo, bankName, accountType, last4 } = req.body;
+  const num = parseFloat(amount);
+  if (!num || num <= 0) return res.status(400).json({ error: "Invalid amount." });
+
+  try {
+    // Check current balance
+    const balRes = await pool.query(
+      "SELECT available_balance FROM member_balances WHERE login_id = $1", [loginId]
+    );
+    const available = parseFloat(balRes.rows[0]?.available_balance ?? 0);
+    if (num > available) {
+      return res.status(400).json({ error: "Insufficient funds." });
+    }
+
+    // Fetch member info for email
+    const memRes = await pool.query(
+      "SELECT first_name, last_name, email FROM membership_applications WHERE login_id = $1",
+      [loginId]
+    );
+    const member = memRes.rows[0];
+
+    // Record the debit transaction
+    const txnDate = new Date().toISOString().slice(0, 10);
+    const description = memo
+      ? `Transfer to ${bankName} — ${memo}`
+      : `Transfer to ${bankName}`;
+    const txRes = await pool.query(
+      `INSERT INTO member_transactions (login_id, txn_date, description, category, amount, txn_type)
+       VALUES ($1, $2, $3, 'Transfer', $4, 'debit') RETURNING *`,
+      [loginId, txnDate, description, num]
+    );
+
+    // Recalc and persist balance
+    const newBalance = await recalcBalance(loginId);
+
+    // Send debit notification email (fire-and-forget — don't block response)
+    const transporter = createTransporter();
+    if (transporter && member?.email) {
+      const sentAt = new Date().toLocaleString("en-US", {
+        timeZone: "America/Chicago",
+        dateStyle: "full",
+        timeStyle: "long",
+      });
+      const fmtUSD = (n) => Number(n).toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+      const html = `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden">
+          <div style="background:#2b6e44;padding:24px 28px">
+            <p style="margin:0;color:#a7f3d0;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">A+ Federal Credit Union</p>
+            <h1 style="margin:8px 0 0;color:#fff;font-size:22px;font-weight:700">Debit Notification</h1>
+          </div>
+          <div style="padding:28px">
+            <p style="margin:0 0 20px;font-size:14px;color:#374151">
+              Hi ${member.first_name},
+            </p>
+            <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.6">
+              A withdrawal has been processed from your A+ Federal Credit Union account. Here are the details:
+            </p>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px">
+              <tr style="border-bottom:1px solid #f3f4f6">
+                <td style="padding:10px 0;color:#6b7280;width:140px">Amount</td>
+                <td style="padding:10px 0;font-weight:700;color:#dc2626;font-size:16px">&minus;${fmtUSD(num)}</td>
+              </tr>
+              <tr style="border-bottom:1px solid #f3f4f6">
+                <td style="padding:10px 0;color:#6b7280">Transferred To</td>
+                <td style="padding:10px 0;font-weight:600;color:#111827">${bankName}${last4 ? ` &bull;&bull;&bull;&bull; ${last4}` : ""}${accountType ? ` (${accountType})` : ""}</td>
+              </tr>
+              ${memo ? `<tr style="border-bottom:1px solid #f3f4f6"><td style="padding:10px 0;color:#6b7280">Memo</td><td style="padding:10px 0;color:#111827">${memo}</td></tr>` : ""}
+              <tr style="border-bottom:1px solid #f3f4f6">
+                <td style="padding:10px 0;color:#6b7280">Date</td>
+                <td style="padding:10px 0;color:#111827">${sentAt}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;color:#6b7280">Remaining Balance</td>
+                <td style="padding:10px 0;font-weight:600;color:#111827">${fmtUSD(newBalance)}</td>
+              </tr>
+            </table>
+            <div style="background:#fef9c3;border-left:3px solid #f59e0b;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:24px">
+              If you did not authorize this transfer, please contact us immediately at <strong>512.302.6800</strong>.
+            </div>
+            <p style="margin:0;font-size:12px;color:#9ca3af">
+              A+ Federal Credit Union &nbsp;&middot;&nbsp; Member FDIC &nbsp;&middot;&nbsp; Equal Housing Lender<br>
+              This is an automated notification. Please do not reply to this email.
+            </p>
+          </div>
+        </div>`;
+
+      transporter.sendMail({
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        to: member.email,
+        subject: `Debit of ${fmtUSD(num)} processed — A+ Federal Credit Union`,
+        html,
+        text: `Hi ${member.first_name},\n\nA withdrawal of ${fmtUSD(num)} has been processed from your account.\n\nTransferred to: ${bankName}${last4 ? ` ****${last4}` : ""}${accountType ? ` (${accountType})` : ""}\n${memo ? `Memo: ${memo}\n` : ""}Date: ${sentAt}\nRemaining balance: ${fmtUSD(newBalance)}\n\nIf you did not authorize this, call us at 512.302.6800.\n\nA+ Federal Credit Union`,
+      }).catch(err => console.warn("Transfer email failed:", err.message));
+    } else if (!transporter) {
+      console.warn(`Transfer email skipped (SMTP not configured). ${member?.first_name} ${member?.last_name} — ${loginId} — ${num}`);
+    }
+
+    return res.json({
+      success: true,
+      transaction: txRes.rows[0],
+      newBalance,
+    });
+  } catch (err) {
+    console.error("Transfer error:", err);
+    return res.status(500).json({ error: "Transfer failed. Please try again." });
+  }
+});
+
 // Helper: recompute balance from all transactions and persist it
 async function recalcBalance(loginId) {
   const txRes = await pool.query(
