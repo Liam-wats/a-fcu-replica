@@ -221,6 +221,50 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ── Security headers ─────────────────────────────────────────────────────────
+
+app.use((req, res, next) => {
+  // Prevent MIME-type sniffing (stops content-type confusion attacks)
+  res.setHeader("X-Content-Type-Options", "nosniff");
+
+  // Block clickjacking / framing by third parties
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+
+  // Enforce HTTPS for all future requests (1 year)
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+  // Reduce referrer data sent to external sites
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Restrict browser feature APIs to only what the app needs
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  );
+
+  // Content Security Policy — prevents XSS and blocks suspicious resource loads
+  // Allows only same-origin resources plus the CDN fonts/icons used by the app
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",      // React/Vite dev needs unsafe-eval
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: blob:",                           // data: for jsPDF, blob: for file previews
+      "connect-src 'self'",
+      "frame-ancestors 'none'",                              // equivalent to X-Frame-Options DENY for modern browsers
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join("; ")
+  );
+
+  // Tell crawlers this content should not be indexed even if they ignore robots.txt
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+
+  next();
+});
+
 // ── Auth endpoints ───────────────────────────────────────────────────────────
 
 // GET /api/auth/verify — validate a member JWT

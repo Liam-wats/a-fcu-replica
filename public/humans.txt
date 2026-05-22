@@ -1,0 +1,8 @@
+/* TEAM */
+Organization: A+ Federal Credit Union
+Site: https://aplusfcu.org
+Location: Austin, TX, USA
+
+/* SITE */
+Standards: HTML5, CSS3, ARIA
+Components: React, TypeScript, TanStack Router, Express, PostgreSQL
