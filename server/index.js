@@ -272,8 +272,61 @@ app.get("/api/auth/verify", requireAuth, (req, res) => {
   res.json({ valid: true, loginId: req.user.loginId });
 });
 
+// ── Login rate limiter (in-memory, per IP) ───────────────────────────────────
+// Max 5 failed attempts per IP per 15-minute window.
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS    = 15 * 60 * 1000; // 15 minutes
+
+const loginAttempts = new Map(); // ip → { count, resetAt }
+
+function checkLoginRateLimit(ip) {
+  const now  = Date.now();
+  const rec  = loginAttempts.get(ip);
+  if (!rec || now > rec.resetAt) {
+    loginAttempts.set(ip, { count: 0, resetAt: now + LOGIN_WINDOW_MS });
+    return { blocked: false };
+  }
+  if (rec.count >= LOGIN_MAX_ATTEMPTS) {
+    const retryAfterSec = Math.ceil((rec.resetAt - now) / 1000);
+    return { blocked: true, retryAfterSec };
+  }
+  return { blocked: false };
+}
+
+function recordFailedLogin(ip) {
+  const now = Date.now();
+  const rec = loginAttempts.get(ip);
+  if (!rec || now > rec.resetAt) {
+    loginAttempts.set(ip, { count: 1, resetAt: now + LOGIN_WINDOW_MS });
+  } else {
+    rec.count += 1;
+  }
+}
+
+function clearLoginAttempts(ip) {
+  loginAttempts.delete(ip);
+}
+
+// Purge stale entries every 30 minutes to prevent memory growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, rec] of loginAttempts.entries()) {
+    if (now > rec.resetAt) loginAttempts.delete(ip);
+  }
+}, 30 * 60 * 1000);
+
 // POST /api/login — authenticate a member, return JWT
 app.post("/api/login", async (req, res) => {
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress || "unknown";
+  const { blocked, retryAfterSec } = checkLoginRateLimit(ip);
+
+  if (blocked) {
+    res.setHeader("Retry-After", String(retryAfterSec));
+    return res.status(429).json({
+      error: `Too many failed login attempts. Please wait ${Math.ceil(retryAfterSec / 60)} minute(s) before trying again.`,
+    });
+  }
+
   const { loginId, password } = req.body;
 
   if (!loginId || !password) {
@@ -291,17 +344,23 @@ app.post("/api/login", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
+      recordFailedLogin(ip);
+      // Consistent response time — don't leak whether the loginId exists
       return res.status(401).json({ error: "Incorrect Login ID or password. Please try again." });
     }
 
     const member = result.rows[0];
 
     if (member.status === "pending") {
+      // Pending status is not a credential failure — don't count against rate limit
       return res.status(403).json({
         error: "Your membership application is still under review. You'll receive an email once approved.",
         status: "pending",
       });
     }
+
+    // Successful login — clear any accumulated failure count for this IP
+    clearLoginAttempts(ip);
 
     const token = signToken({ loginId: member.login_id, sub: member.id });
 
