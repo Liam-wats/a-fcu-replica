@@ -117,7 +117,7 @@ function MemberServicesPage() {
             <p className="text-xs text-muted-foreground mt-3 italic">*Domestic wires submitted before 2:00 PM CT on business days.</p>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
             alt="A+FCU member services team"
             className="w-full h-auto"
           />

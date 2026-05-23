@@ -102,7 +102,7 @@ function CommunityPage() {
         <div className="container-x max-w-5xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <img
-              src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+              src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
               alt="A+FCU volunteers in the community"
               className="w-full h-auto"
             />

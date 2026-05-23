@@ -84,7 +84,7 @@ function InsuranceInvestmentsPage() {
       <section className="bg-white py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
             alt="Family protected by A+FCU insurance"
             className="w-full h-auto"
           />
@@ -153,7 +153,7 @@ function InsuranceInvestmentsPage() {
             </Link>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp"
+            src="/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp"
             alt="Couple planning for retirement"
             className="w-full h-auto"
           />

@@ -132,7 +132,7 @@ function OnlineBankingPage() {
             </Link>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp"
+            src="/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp"
             alt="Person checking credit score on laptop"
             className="w-full h-auto"
           />

@@ -90,7 +90,7 @@ function SavingsPage() {
             </Link>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
             alt="A+FCU team members"
             className="w-full h-auto"
           />

@@ -300,7 +300,7 @@ export const HERO_SLIDES: Array<{
     body: "Big summer plans? Apply for a personal loan today, get funds by tomorrow.†",
     ctaLabel: "Apply Online",
     ctaHref: "/loans",
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
     alt: "Man and woman sit at kitchen table with laptop and mobile phone.",
     bg: "white",
   },
@@ -310,7 +310,7 @@ export const HERO_SLIDES: Array<{
     body: "Join the cash-back movement by using your A+FCU debit card for everyday purchases.",
     ctaLabel: "Here's How",
     ctaHref: "/accounts",
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
+    image: "/assets/apfcu/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
     alt: "Image of mobile phone with the A+ Mobile App showing cash back earned. A+ debit card is in front of the phone.",
     bg: "white",
   },
@@ -360,33 +360,33 @@ export const RATES = [
 ];
 
 export const AWARDS = [
-  "https://aplusfcu.org/wp-content/uploads/global/img/logo-grid-image_2025-cca-winner-badge_sep25.jpg",
-  "https://aplusfcu.org/wp-content/uploads/global/img/logo-grid-image_2025-top-workplaces-badge_nov25.webp",
-  "https://aplusfcu.org/wp-content/uploads/global/img/logo-grid-image_2025-austin-gives-winner-badge_sep25.webp",
-  "https://aplusfcu.org/wp-content/uploads/global/img/logo-grid-image_2025-global-finance-best-mobile-app-award_sep25.webp",
-  "https://aplusfcu.org/wp-content/uploads/landing-pages/img/logo-grid-image_2024-communitys-choice-awards-badge_sep24.jpg",
-  "https://aplusfcu.org/wp-content/uploads/global/img/logo-grid-image_2025-top-workplaces-badge_jan25.png",
-  "https://aplusfcu.org/wp-content/uploads/landing-pages/img/logo-grid-image-a-awards-landing-page_2023-best-of-the-best_nov23.jpg",
-  "https://aplusfcu.org/wp-content/uploads/landing-pages/img/logo-grid-image-a-awards-landing-page_2023-top-workplace_nov23.jpg",
-  "https://aplusfcu.org/wp-content/uploads/landing-pages/img/logo-grid-image-a-awards-landing-page_austin-gives-generous-business_nov23.jpg",
-  "https://aplusfcu.org/wp-content/uploads/landing-pages/img/logo-grid-image-a-awards-landing-page_dora-maxwell-social-responsibility_nov23.jpg",
+  "/assets/apfcu/logo-grid-image_2025-cca-winner-badge_sep25.jpg",
+  "/assets/apfcu/logo-grid-image_2025-top-workplaces-badge_nov25.webp",
+  "/assets/apfcu/logo-grid-image_2025-austin-gives-winner-badge_sep25.webp",
+  "/assets/apfcu/logo-grid-image_2025-global-finance-best-mobile-app-award_sep25.webp",
+  "/assets/apfcu/logo-grid-image_2024-communitys-choice-awards-badge_sep24.jpg",
+  "/assets/apfcu/logo-grid-image_2025-top-workplaces-badge_jan25.png",
+  "/assets/apfcu/logo-grid-image-a-awards-landing-page_2023-best-of-the-best_nov23.jpg",
+  "/assets/apfcu/logo-grid-image-a-awards-landing-page_2023-top-workplace_nov23.jpg",
+  "/assets/apfcu/logo-grid-image-a-awards-landing-page_austin-gives-generous-business_nov23.jpg",
+  "/assets/apfcu/logo-grid-image-a-awards-landing-page_dora-maxwell-social-responsibility_nov23.jpg",
 ];
 
 export const ARTICLES = [
   {
     title: "What To Avoid During The Mortgage Process: 9 Common Mistakes",
     excerpt: "Avoid these 9 common mistakes buyers make during the mortgage process to help ensure your application stays on course for a successful closing.",
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    image: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
   {
     title: "16 Months Of Financial Tips",
     excerpt: "Use these monthly financial tips to break down your top financial tasks and to-dos and get on the right path to being financially healthy.",
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
   {
     title: "Want To Teach Your Kids About Money? Start With These 6 Simple Lessons",
     excerpt: "Help your kids build smart money habits early with practical tips on saving, spending, and financial responsibility.",
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
+    image: "/assets/apfcu/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
   },
 ];
 

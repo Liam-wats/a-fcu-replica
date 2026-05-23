@@ -35,7 +35,7 @@ export const ONLINE_BANKING_FEATURES = [
       "Set payment reminders via email or text",
       "Available via Online Banking and A+ Mobile App",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
 ];
 
@@ -86,7 +86,7 @@ export const MOBILE_FEATURES = [
       "No branch visit or ATM required",
       "Available on iOS and Android",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
+    image: "/assets/apfcu/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
   },
 ];
 
@@ -114,7 +114,7 @@ export const MEMBER_SERVICES_LIST = [
       "No enrollment fee",
       "Instant notification when funds arrive",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "wire-transfers",
@@ -133,7 +133,7 @@ export const MEMBER_SERVICES_LIST = [
       "Competitive wire fee rates",
       "Trace number provided for every transaction",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    image: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
 ];
 
@@ -168,7 +168,7 @@ export const INSURANCE_PRODUCTS = [
       "Identity theft protection",
       "Backed by TruStage™, the credit union insurance provider",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "investments",
@@ -187,7 +187,7 @@ export const INSURANCE_PRODUCTS = [
       "Regular portfolio reviews",
       "Non-deposit investment products are not NCUA insured",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
   {
     id: "retirement",
@@ -206,6 +206,6 @@ export const INSURANCE_PRODUCTS = [
       "Annual contribution limit guidance",
       "NCUA insured separately up to $250,000",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
 ];

@@ -62,7 +62,7 @@ export const ARTICLES = [
     date: "May 3, 2026",
     readTime: "5 min read",
     excerpt: "Getting pre-approved is just the first step. Here's what lenders are really looking for — and how to put your best foot forward.",
-    img: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    img: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
   {
     category: "Credit",
@@ -70,7 +70,7 @@ export const ARTICLES = [
     date: "April 21, 2026",
     readTime: "6 min read",
     excerpt: "Small, consistent changes to how you use credit can produce big score improvements over time. Here's exactly what moves the needle.",
-    img: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    img: "/assets/apfcu/planner_blog.jpg",
   },
   {
     category: "Budgeting",
@@ -78,7 +78,7 @@ export const ARTICLES = [
     date: "April 10, 2026",
     readTime: "4 min read",
     excerpt: "The popular budgeting rule assigns 50% to needs, 30% to wants, and 20% to savings. We break down when it works — and when to adjust it.",
-    img: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    img: "/assets/apfcu/planner_blog.jpg",
   },
   {
     category: "Investing",
@@ -86,7 +86,7 @@ export const ARTICLES = [
     date: "March 28, 2026",
     readTime: "7 min read",
     excerpt: "The data consistently favors low-cost index funds for most long-term investors. Here's a clear breakdown of the tradeoffs.",
-    img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    img: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     category: "Retirement",
@@ -102,7 +102,7 @@ export const ARTICLES = [
     date: "March 2, 2026",
     readTime: "4 min read",
     excerpt: "A credit freeze is one of the most powerful tools against identity theft — and it's free. Here's how it works and how to set one up.",
-    img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    img: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
 ];
 

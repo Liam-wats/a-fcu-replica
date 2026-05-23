@@ -29,7 +29,7 @@ function Index() {
       <ContentBlock
         image="/assets/apfcu/alt-content-block-image_online-services_feb26.webp"
         imageAlt="Person using A+ mobile banking app on phone"
-        icon="https://aplusfcu.org/wp-content/uploads/global/icons/gray/icon_gray_mobile-banking.svg"
+        icon="/assets/apfcu/icon_gray_mobile-banking.svg"
         eyebrow="Online Services"
         title="Convenient Online Tools To Help You Live Your A+ Life"
         body="Get the most out of your A+FCU membership with free services designed to benefit you. Get paid up to two days early† with direct deposit, use Card Management to add extra security and set controls for your A+FCU debit cards, and stay on top of your credit with monthly credit score updates through A+ Online Banking and the award-winning A+ Mobile App, recognized as the 2025 Best Mobile Banking App in North America."
@@ -43,9 +43,9 @@ function Index() {
       <ContentBlock
         flip
         bg="cream"
-        image="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+        image="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
         imageAlt="A+FCU team members making heart shapes with their hands."
-        icon="https://aplusfcu.org/wp-content/uploads/global/icons/gray/icon_gray_about.svg"
+        icon="/assets/apfcu/icon_gray_about.svg"
         eyebrow="About A+FCU"
         title="Banking on each other. Building stronger communities.®"
         body="At A+FCU, we don't have customers, we have members. That means we're all in this together, and when one member does well, we all share the benefits."
@@ -57,9 +57,9 @@ function Index() {
       />
       <AwardsGrid />
       <ContentBlock
-        image="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_a-loans_sep24.png"
+        image="/assets/apfcu/alt-content-block-image_a-loans_sep24.png"
         imageAlt="A young man and young woman sitting on a porch talking."
-        icon="https://aplusfcu.org/wp-content/uploads/global/icons/gray/icon_gray_loans.svg"
+        icon="/assets/apfcu/icon_gray_loans.svg"
         eyebrow="A+FCU Loans"
         title="We'll set you up with the right loan for your needs."
         body="Depending on your wants, needs, and financial situation, we'll work together to find the loan that's best for you."

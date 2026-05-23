@@ -37,7 +37,7 @@ export const HOME_LOAN_PRODUCTS = [
       "Online application with e-signature",
       "Lock your rate while you shop",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "home-equity",
@@ -77,7 +77,7 @@ export const HOME_LOAN_PRODUCTS = [
       "Interest may be tax-deductible (consult your tax advisor)",
       "No closing costs on most HELOCs*",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    image: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
 ];
 
@@ -108,7 +108,7 @@ export const VEHICLE_LOAN_PRODUCTS = [
       "GAP coverage and extended warranty available",
       "Refinance your existing auto loan too",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
   {
     id: "auto-refinance",
@@ -144,7 +144,7 @@ export const VEHICLE_LOAN_PRODUCTS = [
       "Quick online application",
       "No prepayment penalty",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "motorcycle",
@@ -195,7 +195,7 @@ export const PERSONAL_CREDIT_PRODUCTS = [
       "No prepayment penalty",
       "Use for any purpose: debt consolidation, medical, travel, and more",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
   {
     id: "credit-cards",
@@ -254,7 +254,7 @@ export const STUDENT_LOAN_PRODUCTS = [
       "Fixed and variable rate options",
       "Apply online in minutes",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
   {
     id: "refinance-student-loans",
@@ -273,6 +273,6 @@ export const STUDENT_LOAN_PRODUCTS = [
       "Cosigner not required (but may help qualify)",
       "No prepayment penalty",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
 ];

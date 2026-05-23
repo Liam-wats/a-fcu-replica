@@ -102,7 +102,7 @@ function YouthPage() {
       <section className="bg-white py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/blog/img/6-powerful-money-lessons-for-little-kids_may18_blog.jpg"
+            src="/assets/apfcu/6-powerful-money-lessons-for-little-kids_may18_blog.jpg"
             alt="Parent teaching child about money"
             className="w-full h-auto"
           />

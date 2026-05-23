@@ -17,7 +17,7 @@ export const BUSINESS_CHECKING_PRODUCTS = [
       "ACH origination capability",
       "NCUA insured up to $250,000",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "business-interest-checking",
@@ -37,7 +37,7 @@ export const BUSINESS_CHECKING_PRODUCTS = [
       "ACH origination capability",
       "NCUA insured up to $250,000",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
 ];
 
@@ -76,7 +76,7 @@ export const BUSINESS_SAVINGS_PRODUCTS = [
       "Free online & mobile banking access",
       "Up to 6 withdrawals per month",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "business-certificates",
@@ -94,7 +94,7 @@ export const BUSINESS_SAVINGS_PRODUCTS = [
       "Auto-renewal option at maturity",
       "Ideal for tax reserves, equipment funds, or seasonal cash",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    image: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
 ];
 
@@ -192,7 +192,7 @@ export const BUSINESS_SERVICES_FEATURES = [
       "Detailed reporting and analytics",
       "24/7 technical support",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
 ];
 

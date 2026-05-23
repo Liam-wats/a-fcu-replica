@@ -106,7 +106,7 @@ function BusinessAccountsPage() {
             </div>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
             alt="Business owner using A+FCU online banking"
             className="w-full h-auto"
           />

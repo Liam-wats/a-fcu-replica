@@ -86,7 +86,7 @@ function VehicleLoansPage() {
       <section className="bg-white py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp"
+            src="/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp"
             alt="Person financing a vehicle with A+FCU"
             className="w-full h-auto"
           />

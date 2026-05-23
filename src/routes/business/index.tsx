@@ -110,7 +110,7 @@ function BusinessPage() {
       <section className="bg-white py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp"
             alt="A+FCU business team"
             className="w-full h-auto"
           />

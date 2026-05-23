@@ -17,7 +17,7 @@ export const CHECKING_PRODUCTS = [
       "Unlimited free transactions",
       "Overdraft protection options",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
+    image: "/assets/apfcu/q2-checking-accounts_may26_homepage-hero_v1-1400x950.webp",
   },
   {
     id: "free-checking",
@@ -59,7 +59,7 @@ export const SAVINGS_PRODUCTS = [
       "Unlimited deposits",
       "Up to 6 withdrawals per month",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "money-market",
@@ -78,7 +78,7 @@ export const SAVINGS_PRODUCTS = [
       "Up to 6 withdrawals per month",
       "Great complement to regular savings",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/planner_blog.jpg",
+    image: "/assets/apfcu/planner_blog.jpg",
   },
   {
     id: "holiday-vacation",
@@ -96,7 +96,7 @@ export const SAVINGS_PRODUCTS = [
       "Perfect for seasonal expenses & travel",
       "Easy to set up in online banking",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
+    image: "/assets/apfcu/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
   },
 ];
 
@@ -140,7 +140,7 @@ export const CERTIFICATE_PRODUCTS = [
       "Annual contribution limits apply (IRS guidelines)",
       "No monthly fees",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/9-things-to-avoid-mortgage_blog.jpg",
+    image: "/assets/apfcu/9-things-to-avoid-mortgage_blog.jpg",
   },
 ];
 
@@ -174,7 +174,7 @@ export const YOUTH_PRODUCTS = [
       "Upgrade automatically when member turns 13",
       "Free piggy bank with new account opening†",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/blog/img/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
+    image: "/assets/apfcu/6-powerful-money-lessons-for-little-kids_may18_blog.jpg",
   },
   {
     id: "teen-accounts",
@@ -194,7 +194,7 @@ export const YOUTH_PRODUCTS = [
       "Financial literacy tools and workshops",
       "Automatic upgrade to full membership at 18",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_about-afcu_feb26.webp",
   },
   {
     id: "student-accounts",
@@ -215,6 +215,6 @@ export const YOUTH_PRODUCTS = [
       "Budgeting tools in the A+ Mobile App",
       "No minimum balance requirement",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-personal-loan_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-personal-loan_may26_homepage-hero.webp",
   },
 ];
