@@ -53,7 +53,7 @@ function MobileBankingPage() {
       <section className="bg-brand-cream py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_online-services_feb26.webp"
             alt="A+ Mobile App on iPhone"
             className="w-full h-auto"
           />

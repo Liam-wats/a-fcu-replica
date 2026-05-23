@@ -15,28 +15,28 @@ export const Route = createFileRoute("/accounts/")({
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Checking",
     href: "/accounts/checking",
     desc: "Everyday spending made rewarding. Earn cash back, get paid early, and pay zero monthly fees.",
     links: ["Cash-Back Checking", "Free Checking", "Compare Checking"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-equity.svg",
+    icon: "/assets/apfcu/icon_home-equity.svg",
     title: "Savings",
     href: "/accounts/savings",
     desc: "Build your financial cushion with accounts that earn dividends and grow with you.",
     links: ["Regular Savings", "Money Market", "Holiday & Vacation Club"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-refinance.svg",
+    icon: "/assets/apfcu/icon_home-refinance.svg",
     title: "Certificates",
     href: "/accounts/certificates",
     desc: "Lock in a guaranteed rate and maximize your savings with our Share and IRA Certificates.",
     links: ["Share Certificates", "IRA Certificates", "View All Rates"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Youth Accounts",
     href: "/accounts/youth",
     desc: "Start the next generation off right with accounts built for kids, teens, and students.",

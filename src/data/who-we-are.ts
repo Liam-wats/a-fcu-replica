@@ -1,10 +1,10 @@
 export const LEADERSHIP_TEAM = [
   { name: "Kirk Dorius", title: "President & CEO", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp" },
-  { name: "Maria Gonzalez", title: "Chief Financial Officer", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp" },
+  { name: "Maria Gonzalez", title: "Chief Financial Officer", img: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp" },
   { name: "James Holloway", title: "Chief Lending Officer", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp" },
-  { name: "Sandra Pierce", title: "Chief Operating Officer", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp" },
+  { name: "Sandra Pierce", title: "Chief Operating Officer", img: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp" },
   { name: "David Kim", title: "Chief Technology Officer", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_about-afcu_feb26.webp" },
-  { name: "Rachel Torres", title: "SVP, Member Experience", img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp" },
+  { name: "Rachel Torres", title: "SVP, Member Experience", img: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp" },
 ];
 
 export const TIMELINE = [

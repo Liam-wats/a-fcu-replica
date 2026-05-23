@@ -17,7 +17,7 @@ export const HOME_LOAN_PRODUCTS = [
       "Dedicated mortgage advisors throughout the process",
       "Online application and e-signature available",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-mortgage-purchase_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-mortgage-purchase_may26_homepage-hero.webp",
   },
   {
     id: "mortgage-refinance",
@@ -57,7 +57,7 @@ export const HOME_LOAN_PRODUCTS = [
       "Interest may be tax-deductible (consult your tax advisor)",
       "Local processing and fast approvals",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "heloc",
@@ -126,7 +126,7 @@ export const VEHICLE_LOAN_PRODUCTS = [
       "Any make, model, or year",
       "Online application with e-signature",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
+    image: "/assets/apfcu/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
   },
   {
     id: "rv-boat",
@@ -162,7 +162,7 @@ export const VEHICLE_LOAN_PRODUCTS = [
       "No prepayment penalty",
       "GAP coverage available",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
 ];
 
@@ -214,7 +214,7 @@ export const PERSONAL_CREDIT_PRODUCTS = [
       "Tap to pay and digital wallet compatible",
       "Freeze/unfreeze your card instantly in the app",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
+    image: "/assets/apfcu/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
   },
   {
     id: "lines-of-credit",
@@ -232,7 +232,7 @@ export const PERSONAL_CREDIT_PRODUCTS = [
       "Great for covering unexpected expenses",
       "No prepayment penalty",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
 ];
 

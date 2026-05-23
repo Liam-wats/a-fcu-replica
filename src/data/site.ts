@@ -290,7 +290,7 @@ export const HERO_SLIDES: Array<{
     body: "Close on your new home by September 30 to get a $500 lender credit!*",
     ctaLabel: "Get Details",
     ctaHref: "/loans",
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/q2-mortgage-purchase_may26_homepage-hero.webp",
+    image: "/assets/apfcu/q2-mortgage-purchase_may26_homepage-hero.webp",
     alt: "Family of four in the backyard while the dad helps the younger son ride a bike. Mom and sister clap in the back.",
     bg: "white",
   },
@@ -318,7 +318,7 @@ export const HERO_SLIDES: Array<{
 
 export const RATES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     name: "Mortgage Purchase",
     term: "30-Year Fixed",
     primary: "5.990%",
@@ -326,7 +326,7 @@ export const RATES = [
     secondary: "6.042% APR",
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     name: "Auto Purchase",
     term: "6-36 Months",
     primary: "5.49%",
@@ -334,7 +334,7 @@ export const RATES = [
     secondary: "APR",
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     name: "Share Certificate",
     term: "18-Month Term",
     primary: "3.55%",
@@ -342,7 +342,7 @@ export const RATES = [
     secondary: "APY",
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-equity.svg",
+    icon: "/assets/apfcu/icon_home-equity.svg",
     name: "Home Equity Loan",
     term: "5-Year Home Equity",
     primary: "5.240%",
@@ -350,7 +350,7 @@ export const RATES = [
     secondary: "5.500% APR",
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-refinance.svg",
+    icon: "/assets/apfcu/icon_home-refinance.svg",
     name: "Mortgage Refi",
     term: "15-Year Fixed",
     primary: "5.625%",
@@ -391,6 +391,6 @@ export const ARTICLES = [
 ];
 
 export const ANGLE_OVERLAY =
-  "https://aplusfcu.org/wp-content/themes/aplusfcu/images/dist/angle_hero-homepage.png";
+  "/assets/apfcu/angle_hero-homepage.png";
 
 export const LOGO_ALT = "A+ Federal Credit Union";

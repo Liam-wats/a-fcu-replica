@@ -5,28 +5,28 @@ import { AccountBenefits } from "@/components/accounts/AccountBenefits";
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Online Banking",
     href: "/services/online-banking",
     desc: "Manage your accounts, pay bills, monitor your credit score, and control your cards — all from your browser.",
     links: ["A+ Online Banking", "Bill Pay", "Card Management", "Credit Score"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Mobile Banking",
     href: "/services/mobile-banking",
     desc: "The award-winning A+ Mobile App puts your finances in your pocket. Deposit checks, pay anyone, and more.",
     links: ["A+ Mobile App", "Mobile Deposit", "Digital Wallets"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     title: "Member Services",
     href: "/services/member-services",
     desc: "Convenient, practical services to help your money move — direct deposit, wires, and in-branch notary.",
     links: ["Direct Deposit", "Wire Transfers", "Notary"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-equity.svg",
+    icon: "/assets/apfcu/icon_home-equity.svg",
     title: "Insurance & Investments",
     href: "/services/insurance-investments",
     desc: "Protect your family and grow your wealth with insurance, investment, and retirement planning services.",
@@ -87,7 +87,7 @@ function ServicesPage() {
       <section className="bg-brand-cream py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_online-services_feb26.webp"
             alt="A+ Mobile App and Online Banking on devices"
             className="w-full h-auto"
           />

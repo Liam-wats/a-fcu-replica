@@ -15,7 +15,7 @@ export const Route = createFileRoute("/loans/")({
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     title: "Home Loans",
     href: "/loans/home-loans",
     desc: "From purchase to refinance to home equity — we'll help you find the right mortgage for your situation.",
@@ -23,7 +23,7 @@ const CATEGORIES = [
     links: ["Mortgage Purchase", "Mortgage Refinance", "Home Equity", "HELOC"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Vehicle Loans",
     href: "/loans/vehicle-loans",
     desc: "Drive home in your new car, truck, boat, or RV with competitive rates and terms up to 84 months.",
@@ -31,7 +31,7 @@ const CATEGORIES = [
     links: ["Auto Purchase", "Auto Refinance", "RV & Boat", "Motorcycle"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Personal Credit",
     href: "/loans/personal-credit",
     desc: "Get the funds you need fast — personal loans, credit cards, and lines of credit with no collateral required.",
@@ -39,7 +39,7 @@ const CATEGORIES = [
     links: ["Personal Loans", "Credit Cards", "Lines of Credit"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-refinance.svg",
+    icon: "/assets/apfcu/icon_home-refinance.svg",
     title: "Student Loans",
     href: "/loans/student-loans",
     desc: "Private student loans and refinancing options to help you invest in your education without the stress.",

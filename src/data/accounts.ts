@@ -37,7 +37,7 @@ export const CHECKING_PRODUCTS = [
       "Bill Pay at no charge",
       "Overdraft protection options",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
+    image: "/assets/apfcu/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg",
   },
 ];
 
@@ -120,7 +120,7 @@ export const CERTIFICATE_PRODUCTS = [
       "No monthly fees",
       "Early withdrawal penalty may apply",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "ira-certificates",

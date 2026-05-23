@@ -5,21 +5,21 @@ import { BUSINESS_WHY } from "@/data/business";
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Business Accounts",
     href: "/business/accounts",
     desc: "Checking, savings, and certificate accounts built for businesses — with the same no-fee, member-first philosophy.",
     links: ["Business Checking", "Business Savings", "Business Certificates"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     title: "Business Lending",
     href: "/business/lending",
     desc: "Term loans, lines of credit, and commercial real estate financing with local decisions and competitive rates.",
     links: ["Business Term Loans", "Lines of Credit", "Commercial Real Estate"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Business Services",
     href: "/business/services",
     desc: "Online banking, merchant services, and payroll solutions to run your business more efficiently.",

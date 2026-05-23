@@ -1,6 +1,6 @@
 const CARDS = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Accounts",
     href: "/accounts",
     body: "Discover a range of account options designed to meet your everyday banking needs and maximize your savings.",
@@ -11,7 +11,7 @@ const CARDS = [
     ],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_online-banking.svg",
+    icon: "/assets/apfcu/icon_online-banking.svg",
     title: "Online Banking",
     href: "/services",
     body: "As your financial institution, we offer a variety of convenient services to simplify your financial needs.",
@@ -24,7 +24,7 @@ const CARDS = [
 ];
 
 const HERO_IMG =
-  "https://aplusfcu.org/wp-content/uploads/global/img/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg";
+  "/assets/apfcu/subpage-overview-cards-image-home-page_accounts-digital_sep22.jpg";
 
 export function CategoryCards() {
   return (

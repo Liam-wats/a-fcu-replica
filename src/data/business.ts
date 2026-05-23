@@ -58,7 +58,7 @@ export const BUSINESS_SAVINGS_PRODUCTS = [
       "No monthly service fee",
       "Perfect for operating reserves and emergency funds",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "business-money-market",
@@ -173,7 +173,7 @@ export const BUSINESS_SERVICES_FEATURES = [
       "Download statements and transaction history",
       "Set account alerts and notifications",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "merchant-services",

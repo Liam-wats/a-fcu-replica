@@ -4,21 +4,21 @@ import { PageHero } from "@/components/site/PageHero";
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "About A+FCU",
     href: "/who-we-are/about",
     desc: "Founded by Austin teachers in 1949, A+FCU has grown to serve over 100,000 members. Learn our story, meet our leaders, and explore careers.",
     links: ["Our Story", "Leadership", "Careers", "Newsroom"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     title: "Community",
     href: "/who-we-are/community",
     desc: "We put people before profit — that means giving back to the community we've called home for over 75 years through grants, sponsorships, and volunteers.",
     links: ["A+ Gives", "Sponsorships", "Volunteering"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Membership",
     href: "/who-we-are/membership",
     desc: "Membership opens the door to better rates, fewer fees, and real service from people who care. See how to join and what you get as a member.",

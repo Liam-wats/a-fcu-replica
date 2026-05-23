@@ -4,21 +4,21 @@ import { PageHero } from "@/components/site/PageHero";
 
 const CATEGORIES = [
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg",
+    icon: "/assets/apfcu/icon_personal-finances.svg",
     title: "Financial Education",
     href: "/guidance/financial-education",
     desc: "Free workshops, practical articles, and interactive calculators to help you make smarter financial decisions.",
     links: ["Workshops", "Calculators", "Articles"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg",
+    icon: "/assets/apfcu/icon_home-loans.svg",
     title: "Rates",
     href: "/guidance/rates",
     desc: "Up-to-date rates on all A+FCU loan and deposit products — from mortgages and auto loans to certificates and money markets.",
     links: ["All Rates", "Loan Rates", "Deposit Rates"],
   },
   {
-    icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg",
+    icon: "/assets/apfcu/icon_vehicle-loans.svg",
     title: "Tools & Support",
     href: "/guidance/tools",
     desc: "Make a payment, download our switch kit to move your banking, or get answers to common questions in our FAQ.",
@@ -99,7 +99,7 @@ function GuidancePage() {
       <section className="bg-brand-cream py-16">
         <div className="container-x grid lg:grid-cols-2 gap-12 items-center max-w-5xl">
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp"
+            src="/assets/apfcu/alt-content-block-image_online-services_feb26.webp"
             alt="A+FCU financial education"
             className="w-full h-auto"
           />

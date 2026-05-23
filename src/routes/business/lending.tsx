@@ -161,7 +161,7 @@ function BusinessLendingPage() {
             </ul>
           </div>
           <img
-            src="https://aplusfcu.org/wp-content/uploads/global/img/q2-mortgage-purchase_may26_homepage-hero.webp"
+            src="/assets/apfcu/q2-mortgage-purchase_may26_homepage-hero.webp"
             alt="Commercial building financed by A+FCU"
             className="w-full h-auto"
           />

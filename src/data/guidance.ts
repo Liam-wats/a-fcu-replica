@@ -94,7 +94,7 @@ export const ARTICLES = [
     date: "March 15, 2026",
     readTime: "5 min read",
     excerpt: "The right choice depends on your current tax bracket and expected future income. Here's how to think through it.",
-    img: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    img: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     category: "Security",

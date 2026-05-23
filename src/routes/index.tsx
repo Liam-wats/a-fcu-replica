@@ -27,7 +27,7 @@ function Index() {
       <OnlineBankingLogin />
       <FeaturedRates />
       <ContentBlock
-        image="https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp"
+        image="/assets/apfcu/alt-content-block-image_online-services_feb26.webp"
         imageAlt="Person using A+ mobile banking app on phone"
         icon="https://aplusfcu.org/wp-content/uploads/global/icons/gray/icon_gray_mobile-banking.svg"
         eyebrow="Online Services"

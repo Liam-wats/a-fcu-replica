@@ -16,7 +16,7 @@ export const ONLINE_BANKING_FEATURES = [
       "Monitor your monthly credit score",
       "Apply for loans and open new accounts",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "bill-pay",
@@ -67,7 +67,7 @@ export const MOBILE_FEATURES = [
       "Peer-to-peer transfers via Zelle®",
       "Access to 85,000+ surcharge-free ATMs via map",
     ],
-    image: "https://aplusfcu.org/wp-content/uploads/global/img/alt-content-block-image_online-services_feb26.webp",
+    image: "/assets/apfcu/alt-content-block-image_online-services_feb26.webp",
   },
   {
     id: "mobile-deposit",
@@ -91,9 +91,9 @@ export const MOBILE_FEATURES = [
 ];
 
 export const DIGITAL_WALLETS = [
-  { name: "Apple Pay", icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_personal-finances.svg", desc: "Add your A+FCU debit or credit card to Apple Wallet for contactless payments on iPhone, Apple Watch, iPad, and Mac." },
-  { name: "Google Pay", icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_vehicle-loans.svg", desc: "Pay in stores, online, or in apps with your Android device using your A+FCU card stored in Google Wallet." },
-  { name: "Samsung Pay", icon: "https://aplusfcu.org/wp-content/uploads/global/icons/color/icon_home-loans.svg", desc: "Use Samsung Pay anywhere you swipe or tap — works with both NFC and MST terminals." },
+  { name: "Apple Pay", icon: "/assets/apfcu/icon_personal-finances.svg", desc: "Add your A+FCU debit or credit card to Apple Wallet for contactless payments on iPhone, Apple Watch, iPad, and Mac." },
+  { name: "Google Pay", icon: "/assets/apfcu/icon_vehicle-loans.svg", desc: "Pay in stores, online, or in apps with your Android device using your A+FCU card stored in Google Wallet." },
+  { name: "Samsung Pay", icon: "/assets/apfcu/icon_home-loans.svg", desc: "Use Samsung Pay anywhere you swipe or tap — works with both NFC and MST terminals." },
 ];
 
 export const MEMBER_SERVICES_LIST = [
