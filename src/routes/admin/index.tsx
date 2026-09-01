@@ -114,6 +114,12 @@ function fmt(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
+function todayInputValue() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60_000).toISOString().slice(0, 10);
+}
+
 function EditDrawer({
   app,
   onClose,
@@ -143,9 +149,10 @@ function EditDrawer({
   const [balSaved, setBalSaved]       = useState(false);
 
   // New transaction form
-  const [txForm, setTxForm] = useState({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
+  const [txForm, setTxForm] = useState({ txn_date: todayInputValue(), description: "", category: "Other", amount: "", txn_type: "debit" });
   const [addingTx, setAddingTx]   = useState(false);
   const [showTxForm, setShowTxForm] = useState(false);
+  const [txError, setTxError] = useState("");
 
   // Edit transaction
   const [editingTxId, setEditingTxId] = useState<number | null>(null);
@@ -245,22 +252,39 @@ function EditDrawer({
   };
 
   const addTransaction = async () => {
-    if (!loginId || !txForm.description || !txForm.amount || !txForm.txn_date) return;
+    if (!loginId) {
+      setTxError("This application needs a Login ID before a transaction can be added.");
+      return;
+    }
+    if (!txForm.description.trim() || !txForm.amount || !txForm.txn_date) {
+      setTxError("Enter a date, description, and amount.");
+      return;
+    }
+    const amount = parseFloat(txForm.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setTxError("Enter an amount greater than $0.");
+      return;
+    }
     setAddingTx(true);
+    setTxError("");
     try {
       const res = await fetch(`/api/member/${loginId}/transactions`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ ...txForm, amount: parseFloat(txForm.amount) }),
+        body: JSON.stringify({ ...txForm, description: txForm.description.trim(), amount }),
       });
       const data = await res.json();
-      if (res.ok && acct) {
+      if (!res.ok) throw new Error(data.error || "Failed to add transaction.");
+      if (acct) {
         setAcct({ ...acct, transactions: [data.transaction, ...acct.transactions] });
-        setTxForm({ txn_date: "", description: "", category: "Other", amount: "", txn_type: "debit" });
+        setTxForm({ txn_date: todayInputValue(), description: "", category: "Other", amount: "", txn_type: "debit" });
+        setTxError("");
         setShowTxForm(false);
         applyNewBalance(data.newBalance);
       }
-    } catch { /* silent */ }
+    } catch (e) {
+      setTxError(e instanceof Error ? e.message : "Failed to add transaction.");
+    }
     finally { setAddingTx(false); }
   };
 
@@ -365,8 +389,6 @@ function EditDrawer({
     });
     if (acct) setAcct({ ...acct, alerts: acct.alerts.filter(a => a.id !== id) });
   };
-
-  const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <>
@@ -593,7 +615,13 @@ function EditDrawer({
                         </p>
                       </div>
                       <button
-                        onClick={() => { setShowTxForm(v => !v); setEditingTxId(null); }}
+                        type="button"
+                        onClick={() => {
+                          setShowTxForm(v => !v);
+                          setEditingTxId(null);
+                          setTxError("");
+                          setTxForm(f => ({ ...f, txn_date: f.txn_date || todayInputValue() }));
+                        }}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-green hover:underline"
                       >
                         <Plus className="w-3 h-3" /> Add
@@ -606,7 +634,7 @@ function EditDrawer({
                           <div>
                             <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Date</label>
                             <input
-                              placeholder={todayStr}
+                              type="date"
                               className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 outline-none focus:border-brand-green"
                               value={txForm.txn_date}
                               onChange={e => setTxForm(f => ({ ...f, txn_date: e.target.value }))}
@@ -662,14 +690,22 @@ function EditDrawer({
                           </div>
                         </div>
                         <div className="flex gap-2 pt-1">
-                          <button onClick={addTransaction} disabled={addingTx}
+                          <button type="button" onClick={addTransaction} disabled={addingTx}
                             className="text-xs font-semibold bg-brand-green text-white px-3 py-1.5 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
                           >
                             {addingTx ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
                             Add Transaction
                           </button>
-                          <button onClick={() => setShowTxForm(false)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                          <button type="button"
+                            onClick={() => { setShowTxForm(false); setTxError(""); }}
+                            className="text-xs text-slate-400 hover:text-slate-600 px-2"
+                          >
+                            Cancel
+                          </button>
                         </div>
+                        {txError && (
+                          <p role="alert" className="text-[11px] font-medium text-red-600">{txError}</p>
+                        )}
                       </div>
                     )}
 
