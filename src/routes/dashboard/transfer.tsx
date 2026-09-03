@@ -358,7 +358,7 @@ function TransferPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleReview} className="space-y-5">
                 <div>
                   <label className="block text-[13px] font-semibold text-ink mb-1.5">
                     Withdrawal Amount
