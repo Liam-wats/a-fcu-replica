@@ -38,7 +38,7 @@ interface LinkForm {
   nickname: string;
 }
 
-type Step = "form" | "success" | "failed";
+type Step = "form" | "review" | "success" | "failed";
 
 interface SuccessDetails {
   amount: number;
@@ -68,6 +68,7 @@ function TransferPage() {
   const [feeError, setFeeError] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState<Step>("form");
+  const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const [sending, setSending] = useState(false);
   const [successDetails, setSuccessDetails] = useState<SuccessDetails | null>(null);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -163,14 +164,32 @@ function TransferPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleReview = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     const num = parseFloat(amount);
     if (!Number.isFinite(num) || num <= 0) return setError("Please enter a valid amount.");
     if (feeLoading) return setError("Transfer fee is still loading. Please try again.");
     if (feeError) return setError(feeError);
-    const total = Math.round((num + transferFee) * 100) / 100;
+    const normalizedAmount = Math.round(num * 100) / 100;
+    const total = Math.round((normalizedAmount + transferFee) * 100) / 100;
+    if (balance && total > balance.available)
+      return setError(`Total charge of ${fmt(total)} exceeds your available balance of ${fmt(balance.available)}.`);
+    if (!linked) return setError("Please link an external account before transferring.");
+    if (!session?.loginId) return setError("Session expired. Please log in again.");
+    setReviewConfirmed(false);
+    setStep("review");
+  };
+
+  const handleConfirm = async () => {
+    setError("");
+    const num = parseFloat(amount);
+    if (!Number.isFinite(num) || num <= 0) return setError("Please enter a valid amount.");
+    if (!reviewConfirmed) return setError("Please confirm the amount and charges before proceeding.");
+    if (feeLoading) return setError("Transfer fee is still loading. Please try again.");
+    if (feeError) return setError(feeError);
+    const normalizedAmount = Math.round(num * 100) / 100;
+    const total = Math.round((normalizedAmount + transferFee) * 100) / 100;
     if (balance && total > balance.available)
       return setError(`Total charge of ${fmt(total)} exceeds your available balance of ${fmt(balance.available)}.`);
     if (!linked) return setError("Please link an external account before transferring.");
@@ -182,7 +201,7 @@ function TransferPage() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({
-          amount: num,
+          amount: normalizedAmount,
           memo: memo.trim() || null,
           bankName: linked.nickname || linked.bank_name,
           accountType: linked.account_type,
@@ -195,9 +214,9 @@ function TransferPage() {
         return;
       }
       setSuccessDetails({
-        amount: num,
-         feeAmount: Number(data.feeAmount ?? transferFee),
-         totalAmount: Number(data.totalAmount ?? total),
+        amount: normalizedAmount,
+        feeAmount: Number(data.feeAmount ?? transferFee),
+        totalAmount: Number(data.totalAmount ?? total),
         bankName: linked.nickname || linked.bank_name,
         accountType: linked.account_type,
         last4: linked.account_number.slice(-4),
@@ -216,7 +235,8 @@ function TransferPage() {
   const accountLabel = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
   const acctNumber = generateAccountNumber(session.referenceNumber);
   const parsedAmount = parseFloat(amount) || 0;
-  const totalAmount = Math.round((parsedAmount + transferFee) * 100) / 100;
+  const normalizedAmount = Math.round(parsedAmount * 100) / 100;
+  const totalAmount = Math.round((normalizedAmount + transferFee) * 100) / 100;
   const afterBalance = balance ? balance.available - totalAmount : null;
   const displayName = linked?.nickname || linked?.bank_name || "";
   const last4 = linked?.account_number.slice(-4) ?? "";
@@ -376,23 +396,6 @@ function TransferPage() {
                   />
                 </div>
 
-                <div className="border border-border divide-y divide-border">
-                  <div className="flex items-center justify-between px-4 py-2.5 text-[13px]">
-                    <span className="text-ink/55">Transfer amount</span>
-                    <span className="font-semibold text-ink">{fmt(parsedAmount)}</span>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-2.5 text-[13px]">
-                    <span className="text-ink/55">Transfer fee</span>
-                    <span className="font-semibold text-ink">
-                      {feeLoading ? "Loading…" : fmt(transferFee)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-3 bg-secondary/30 text-[14px]">
-                    <span className="font-semibold text-ink">Total charged</span>
-                    <span className="font-bold text-ink">{fmt(totalAmount)}</span>
-                  </div>
-                </div>
-
                 <div className="border border-border bg-secondary/30 px-4 py-3 flex items-start gap-2">
                   <Info className="w-3.5 h-3.5 text-ink/35 mt-0.5 shrink-0" />
                   <p className="text-[12px] text-ink/55 leading-relaxed">
@@ -403,14 +406,10 @@ function TransferPage() {
 
                 <button
                   type="submit"
-                  disabled={sending || fetching || feeLoading || !!feeError || !linked || !amount || parsedAmount <= 0 || (!!balance && totalAmount > balance.available)}
+                  disabled={fetching || feeLoading || !!feeError || !linked || !amount || parsedAmount <= 0 || (!!balance && totalAmount > balance.available)}
                   className="w-full bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors"
                 >
-                  {sending ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
-                  ) : (
-                    <><ArrowLeftRight className="w-4 h-4" /> Confirm Withdrawal</>
-                  )}
+                  <><ChevronRight className="w-4 h-4" /> Review Amount & Charges</>
                 </button>
                 {!linked && !linkedLoading && (
                   <p className="text-[11px] text-center text-ink/40">Link an external account above to enable transfers.</p>
@@ -418,6 +417,84 @@ function TransferPage() {
               </form>
             </div>
           </>
+        )}
+
+        {/* ── STEP: REVIEW ── */}
+        {step === "review" && (
+          <div className="px-8 py-8">
+            <div className="mb-6">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-green mb-1">Review Before Submitting</p>
+              <h2 className="font-serif text-2xl text-ink">Confirm your transfer</h2>
+              <p className="text-[13px] text-ink/55 mt-1 leading-relaxed">
+                Review the amount and charges below. Your transfer will not be submitted until you confirm these details.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-5 bg-red-50 border-l-4 border-red-500 text-red-700 text-[13px] px-4 py-3 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> {error}
+              </div>
+            )}
+
+            <div className="border border-border divide-y divide-border mb-5">
+              <div className="flex items-center justify-between px-5 py-3.5 text-[13px]">
+                <span className="text-ink/55">Withdrawal amount</span>
+                <span className="font-semibold text-ink">{fmt(normalizedAmount)}</span>
+              </div>
+              <div className="flex items-center justify-between px-5 py-3.5 text-[13px]">
+                <span className="text-ink/55">Transfer fee</span>
+                <span className="font-semibold text-ink">{fmt(transferFee)}</span>
+              </div>
+              <div className="flex items-center justify-between px-5 py-4 bg-secondary/30 text-[14px]">
+                <span className="font-semibold text-ink">Total charged</span>
+                <span className="font-bold text-ink">{fmt(totalAmount)}</span>
+              </div>
+              <div className="flex items-center justify-between px-5 py-3.5 text-[13px]">
+                <span className="text-ink/55">Remaining balance</span>
+                <span className={`font-semibold ${afterBalance !== null && afterBalance < 0 ? "text-red-500" : "text-brand-green"}`}>
+                  {afterBalance === null ? "—" : fmt(afterBalance)}
+                </span>
+              </div>
+            </div>
+
+            <div className="border border-border bg-secondary/30 px-4 py-3.5 mb-6">
+              <div className="flex items-start gap-3">
+                <input
+                  id="confirm-transfer-details"
+                  type="checkbox"
+                  checked={reviewConfirmed}
+                  onChange={e => { setReviewConfirmed(e.target.checked); setError(""); }}
+                  className="mt-0.5 h-4 w-4 accent-brand-green"
+                />
+                <label htmlFor="confirm-transfer-details" className="text-[13px] text-ink/65 leading-relaxed cursor-pointer">
+                  I confirm that the withdrawal amount of <span className="font-semibold text-ink">{fmt(normalizedAmount)}</span> and the transfer fee of <span className="font-semibold text-ink">{fmt(transferFee)}</span> are correct. I authorize a total charge of <span className="font-semibold text-ink">{fmt(totalAmount)}</span>.
+                </label>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => { setStep("form"); setError(""); setReviewConfirmed(false); }}
+                disabled={sending}
+                className="flex-1 border border-border bg-secondary/40 hover:bg-secondary disabled:opacity-50 text-ink py-3.5 font-semibold text-sm transition-colors"
+              >
+                Edit Amount
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirm}
+                disabled={sending || !reviewConfirmed}
+                className="flex-1 bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors"
+              >
+                {sending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+                ) : (
+                  <><CheckCircle2 className="w-4 h-4" /> Confirm & Submit Transfer</>
+                )}
+              </button>
+            </div>
+          </div>
         )}
 
         {/* ── STEP: SUCCESS ── */}
