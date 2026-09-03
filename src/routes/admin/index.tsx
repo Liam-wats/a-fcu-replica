@@ -280,6 +280,7 @@ function EditDrawer({
         setTxForm({ txn_date: todayInputValue(), description: "", category: "Other", amount: "", txn_type: "debit" });
         setTxError("");
         setShowTxForm(false);
+        startEditTx(data.transaction);
         applyNewBalance(data.newBalance);
       }
     } catch (e) {
@@ -775,13 +776,13 @@ function EditDrawer({
                                   </div>
                                 </div>
                                 <div className="flex gap-2 pt-1">
-                                  <button onClick={() => saveEditTx(tx.id)} disabled={savingTxId === tx.id}
+                                  <button type="button" onClick={() => saveEditTx(tx.id)} disabled={savingTxId === tx.id}
                                     className="text-xs font-semibold bg-brand-green text-white px-3 py-1 rounded hover:bg-brand-green-dark disabled:opacity-50 inline-flex items-center gap-1"
                                   >
                                     {savingTxId === tx.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                                     Save
                                   </button>
-                                  <button onClick={() => setEditingTxId(null)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
+                                  <button type="button" onClick={() => setEditingTxId(null)} className="text-xs text-slate-400 hover:text-slate-600 px-2">Cancel</button>
                                 </div>
                               </div>
                             ) : (
@@ -804,9 +805,11 @@ function EditDrawer({
                                     {tx.txn_type === "debit" ? "−" : "+"}{fmt(Math.abs(tx.amount))}
                                   </span>
                                   <button
+                                    type="button"
                                     onClick={() => startEditTx(tx)}
-                                    className="p-0.5 text-slate-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all"
+                                    className="p-1 text-slate-400 hover:text-blue-500 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                                     title="Edit transaction"
+                                    aria-label={`Edit ${tx.description}`}
                                   >
                                     <Pencil className="w-3 h-3" />
                                   </button>
