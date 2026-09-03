@@ -42,6 +42,8 @@ type Step = "form" | "success" | "failed";
 
 interface SuccessDetails {
   amount: number;
+  feeAmount: number;
+  totalAmount: number;
   bankName: string;
   accountType: string;
   last4: string;
@@ -58,9 +60,12 @@ function TransferPage() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [balance, setBalance] = useState<{ available: number; current: number } | null>(null);
+  const [transferFee, setTransferFee] = useState(0);
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [fetching, setFetching] = useState(true);
+  const [feeLoading, setFeeLoading] = useState(true);
+  const [feeError, setFeeError] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState<Step>("form");
   const [sending, setSending] = useState(false);
@@ -85,6 +90,15 @@ function TransferPage() {
     Promise.all([
       fetch(`/api/member/${s.loginId}/account`, { headers })
         .then(r => r.json()).then(d => setBalance(d.balance)).catch(() => {}),
+      fetch(`/api/member/${s.loginId}/transfer-settings`, { headers })
+        .then(async r => {
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.error || "Unable to load transfer fee.");
+          return d;
+        })
+        .then(d => setTransferFee(Math.max(0, Number(d.feeAmount) || 0)))
+        .catch(() => setFeeError("Unable to load the current transfer fee. Please try again."))
+        .finally(() => setFeeLoading(false)),
       fetch(`/api/member/${s.loginId}/linked-account`, { headers })
         .then(r => r.json()).then(d => setLinked(d.account)).catch(() => {}),
     ]).finally(() => { setFetching(false); setLinkedLoading(false); });
@@ -153,9 +167,12 @@ function TransferPage() {
     e.preventDefault();
     setError("");
     const num = parseFloat(amount);
-    if (!num || num <= 0) return setError("Please enter a valid amount.");
-    if (balance && num > balance.available)
-      return setError(`Amount exceeds your available balance of ${fmt(balance.available)}.`);
+    if (!Number.isFinite(num) || num <= 0) return setError("Please enter a valid amount.");
+    if (feeLoading) return setError("Transfer fee is still loading. Please try again.");
+    if (feeError) return setError(feeError);
+    const total = Math.round((num + transferFee) * 100) / 100;
+    if (balance && total > balance.available)
+      return setError(`Total charge of ${fmt(total)} exceeds your available balance of ${fmt(balance.available)}.`);
     if (!linked) return setError("Please link an external account before transferring.");
     if (!session?.loginId) return setError("Session expired. Please log in again.");
 
@@ -179,6 +196,8 @@ function TransferPage() {
       }
       setSuccessDetails({
         amount: num,
+         feeAmount: Number(data.feeAmount ?? transferFee),
+         totalAmount: Number(data.totalAmount ?? total),
         bankName: linked.nickname || linked.bank_name,
         accountType: linked.account_type,
         last4: linked.account_number.slice(-4),
@@ -197,7 +216,8 @@ function TransferPage() {
   const accountLabel = ACCOUNT_LABELS[session.accountType] ?? session.accountType;
   const acctNumber = generateAccountNumber(session.referenceNumber);
   const parsedAmount = parseFloat(amount) || 0;
-  const afterBalance = balance ? balance.available - parsedAmount : null;
+  const totalAmount = Math.round((parsedAmount + transferFee) * 100) / 100;
+  const afterBalance = balance ? balance.available - totalAmount : null;
   const displayName = linked?.nickname || linked?.bank_name || "";
   const last4 = linked?.account_number.slice(-4) ?? "";
 
@@ -236,7 +256,7 @@ function TransferPage() {
                   <p className="font-serif text-xl font-semibold text-ink">{fmt(balance?.available ?? 0)}</p>
                 )}
               </div>
-              {parsedAmount > 0 && balance && (
+               {parsedAmount > 0 && balance && (
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-ink/35 mb-0.5">After Transfer</p>
                   <p className={`font-serif text-xl font-semibold ${afterBalance! < 0 ? "text-red-500" : "text-brand-green"}`}>
@@ -356,6 +376,23 @@ function TransferPage() {
                   />
                 </div>
 
+                <div className="border border-border divide-y divide-border">
+                  <div className="flex items-center justify-between px-4 py-2.5 text-[13px]">
+                    <span className="text-ink/55">Transfer amount</span>
+                    <span className="font-semibold text-ink">{fmt(parsedAmount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between px-4 py-2.5 text-[13px]">
+                    <span className="text-ink/55">Transfer fee</span>
+                    <span className="font-semibold text-ink">
+                      {feeLoading ? "Loading…" : fmt(transferFee)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between px-4 py-3 bg-secondary/30 text-[14px]">
+                    <span className="font-semibold text-ink">Total charged</span>
+                    <span className="font-bold text-ink">{fmt(totalAmount)}</span>
+                  </div>
+                </div>
+
                 <div className="border border-border bg-secondary/30 px-4 py-3 flex items-start gap-2">
                   <Info className="w-3.5 h-3.5 text-ink/35 mt-0.5 shrink-0" />
                   <p className="text-[12px] text-ink/55 leading-relaxed">
@@ -366,7 +403,7 @@ function TransferPage() {
 
                 <button
                   type="submit"
-                  disabled={sending || fetching || !linked || !amount || parsedAmount <= 0 || (!!balance && parsedAmount > balance.available)}
+                  disabled={sending || fetching || feeLoading || !!feeError || !linked || !amount || parsedAmount <= 0 || (!!balance && totalAmount > balance.available)}
                   className="w-full bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors"
                 >
                   {sending ? (
@@ -393,7 +430,8 @@ function TransferPage() {
             <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed mb-6">
               Your transfer of{" "}
               <span className="font-semibold text-ink">{fmt(successDetails.amount)}</span>{" "}
-              to <span className="font-semibold text-ink">{successDetails.bankName}</span> has been processed.
+              to <span className="font-semibold text-ink">{successDetails.bankName}</span> has been processed. The total charge is{" "}
+              <span className="font-semibold text-ink">{fmt(successDetails.totalAmount)}</span>.
             </p>
 
             {/* Summary box */}
@@ -401,6 +439,14 @@ function TransferPage() {
               <div className="flex justify-between px-5 py-3">
                 <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Amount</span>
                 <span className="text-[13px] font-bold text-red-600">−{fmt(successDetails.amount)}</span>
+              </div>
+              <div className="flex justify-between px-5 py-3">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Transfer Fee</span>
+                <span className="text-[13px] font-semibold text-ink">{fmt(successDetails.feeAmount)}</span>
+              </div>
+              <div className="flex justify-between px-5 py-3 bg-secondary/30">
+                <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Total Charged</span>
+                <span className="text-[13px] font-bold text-red-600">−{fmt(successDetails.totalAmount)}</span>
               </div>
               <div className="flex justify-between px-5 py-3">
                 <span className="text-[12px] text-ink/40 font-semibold uppercase tracking-wide">Sent To</span>
