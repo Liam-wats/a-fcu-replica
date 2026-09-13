@@ -574,7 +574,7 @@ function TransferPage() {
             <h2 className="font-serif text-xl text-ink mb-2">Transfer Failed</h2>
             <p className="text-[13px] text-ink/55 max-w-sm leading-relaxed mb-8">
               We were unable to process your transfer at this time. No funds have been deducted from your account.
-               Please try again or contact member services at <span className="font-semibold text-ink">689318829</span>.
+               Please try again or contact member services at <span className="font-semibold text-ink">689.318.829</span>.
             </p>
             <div className="flex gap-3 w-full">
               <button

@@ -44,11 +44,11 @@ export function Footer() {
             </div>
             <p className="text-xs text-ink/70 mt-8 max-w-lg italic leading-relaxed">
               If you're using a screen reader and are having problems using this website, please call{" "}
-              <a href="tel:689318829" className="underline">689318829</a> for assistance.
+              <a href="tel:689318829" className="underline">689.318.829</a> for assistance.
             </p>
             <p className="text-xs text-ink/70 mt-3 max-w-lg italic leading-relaxed">
               Since changes may be made to the info on our website without advance notice, for the most up-to-date information, please call{" "}
-              <a href="tel:689318829" className="underline">689318829</a>.
+              <a href="tel:689318829" className="underline">689.318.829</a>.
             </p>
           </div>
 

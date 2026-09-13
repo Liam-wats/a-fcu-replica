@@ -354,7 +354,7 @@ function DashboardLayout() {
         <div className="container-x py-4 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-ink/45 flex-wrap">
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <a href="tel:689318829" className="flex items-center gap-1 hover:text-brand-green transition-colors">
-              <Phone className="w-3 h-3" /> 689318829
+              <Phone className="w-3 h-3" /> (689) 318-829
             </a>
             <Link to="/locations" className="flex items-center gap-1 hover:text-brand-green transition-colors">
               <MapPin className="w-3 h-3" /> Locations

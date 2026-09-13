@@ -27,7 +27,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 const PAYMENT_OPTIONS = [
   { icon: "📱", title: "A+ Mobile App", desc: "Make transfers and loan payments instantly from your phone — available on iOS and Android.", cta: "Download the App", href: "/services/mobile-banking" },
   { icon: "💻", title: "A+ Online Banking", desc: "Log in to make a one-time or recurring loan payment, transfer funds, or pay a bill.", cta: "Log In to Online Banking", href: "#" },
-  { icon: "📞", title: "Phone Payment", desc: "Call 689318829 to make a payment by phone. Available 24/7 for automated payments.", cta: "Call 689318829", href: "tel:689318829" },
+  { icon: "📞", title: "Phone Payment", desc: "Call 689-318-829 to make a payment by phone. Available 24/7 for automated payments.", cta: "Call 689-318-829", href: "tel:689318829" },
   { icon: "🏦", title: "Branch Payment", desc: "Visit any of our 20+ A+FCU branches to make a payment in person with a teller.", cta: "Find a Branch", href: "#" },
   { icon: "✉️", title: "Mail a Check", desc: "Mail a check to: A+FCU, PO Box 14867, Austin, TX 78761. Include your account number on the memo line.", cta: null, href: null },
 ];

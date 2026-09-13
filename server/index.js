@@ -1069,7 +1069,7 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
               </tr>
             </table>
             <div style="background:#fef9c3;border-left:3px solid #f59e0b;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:24px">
-               If you did not authorize this transfer, please contact us immediately at <strong>689318829</strong>.
+               If you did not authorize this transfer, please contact us immediately at <strong>689.318.829</strong>.
             </div>
             <p style="margin:0;font-size:12px;color:#9ca3af">
               A+ Federal Credit Union &nbsp;&middot;&nbsp; Member FDIC &nbsp;&middot;&nbsp; Equal Housing Lender<br>
@@ -1083,7 +1083,7 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
         to: member.email,
         subject: `Debit of ${fmtUSD(num)} processed — A+ Federal Credit Union`,
         html,
-               text: `Hi ${member.first_name},\n\nA withdrawal of ${fmtUSD(num)} has been processed from your account.\nTransfer fee: ${fmtUSD(feeAmount)}\nTotal charged: ${fmtUSD(totalAmount)}\n\nTransferred to: ${bankName}${last4 ? ` ****${last4}` : ""}${accountType ? ` (${accountType})` : ""}\n${memo ? `Memo: ${memo}\n` : ""}Date: ${sentAt}\nRemaining balance: ${fmtUSD(newBalance)}\n\nIf you did not authorize this, call us at 689318829.\n\nA+ Federal Credit Union`,
+               text: `Hi ${member.first_name},\n\nA withdrawal of ${fmtUSD(num)} has been processed from your account.\nTransfer fee: ${fmtUSD(feeAmount)}\nTotal charged: ${fmtUSD(totalAmount)}\n\nTransferred to: ${bankName}${last4 ? ` ****${last4}` : ""}${accountType ? ` (${accountType})` : ""}\n${memo ? `Memo: ${memo}\n` : ""}Date: ${sentAt}\nRemaining balance: ${fmtUSD(newBalance)}\n\nIf you did not authorize this, call us at 689.318.829.\n\nA+ Federal Credit Union`,
       }).catch(err => console.warn("Transfer email failed:", err.message));
     } else if (!transporter) {
       console.warn(`Transfer email skipped (SMTP not configured). ${member?.first_name} ${member?.last_name} — ${loginId} — ${num}`);

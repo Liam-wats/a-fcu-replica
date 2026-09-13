@@ -277,7 +277,7 @@ function LoginPage() {
             <p className="mt-8 text-center text-[11px] text-ink/40 leading-relaxed">
               Need help? Call{" "}
                <a href="tel:689318829" className="text-brand-green hover:underline">
-                 689318829
+                 (689) 318-829
               </a>
               {" "}· Mon–Fri 8am–6pm CT
             </p>

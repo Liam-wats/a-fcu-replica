@@ -21,7 +21,7 @@ export const Route = createFileRoute("/contact-us")({
 });
 
 const CHANNELS = [
-  { icon: Phone, title: "Call Us", lines: ["689318829"] },
+  { icon: Phone, title: "Call Us", lines: ["689.318.829"] },
   { icon: Mail, title: "Message Us", lines: ["Send a secure message", "from Online Banking"] },
   { icon: MapPin, title: "Visit Us", lines: ["27 branches across", "Central Texas"] },
   { icon: Clock, title: "Hours", lines: ["Mon–Fri 9am–6pm", "Sat 9am–1pm"] },

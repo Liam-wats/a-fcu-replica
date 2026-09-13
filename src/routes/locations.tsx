@@ -15,12 +15,12 @@ export const Route = createFileRoute("/locations")({
 });
 
 const BRANCHES = [
-  { name: "North Austin", address: "12700 Research Blvd, Austin, TX", phone: "689318829" },
-  { name: "South Austin", address: "4611 S Lamar Blvd, Austin, TX", phone: "689318829" },
-  { name: "Round Rock", address: "201 University Blvd, Round Rock, TX", phone: "689318829" },
-  { name: "Cedar Park", address: "1335 E Whitestone Blvd, Cedar Park, TX", phone: "689318829" },
-  { name: "Pflugerville", address: "1817 FM 685, Pflugerville, TX", phone: "689318829" },
-  { name: "San Marcos", address: "1340 Wonder World Dr, San Marcos, TX", phone: "689318829" },
+  { name: "North Austin", address: "12700 Research Blvd, Austin, TX", phone: "689.318.829" },
+  { name: "South Austin", address: "4611 S Lamar Blvd, Austin, TX", phone: "689.318.829" },
+  { name: "Round Rock", address: "201 University Blvd, Round Rock, TX", phone: "689.318.829" },
+  { name: "Cedar Park", address: "1335 E Whitestone Blvd, Cedar Park, TX", phone: "689.318.829" },
+  { name: "Pflugerville", address: "1817 FM 685, Pflugerville, TX", phone: "689.318.829" },
+  { name: "San Marcos", address: "1340 Wonder World Dr, San Marcos, TX", phone: "689.318.829" },
 ];
 
 function LocationsPage() {
