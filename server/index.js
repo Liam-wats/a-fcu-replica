@@ -90,13 +90,8 @@ async function migrateAccountData() {
       category TEXT DEFAULT 'Other',
       amount NUMERIC NOT NULL,
       txn_type TEXT DEFAULT 'debit',
-      fee_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
-  `);
-  await pool.query(`
-    ALTER TABLE member_transactions
-      ADD COLUMN IF NOT EXISTS fee_amount NUMERIC(12, 2) NOT NULL DEFAULT 0
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS member_alerts (
@@ -107,18 +102,6 @@ async function migrateAccountData() {
       alert_type TEXT DEFAULT 'info',
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
-  `);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS transfer_settings (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      fee_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `);
-  await pool.query(`
-    INSERT INTO transfer_settings (id, fee_amount)
-    VALUES (1, 0)
-    ON CONFLICT (id) DO NOTHING
   `);
 }
 migrateAccountData().catch((err) => console.warn("DB migrateAccountData skipped:", err.message));
@@ -201,13 +184,6 @@ function requireAdmin(req, res, next) {
   } catch {
     return res.status(401).json({ error: "Admin session expired." });
   }
-}
-
-async function getTransferFee(db = pool) {
-  const result = await db.query(
-    "SELECT fee_amount FROM transfer_settings WHERE id = 1"
-  );
-  return Math.max(0, Number.parseFloat(result.rows[0]?.fee_amount ?? "0") || 0);
 }
 
 // ── Email transporter ────────────────────────────────────────────────────────
@@ -426,42 +402,6 @@ app.post("/api/admin/login", (req, res) => {
 // GET /api/admin/verify — validate an admin JWT
 app.get("/api/admin/verify", requireAdmin, (req, res) => {
   res.json({ valid: true });
-});
-
-// GET /api/admin/transfer-settings — read the current transfer fee
-app.get("/api/admin/transfer-settings", requireAdmin, async (_req, res) => {
-  try {
-    return res.json({ feeAmount: await getTransferFee() });
-  } catch (err) {
-    console.error("Error fetching transfer settings:", err);
-    return res.status(500).json({ error: "Failed to fetch transfer settings." });
-  }
-});
-
-// PUT /api/admin/transfer-settings — update the fee used by future transfers
-app.put("/api/admin/transfer-settings", requireAdmin, async (req, res) => {
-  const feeAmount = Number.parseFloat(req.body?.feeAmount);
-  if (!Number.isFinite(feeAmount) || feeAmount < 0) {
-    return res.status(400).json({ error: "Transfer fee must be a non-negative amount." });
-  }
-  const normalizedFee = Math.round(feeAmount * 100) / 100;
-  try {
-    const result = await pool.query(
-      `INSERT INTO transfer_settings (id, fee_amount, updated_at)
-       VALUES (1, $1, NOW())
-       ON CONFLICT (id) DO UPDATE SET fee_amount = EXCLUDED.fee_amount, updated_at = NOW()
-       RETURNING fee_amount, updated_at`,
-      [normalizedFee]
-    );
-    return res.json({
-      success: true,
-      feeAmount: Number.parseFloat(result.rows[0].fee_amount),
-      updatedAt: result.rows[0].updated_at,
-    });
-  } catch (err) {
-    console.error("Error updating transfer settings:", err);
-    return res.status(500).json({ error: "Failed to save transfer settings." });
-  }
 });
 
 // ── Application endpoints ────────────────────────────────────────────────────
@@ -786,18 +726,6 @@ app.get("/api/member/:loginId/account", requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/member/:loginId/transfer-settings — member-readable current fee
-app.get("/api/member/:loginId/transfer-settings", requireAuth, async (req, res) => {
-  const { loginId } = req.params;
-  if (req.user.loginId !== loginId) return res.status(403).json({ error: "Access denied." });
-  try {
-    return res.json({ feeAmount: await getTransferFee() });
-  } catch (err) {
-    console.error("Error fetching member transfer settings:", err);
-    return res.status(500).json({ error: "Failed to fetch transfer settings." });
-  }
-});
-
 // ── Linked External Account endpoints ────────────────────────────────────────
 
 // POST /api/member/:loginId/deposit — submit a mobile check deposit with images
@@ -976,27 +904,18 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
   const num = parseFloat(amount);
   if (!num || num <= 0) return res.status(400).json({ error: "Invalid amount." });
 
-  let client;
   try {
-    client = await pool.connect();
-    await client.query("BEGIN");
-
-    // Read the fee at submission time so every transfer gets an immutable snapshot.
-    const feeAmount = await getTransferFee(client);
-    const totalAmount = Math.round((num + feeAmount) * 100) / 100;
-
     // Check current balance
-    const balRes = await client.query(
-      "SELECT available_balance FROM member_balances WHERE login_id = $1 FOR UPDATE", [loginId]
+    const balRes = await pool.query(
+      "SELECT available_balance FROM member_balances WHERE login_id = $1", [loginId]
     );
     const available = parseFloat(balRes.rows[0]?.available_balance ?? 0);
-    if (totalAmount > available) {
-      await client.query("ROLLBACK");
+    if (num > available) {
       return res.status(400).json({ error: "Insufficient funds." });
     }
 
     // Fetch member info for email
-    const memRes = await client.query(
+    const memRes = await pool.query(
       "SELECT first_name, last_name, email FROM membership_applications WHERE login_id = $1",
       [loginId]
     );
@@ -1007,13 +926,11 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
     const description = memo
       ? `Transfer to ${bankName} — ${memo}`
       : `Transfer to ${bankName}`;
-    const txRes = await client.query(
-      `INSERT INTO member_transactions (login_id, txn_date, description, category, amount, txn_type, fee_amount)
-       VALUES ($1, $2, $3, 'Transfer', $4, 'debit', $5) RETURNING *`,
-      [loginId, txnDate, description, num, feeAmount]
+    const txRes = await pool.query(
+      `INSERT INTO member_transactions (login_id, txn_date, description, category, amount, txn_type)
+       VALUES ($1, $2, $3, 'Transfer', $4, 'debit') RETURNING *`,
+      [loginId, txnDate, description, num]
     );
-
-    await client.query("COMMIT");
 
     // Recalc and persist balance
     const newBalance = await recalcBalance(loginId);
@@ -1047,14 +964,6 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
                 <td style="padding:10px 0;font-weight:700;color:#dc2626;font-size:16px">&minus;${fmtUSD(num)}</td>
               </tr>
               <tr style="border-bottom:1px solid #f3f4f6">
-                <td style="padding:10px 0;color:#6b7280">Transfer Fee</td>
-                <td style="padding:10px 0;color:#111827">${fmtUSD(feeAmount)}</td>
-              </tr>
-              <tr style="border-bottom:1px solid #f3f4f6">
-                <td style="padding:10px 0;color:#6b7280">Total Charged</td>
-                <td style="padding:10px 0;font-weight:700;color:#dc2626">${fmtUSD(totalAmount)}</td>
-              </tr>
-              <tr style="border-bottom:1px solid #f3f4f6">
                 <td style="padding:10px 0;color:#6b7280">Transferred To</td>
                 <td style="padding:10px 0;font-weight:600;color:#111827">${bankName}${last4 ? ` &bull;&bull;&bull;&bull; ${last4}` : ""}${accountType ? ` (${accountType})` : ""}</td>
               </tr>
@@ -1069,7 +978,7 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
               </tr>
             </table>
             <div style="background:#fef9c3;border-left:3px solid #f59e0b;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:24px">
-               If you did not authorize this transfer, please contact us immediately at <strong>689.318.829</strong>.
+              If you did not authorize this transfer, please contact us immediately at <strong>512.302.6800</strong>.
             </div>
             <p style="margin:0;font-size:12px;color:#9ca3af">
               A+ Federal Credit Union &nbsp;&middot;&nbsp; Member FDIC &nbsp;&middot;&nbsp; Equal Housing Lender<br>
@@ -1083,7 +992,7 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
         to: member.email,
         subject: `Debit of ${fmtUSD(num)} processed — A+ Federal Credit Union`,
         html,
-               text: `Hi ${member.first_name},\n\nA withdrawal of ${fmtUSD(num)} has been processed from your account.\nTransfer fee: ${fmtUSD(feeAmount)}\nTotal charged: ${fmtUSD(totalAmount)}\n\nTransferred to: ${bankName}${last4 ? ` ****${last4}` : ""}${accountType ? ` (${accountType})` : ""}\n${memo ? `Memo: ${memo}\n` : ""}Date: ${sentAt}\nRemaining balance: ${fmtUSD(newBalance)}\n\nIf you did not authorize this, call us at 689.318.829.\n\nA+ Federal Credit Union`,
+        text: `Hi ${member.first_name},\n\nA withdrawal of ${fmtUSD(num)} has been processed from your account.\n\nTransferred to: ${bankName}${last4 ? ` ****${last4}` : ""}${accountType ? ` (${accountType})` : ""}\n${memo ? `Memo: ${memo}\n` : ""}Date: ${sentAt}\nRemaining balance: ${fmtUSD(newBalance)}\n\nIf you did not authorize this, call us at 512.302.6800.\n\nA+ Federal Credit Union`,
       }).catch(err => console.warn("Transfer email failed:", err.message));
     } else if (!transporter) {
       console.warn(`Transfer email skipped (SMTP not configured). ${member?.first_name} ${member?.last_name} — ${loginId} — ${num}`);
@@ -1093,16 +1002,10 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
       success: true,
       transaction: txRes.rows[0],
       newBalance,
-      transferAmount: num,
-      feeAmount,
-      totalAmount,
     });
   } catch (err) {
-    if (client) await client.query("ROLLBACK").catch(() => {});
     console.error("Transfer error:", err);
     return res.status(500).json({ error: "Transfer failed. Please try again." });
-  } finally {
-    client?.release();
   }
 });
 
@@ -1110,7 +1013,7 @@ app.post("/api/member/:loginId/transfer", requireAuth, async (req, res) => {
 async function recalcBalance(loginId) {
   const txRes = await pool.query(
     `SELECT COALESCE(
-       SUM(CASE WHEN txn_type = 'credit' THEN amount ELSE -(amount + COALESCE(fee_amount, 0)) END), 0
+       SUM(CASE WHEN txn_type = 'credit' THEN amount ELSE -amount END), 0
      ) AS net
      FROM member_transactions WHERE login_id = $1`,
     [loginId]

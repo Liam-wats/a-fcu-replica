@@ -202,7 +202,7 @@ function LoginPage() {
                   <label htmlFor="password" className="text-[13px] font-semibold text-ink tracking-wide">
                     Password
                   </label>
-                  <a href="tel:689318829" className="text-[12px] text-brand-green hover:underline underline-offset-4">
+                  <a href="tel:5123026800" className="text-[12px] text-brand-green hover:underline underline-offset-4">
                     Forgot password?
                   </a>
                 </div>
@@ -253,10 +253,10 @@ function LoginPage() {
               <Link to="/join" className="text-[12px] text-brand-green hover:underline underline-offset-4">
                 Enroll in Online Banking
               </Link>
-              <a href="tel:689318829" className="text-[12px] text-brand-green hover:underline underline-offset-4">
+              <a href="tel:5123026800" className="text-[12px] text-brand-green hover:underline underline-offset-4">
                 Forgot ID?
               </a>
-              <a href="tel:689318829" className="text-[12px] text-brand-green hover:underline underline-offset-4">
+              <a href="tel:5123026800" className="text-[12px] text-brand-green hover:underline underline-offset-4">
                 Unlock Account
               </a>
             </div>
@@ -276,8 +276,8 @@ function LoginPage() {
             {/* Help line */}
             <p className="mt-8 text-center text-[11px] text-ink/40 leading-relaxed">
               Need help? Call{" "}
-               <a href="tel:689318829" className="text-brand-green hover:underline">
-                 (689) 318-829
+              <a href="tel:5123026800" className="text-brand-green hover:underline">
+                (512) 302-6800
               </a>
               {" "}· Mon–Fri 8am–6pm CT
             </p>

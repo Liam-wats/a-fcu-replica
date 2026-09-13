@@ -397,8 +397,8 @@ function DashboardOverview() {
             <p className="text-[13px] font-bold text-ink">Need Help?</p>
           </div>
           <div className="space-y-2.5 text-[13px]">
-            <a href="tel:689318829" className="flex items-center gap-2 text-ink/60 hover:text-brand-green transition-colors">
-              <Phone className="w-3.5 h-3.5" /> (689) 318-829
+            <a href="tel:5123026800" className="flex items-center gap-2 text-ink/60 hover:text-brand-green transition-colors">
+              <Phone className="w-3.5 h-3.5" /> (512) 302-6800
             </a>
             <Link to="/locations" className="flex items-center gap-2 text-ink/60 hover:text-brand-green transition-colors">
               <MapPin className="w-3.5 h-3.5" /> Find a Branch or ATM
