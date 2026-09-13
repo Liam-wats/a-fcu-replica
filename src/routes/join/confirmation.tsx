@@ -141,7 +141,7 @@ function ConfirmationPage() {
       {saveStatus === "error" && (
         <div className="flex items-center justify-center gap-2 text-xs text-destructive mb-6">
           <AlertCircle className="w-3.5 h-3.5" />
-          We couldn't save your application right now — please call us at (512) 302-6800.
+          We couldn't save your application right now — please call us at (689) 318-829.
         </div>
       )}
 

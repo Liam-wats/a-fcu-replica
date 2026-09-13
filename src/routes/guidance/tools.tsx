@@ -27,7 +27,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 const PAYMENT_OPTIONS = [
   { icon: "📱", title: "A+ Mobile App", desc: "Make transfers and loan payments instantly from your phone — available on iOS and Android.", cta: "Download the App", href: "/services/mobile-banking" },
   { icon: "💻", title: "A+ Online Banking", desc: "Log in to make a one-time or recurring loan payment, transfer funds, or pay a bill.", cta: "Log In to Online Banking", href: "#" },
-  { icon: "📞", title: "Phone Payment", desc: "Call 1-800-252-8148 to make a payment by phone. Available 24/7 for automated payments.", cta: "Call 1-800-252-8148", href: "tel:18002528148" },
+  { icon: "📞", title: "Phone Payment", desc: "Call 689-318-829 to make a payment by phone. Available 24/7 for automated payments.", cta: "Call 689-318-829", href: "tel:689318829" },
   { icon: "🏦", title: "Branch Payment", desc: "Visit any of our 20+ A+FCU branches to make a payment in person with a teller.", cta: "Find a Branch", href: "#" },
   { icon: "✉️", title: "Mail a Check", desc: "Mail a check to: A+FCU, PO Box 14867, Austin, TX 78761. Include your account number on the memo line.", cta: null, href: null },
 ];
@@ -141,7 +141,7 @@ function ToolsPage() {
               </div>
             </div>
             <div className="flex gap-3 shrink-0">
-              <a href="tel:18002528148" className="inline-flex items-center gap-1.5 bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 font-semibold text-sm transition-colors">
+              <a href="tel:689318829" className="inline-flex items-center gap-1.5 bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2 font-semibold text-sm transition-colors">
                 Call Us
               </a>
               <a href="#" className="inline-flex items-center gap-1.5 border border-border hover:border-brand-green text-ink px-4 py-2 font-semibold text-sm transition-colors">
