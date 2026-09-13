@@ -28,7 +28,7 @@ const CATEGORIES = [
 
 const FEATURED = [
   { label: "Routing Number", value: "314977405", note: "For direct deposit & wire transfers" },
-  { label: "24/7 Phone Support", value: "1-800-252-8148", note: "Lost/stolen cards & account support" },
+  { label: "24/7 Phone Support", value: "689318829", note: "Lost/stolen cards & account support" },
   { label: "Best CD Rate", value: "4.33% APY", note: "12-Month Certificate — $500 min." },
 ];
 

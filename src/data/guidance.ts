@@ -168,7 +168,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How do I report a lost or stolen debit/credit card?",
-    a: "You can instantly freeze your card in the A+ Mobile App or A+ Online Banking. To report it lost or stolen, call us 24/7 at 1-800-252-8148 or visit any branch.",
+    a: "You can instantly freeze your card in the A+ Mobile App or A+ Online Banking. To report it lost or stolen, call us 24/7 at 689318829 or visit any branch.",
   },
   {
     q: "Can I use my A+FCU debit card at any ATM?",
@@ -188,7 +188,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How do I dispute a transaction?",
-    a: "If you see a charge you don't recognize, first try to identify the merchant. If you still believe it's unauthorized, contact us at 1-800-252-8148 or visit any branch to file a dispute. For debit card disputes, act within 60 days of the statement date.",
+    a: "If you see a charge you don't recognize, first try to identify the merchant. If you still believe it's unauthorized, contact us at 689318829 or visit any branch to file a dispute. For debit card disputes, act within 60 days of the statement date.",
   },
 ];
 
